@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>อัตราการเกิดปฏิกิริยาเคมี — สารบัญ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#D9DEDA; --panel:#F7F8F6; --panel-2:#ECEFEB;
+  --ink:#171D1B; --ink-2:#5A6461; --ink-3:#8B948F;
+  --rule:#BAC2BD; --rule-2:#D5DBD6;
+  --index:#C0301A; --index-soft:#F2D9D3;
+  --cobalt:#17457F; --cobalt-soft:#D6E0EE;
+  --engrave: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06);
+  --sans:"Anuphan",system-ui,sans-serif;
+  --tech:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%}
+.wrap{max-width:1000px;margin:0 auto;padding:clamp(20px,4vw,56px)}
+
+.plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
+.plate>div{background:var(--panel);padding:.55em 1em;box-shadow:var(--engrave)}
+.plate .grow{flex:1 1 320px}
+.plate .lbl{font-family:var(--tech);font-weight:600;font-size:.62em;letter-spacing:.22em;
+  color:var(--ink-3);display:block;line-height:1.6}
+.plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
+
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(2rem,4.2vw,3.4rem);line-height:1.2;
+  letter-spacing:-.02em;margin:1.1em 0 .3em;max-width:20ch}
+h1 em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .34em no-repeat}
+.dek{font-size:1.05em;color:var(--ink-2);max-width:56ch;margin:0 0 2em}
+
+.toc{display:grid;gap:2px;background:var(--rule);border:2px solid var(--ink)}
+.toc a{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.1em;
+  background:var(--panel);padding:1.1em 1.3em;text-decoration:none;color:var(--ink);
+  transition:background .12s}
+.toc a:hover{background:var(--panel-2)}
+.toc a.soon{opacity:.55;pointer-events:none}
+.toc .no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:1.5em;color:var(--index);line-height:1;width:1.6em}
+.toc .tt{font-family:var(--tech);font-weight:700;font-size:1.05em;display:block}
+.toc .dd{font-family:var(--sans);font-size:.72em;color:var(--ink-2);margin-top:.3em;font-weight:400;display:block}
+.toc .go{font-family:var(--tech);font-weight:600;font-size:.7em;letter-spacing:.12em;
+  color:var(--cobalt);white-space:nowrap}
+.toc a.soon .go{color:var(--ink-3)}
+
+footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.6em 0 1em;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="plate">
+    <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
+    <div><span class="lbl">จำนวนแผง</span><span class="val">2 / 7 พร้อมใช้</span></div>
+  </div>
+
+  <h1>สื่อการสอน<br><em>อัตราการเกิดปฏิกิริยาเคมี</em></h1>
+  <p class="dek">ชุดหน้าเรียนสำหรับฉายในห้องเรียน แต่ละแผงยืนด้วยตัวเองได้ ทุกแผงมีกราฟโต้ตอบและแบบฝึกหัดพร้อมเฉลย</p>
+
+  <nav class="toc">
+    <a href="01-rate-definition.html">
+      <span class="no">01</span>
+      <span><span class="tt">อัตราการเกิดปฏิกิริยาคืออะไร</span><span class="dd">นิยาม · อัตราเฉลี่ย · อัตรา ณ ขณะหนึ่ง · สัมประสิทธิ์ · วิธีวัด</span></span>
+      <span class="go">เปิดแผง ▸</span>
+    </a>
+    <a href="02-collision-theory.html">
+      <span class="no">02</span>
+      <span><span class="tt">ทฤษฎีการชน</span><span class="dd">เงื่อนไขการชน · พลังงานก่อกัมมันต์ · การกระจายพลังงานจลน์กับอุณหภูมิ</span></span>
+      <span class="go">เปิดแผง ▸</span>
+    </a>
+    <a class="soon">
+      <span class="no">03</span>
+      <span><span class="tt">แผนภาพพลังงานของปฏิกิริยา</span><span class="dd">กำลังจัดทำ</span></span>
+      <span class="go">เร็ว ๆ นี้</span>
+    </a>
+    <a class="soon">
+      <span class="no">04</span>
+      <span><span class="tt">ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยา</span><span class="dd">กำลังจัดทำ</span></span>
+      <span class="go">เร็ว ๆ นี้</span>
+    </a>
+    <a class="soon">
+      <span class="no">05</span>
+      <span><span class="tt">กฎอัตราและอันดับของปฏิกิริยา</span><span class="dd">กำลังจัดทำ</span></span>
+      <span class="go">เร็ว ๆ นี้</span>
+    </a>
+    <a class="soon">
+      <span class="no">06</span>
+      <span><span class="tt">กลไกของปฏิกิริยา</span><span class="dd">กำลังจัดทำ</span></span>
+      <span class="go">เร็ว ๆ นี้</span>
+    </a>
+    <a class="soon">
+      <span class="no">07</span>
+      <span><span class="tt">การเชื่อมโยงและการประยุกต์</span><span class="dd">กำลังจัดทำ</span></span>
+      <span class="go">เร็ว ๆ นี้</span>
+    </a>
+  </nav>
+
+  <footer>อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+</div>
+</body>
+</html>
