@@ -1,0 +1,194 @@
+<title>ตัวอย่าง C — กระดานเรียน</title>
+<!--
+THESIS: อัตราคือสิ่งที่ครูลากให้ดูบนกระดานสด ๆ หน้านี้จึงเป็นกระดานเรียนที่เขียนอยู่ ปฏิเสธการ์ดพาสเทลแบบ edtech และหน้ากระดาษครีม-เซริฟแบบตำรา
+OWN-WORLD: กระดานสีเขียวเข้ม เส้นชอล์กขาวขอบฟุ้ง ชอล์กสีเหลืองและสีชมพูส้ม กรอบวาดมือ รางไม้วางชอล์กใต้กระดาน
+STORY: ครูเลื่อนหมุดสองอันบนกระดาน เส้นชอล์กเหลืองหมุนตาม พอบีบจนชิดเส้นชมพูส้มถูกลากทับเป็นเส้นสัมผัส
+FIRST VIEWPORT: หัวกระดานเขียนชื่อเรื่องด้วยชอล์ก กราฟวาดกลางกระดาน ค่าที่อ่านได้เขียนเป็นรายการทางขวา รางชอล์กไม้อยู่ใต้กระดานทำหน้าที่เป็นแถบควบคุม
+FORM: กระดานเรียน อันดับ 3 ของรายการ, staging กระดานเขียวเต็มจอโหมดเดียว, seed 17bfc58f
+-->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=Anuphan:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --board:#1B3A2E; --board-2:#224637; --chalk:#F1EFE4; --chalk-2:#C3CCC0; --chalk-3:#8FA096;
+  --y:#F3D257; --p:#F49480; --wood:#8A6136; --wood-2:#6E4C29;
+  --c-curve:#F1EFE4; --c-sec:#F3D257; --c-tan:#F49480;
+  --c-axis:#F1EFE4; --c-lbl:#C3CCC0; --c-grid:#2E5546; --c-grid2:#3C6A57;
+  --sans:"Anuphan",system-ui,sans-serif; --form:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--board);color:var(--chalk);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%;
+  background-image:radial-gradient(circle at 22% 18%, rgba(255,255,255,.045), transparent 42%),
+                   radial-gradient(circle at 78% 72%, rgba(255,255,255,.035), transparent 46%)}
+.sheet{max-width:1400px;margin:0 auto;padding:clamp(18px,2.4vw,40px)}
+.eyebrow{font-family:var(--form);font-weight:600;font-size:.68em;letter-spacing:.26em;color:var(--chalk-3);
+  display:flex;gap:1.4em;flex-wrap:wrap;margin-bottom:.5em}
+.board-title{font-family:var(--form);font-weight:700;font-size:clamp(1.6rem,3vw,2.6rem);margin:0 0 .5em;
+  border-bottom:3px solid var(--chalk-3);padding-bottom:.25em;letter-spacing:-.01em}
+.board-title span{color:var(--y)}
+
+.rig{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:clamp(14px,2vw,30px);align-items:start}
+svg.chart{display:block;width:100%;height:auto;touch-action:none}
+.read{display:flex;flex-direction:column;gap:1.5em;padding-top:.6em}
+.read .lbl{font-family:var(--form);font-weight:600;font-size:.62em;letter-spacing:.2em;color:var(--chalk-3);display:block}
+.read .num{font-family:var(--form);font-weight:700;font-size:clamp(2.2rem,3.6vw,3.4rem);line-height:1.05;
+  font-variant-numeric:tabular-nums;display:block;letter-spacing:-.02em}
+.read .u{font-family:var(--form);font-size:.62em;color:var(--chalk-2)}
+.read .y .num{color:var(--y)} .read .p .num{color:var(--p)}
+.key{font-family:var(--form);font-size:.7em;font-weight:600;color:var(--chalk-2);
+  display:flex;flex-direction:column;gap:.5em;border-top:2px solid var(--chalk-3);padding-top:.9em}
+.key i{display:inline-block;width:2.6em;height:0;margin-right:.6em;vertical-align:.3em}
+.key .a i{border-top:4px dashed var(--y)} .key .b i{border-top:4px solid var(--p)}
+
+/* chalk tray */
+.tray{margin-top:clamp(14px,2vw,26px);background:linear-gradient(var(--wood),var(--wood-2));
+  border-radius:0 0 6px 6px;box-shadow:0 6px 0 rgba(0,0,0,.28);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.7em;align-items:center}
+.tray label{font-family:var(--form);font-weight:700;font-size:.8em;color:#F6EFE2;white-space:nowrap}
+.tray .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+input[type=range]{flex:1;accent-color:var(--y);height:1.6em}
+button{font-family:var(--form);font-weight:700;font-size:.74em;letter-spacing:.1em;padding:.7em 1.3em;
+  background:#F6EFE2;color:#2A2013;border:0;border-radius:3px;cursor:pointer;
+  box-shadow:0 3px 0 rgba(0,0,0,.35);transition:transform .08s, box-shadow .08s}
+button:hover{background:var(--y)}
+button:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,.35)}
+
+h1{font-family:var(--form);font-weight:700;font-size:clamp(2rem,4.2vw,3.8rem);line-height:1.24;
+  margin:1.4em 0 .3em;max-width:24ch;letter-spacing:-.02em}
+h1 u{text-decoration:none;color:var(--y);box-shadow:inset 0 -.16em 0 rgba(243,210,87,.28)}
+.dek{color:var(--chalk-2);max-width:56ch;margin:0 0 2.6em}
+.sec{margin-top:2.6em;border:3px solid var(--chalk-3);padding:0}
+.sec-hd{display:flex;align-items:center;gap:.9em;padding:clamp(12px,1.4vw,20px);border-bottom:3px solid var(--chalk-3)}
+.sec-no{font-family:var(--form);font-weight:700;font-size:1em;color:var(--board);background:var(--y);
+  width:2.3em;height:2.3em;border-radius:50%;display:grid;place-items:center;transform:rotate(-4deg)}
+h2{font-family:var(--form);font-weight:700;font-size:clamp(1.45rem,2.5vw,2.3rem);margin:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.eq{font-family:var(--form);font-weight:600;font-size:clamp(1.35rem,2.7vw,2.3rem);text-align:center;
+  padding:.8em .4em;border:2px dashed var(--chalk-3);margin:0 0 1.5em}
+.eq .neg{color:var(--p)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(14px,1.6vw,26px)}
+.notes b.k{font-family:var(--form);display:block;font-size:.64em;letter-spacing:.18em;color:var(--y);margin-bottom:.25em}
+.units{width:100%;border-collapse:collapse;font-family:var(--form);margin-top:1.8em}
+.units th,.units td{border-bottom:2px solid var(--chalk-3);padding:.62em .5em;text-align:left;font-weight:500}
+.units th{font-size:.64em;letter-spacing:.16em;color:var(--chalk-3);font-weight:700}
+.units td:first-child{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--y)}
+@media (max-width:900px){.rig{grid-template-columns:1fr}.read{flex-direction:row;flex-wrap:wrap}.read>div{flex:1 1 45%}}
+</style>
+
+<div class="sheet">
+  <div class="eyebrow"><span>เคมี ม.5</span><span>อัตราการเกิดปฏิกิริยา</span><span>มโนทัศน์ 01 / 07</span></div>
+  <h2 class="board-title">การสลายตัวของ <span>H₂O₂</span> — วัดปริมาตร O₂ ที่เก็บได้</h2>
+
+  <div class="rig">
+    <div>
+      <svg class="chart" id="chart" viewBox="0 0 920 566" role="img" aria-label="กราฟปริมาตรออกซิเจนเทียบกับเวลา พร้อมเส้นตัดและเส้นสัมผัส">
+        <defs><clipPath id="cp"><rect x="96" y="30" width="770" height="408"/></clipPath></defs>
+        <g id="grid"></g><g id="axes"></g>
+        <g clip-path="url(#cp)">
+          <line id="secant" stroke="var(--c-sec)" stroke-width="4" stroke-dasharray="16 10" stroke-linecap="round"/>
+          <line id="tangent" stroke="var(--c-tan)" stroke-width="5" stroke-linecap="round" opacity="0"/>
+        </g>
+        <path id="curve" fill="none" stroke="var(--c-curve)" stroke-width="5" stroke-linecap="round"/>
+        <g id="dtBrace"></g><g id="handles"></g>
+      </svg>
+    </div>
+    <div class="read">
+      <div class="y"><span class="lbl">อัตราเฉลี่ยในช่วง Δt</span><span class="num" id="avg">0.77</span><span class="u">cm³ · s⁻¹</span></div>
+      <div class="p"><span class="lbl">อัตรา ณ ขณะหนึ่ง</span><span class="num" id="inst">0.74</span><span class="u">cm³ · s⁻¹ ที่ t = <span id="tmid">28</span> s</span></div>
+      <div class="key">
+        <span class="a"><i></i>ชอล์กเหลือง = เส้นตัด → อัตราเฉลี่ย</span>
+        <span class="b"><i></i>ชอล์กส้ม = เส้นสัมผัส → อัตราขณะหนึ่ง</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tray">
+    <div class="grp"><label for="t1">หมุด t₁</label><input id="t1" type="range" min="0" max="118" step="1" value="10"></div>
+    <div class="grp"><label for="t2">หมุด t₂</label><input id="t2" type="range" min="2" max="120" step="1" value="46"></div>
+    <button id="squeeze">บีบเข้าหากัน ▸</button>
+    <button id="reset">ลบกระดาน</button>
+  </div>
+
+  <h1>ถ้าจะบอกว่าเร็ว ต้องบอกให้ได้ว่า<br><u>อะไรเปลี่ยนไปเท่าไร ในเวลาเท่าไร</u></h1>
+  <p class="dek">ความชันของเส้นที่ลากบนกราฟคืออัตรา — เลื่อนหมุด t₁ t₂ เข้าหากันจนชิด แล้วดูว่าเส้นตัดค่อย ๆ กลายเป็นเส้นสัมผัสได้อย่างไร</p>
+
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">1.1</span><h2>นิยามและหน่วย</h2></div>
+    <div class="sec-bd">
+      <div class="eq">อัตรา = <span class="neg">−</span> Δ[สารตั้งต้น] / Δt &nbsp;=&nbsp; + Δ[ผลิตภัณฑ์] / Δt</div>
+      <div class="notes">
+        <div><b class="k">Δ คืออะไร</b>ค่าตอนหลัง ลบ ค่าตอนแรก เสมอ ไม่ใช่ผลต่างแบบไม่สนลำดับ</div>
+        <div><b class="k">ทำไมต้องมีลบ</b>สารตั้งต้นลดลง Δ จึงติดลบ ใส่ลบไปหนึ่งตัวเพื่อให้อัตราเป็นบวกเสมอ</div>
+        <div><b class="k">อ่านว่าอย่างไร</b>“ความเข้มข้นเปลี่ยนไปกี่โมลต่อลูกบาศก์เดซิเมตร ในหนึ่งวินาที”</div>
+      </div>
+      <table class="units">
+        <tr><th>หน่วย</th><th>ใช้เมื่อวัดอะไร</th><th>ตัวอย่างปฏิกิริยา</th></tr>
+        <tr><td>mol·dm⁻³·s⁻¹</td><td>ความเข้มข้นของสารในสารละลาย</td><td>หน่วยมาตรฐานที่ใช้ในสูตร</td></tr>
+        <tr><td>cm³·s⁻¹</td><td>ปริมาตรแก๊สที่เกิดขึ้น</td><td>Mg(s) + 2HCl(aq)</td></tr>
+        <tr><td>g·min⁻¹</td><td>มวลที่หายไปจากระบบ</td><td>CaCO₃(s) + 2HCl(aq)</td></tr>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const VMAX=60,K=0.025,TMAX=120,VTOP=66,X0=96,X1=866,Y0=30,Y1=438;
+  const V=t=>VMAX*(1-Math.exp(-K*t)), dV=t=>VMAX*K*Math.exp(-K*t);
+  const sx=t=>X0+(t/TMAX)*(X1-X0), sy=v=>Y1-(v/VTOP)*(Y1-Y0);
+  const S=(n,a)=>{const e=document.createElementNS("http://www.w3.org/2000/svg",n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const g=document.getElementById("grid"),ax=document.getElementById("axes");
+  for(let t=0;t<=TMAX;t+=5){const x=sx(t),M=t%20===0;
+    g.appendChild(S("line",{x1:x,y1:Y0,x2:x,y2:Y1,stroke:M?"var(--c-grid2)":"var(--c-grid)","stroke-width":M?2.4:1.4}));}
+  for(let v=0;v<=VTOP;v+=2){const y=sy(v),M=v%10===0;
+    g.appendChild(S("line",{x1:X0,y1:y,x2:X1,y2:y,stroke:M?"var(--c-grid2)":"var(--c-grid)","stroke-width":M?2.4:1.4}));}
+  for(let t=0;t<=TMAX;t+=5){const x=sx(t),M=t%20===0;
+    ax.appendChild(S("line",{x1:x,y1:Y1,x2:x,y2:Y1+(M?16:8),stroke:"var(--c-lbl)","stroke-width":M?2.5:1.5}));
+    if(M){const l=S("text",{x:x,y:Y1+40,"text-anchor":"middle",fill:"var(--c-lbl)","font-family":"Bai Jamjuree","font-size":21,"font-weight":600});l.textContent=t;ax.appendChild(l);}}
+  for(let v=0;v<=VTOP;v+=2){const y=sy(v),M=v%10===0;
+    ax.appendChild(S("line",{x1:X0-(M?16:8),y1:y,x2:X0,y2:y,stroke:"var(--c-lbl)","stroke-width":M?2.5:1.5}));
+    if(M){const l=S("text",{x:X0-24,y:y+7,"text-anchor":"end",fill:"var(--c-lbl)","font-family":"Bai Jamjuree","font-size":21,"font-weight":600});l.textContent=v;ax.appendChild(l);}}
+  ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--c-axis)","stroke-width":3.5}));
+  ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--c-axis)","stroke-width":3.5}));
+  const xl=S("text",{x:X1,y:Y1+104,"text-anchor":"end",fill:"var(--c-lbl)","font-family":"Bai Jamjuree","font-size":23,"font-weight":600,"letter-spacing":"0.14em"});xl.textContent="เวลา (s)";ax.appendChild(xl);
+  const yl=S("text",{x:0,y:0,"text-anchor":"middle",fill:"var(--c-lbl)","font-family":"Bai Jamjuree","font-size":23,"font-weight":600,"letter-spacing":"0.14em",transform:"translate(28 "+((Y0+Y1)/2)+") rotate(-90)"});yl.textContent="ปริมาตร O₂ (cm³)";ax.appendChild(yl);
+  let d="";for(let t=0;t<=TMAX;t+=0.5)d+=(t?"L":"M")+sx(t).toFixed(2)+" "+sy(V(t)).toFixed(2);
+  document.getElementById("curve").setAttribute("d",d);
+  const t1i=document.getElementById("t1"),t2i=document.getElementById("t2"),sec=document.getElementById("secant"),
+    tan=document.getElementById("tangent"),H=document.getElementById("handles"),BR=document.getElementById("dtBrace"),
+    avgEl=document.getElementById("avg"),instEl=document.getElementById("inst"),tmidEl=document.getElementById("tmid");
+  function draw(){
+    let a=+t1i.value,b=+t2i.value; if(b<=a){b=a+1;t2i.value=b;}
+    const m=(V(b)-V(a))/(b-a),mid=(a+b)/2;
+    const E=t=>({x:sx(t),y:sy(V(a)+m*(t-a))}),p0=E(-20),p1=E(TMAX+20);
+    sec.setAttribute("x1",p0.x);sec.setAttribute("y1",p0.y);sec.setAttribute("x2",p1.x);sec.setAttribute("y2",p1.y);
+    const mt=dV(mid),T=t=>({x:sx(t),y:sy(V(mid)+mt*(t-mid))}),q0=T(-20),q1=T(TMAX+20);
+    tan.setAttribute("x1",q0.x);tan.setAttribute("y1",q0.y);tan.setAttribute("x2",q1.x);tan.setAttribute("y2",q1.y);
+    const c=Math.max(0,1-(b-a)/40);
+    tan.setAttribute("opacity",(0.5+0.5*c).toFixed(3)); sec.setAttribute("opacity",(1-0.5*c).toFixed(3));
+    H.innerHTML="";BR.innerHTML="";
+    [[a,"t₁"],[b,"t₂"]].forEach(function(p){const t=p[0],x=sx(t),y=sy(V(t));
+      H.appendChild(S("line",{x1:x,y1:Y1,x2:x,y2:y,stroke:"var(--c-sec)","stroke-width":2,"stroke-dasharray":"5 6"}));
+      H.appendChild(S("circle",{cx:x,cy:y,r:11,fill:"none",stroke:"var(--c-sec)","stroke-width":5}));
+      const l=S("text",{x:x,y:Y1+72,"text-anchor":"middle",fill:"var(--c-sec)","font-family":"Bai Jamjuree","font-size":23,"font-weight":700});
+      l.textContent=p[1]+" = "+t.toFixed(0)+" s";BR.appendChild(l);});
+    const b1=sx(a),b2=sx(b),by=Y1+56;
+    BR.appendChild(S("path",{d:"M"+b1+" "+(by-9)+" L"+b1+" "+by+" L"+b2+" "+by+" L"+b2+" "+(by-9),fill:"none",stroke:"var(--c-sec)","stroke-width":2.5}));
+    H.appendChild(S("circle",{cx:sx(mid),cy:sy(V(mid)),r:9,fill:"var(--c-tan)"}));
+    avgEl.textContent=m.toFixed(2);instEl.textContent=mt.toFixed(2);tmidEl.textContent=mid.toFixed(0);
+  }
+  t1i.addEventListener("input",draw);t2i.addEventListener("input",draw);
+  let raf=null;
+  document.getElementById("squeeze").addEventListener("click",function(){
+    if(raf)return;
+    const step=function(){let a=+t1i.value,b=+t2i.value,mid=(a+b)/2;
+      if(b-a<=1){raf=null;return;}
+      t1i.value=Math.min(mid-0.5,a+(b-a)*0.06+0.4);t2i.value=Math.max(mid+0.5,b-(b-a)*0.06-0.4);
+      draw();raf=requestAnimationFrame(step);};
+    raf=requestAnimationFrame(step);});
+  document.getElementById("reset").addEventListener("click",function(){
+    if(raf){cancelAnimationFrame(raf);raf=null;} t1i.value=10;t2i.value=46;draw();});
+  draw();
+})();
+</script>

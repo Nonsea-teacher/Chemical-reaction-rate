@@ -1,0 +1,313 @@
+<title>ใบบันทึกผลที่ 01 — อัตราการเกิดปฏิกิริยา</title>
+<!--
+THESIS: อัตราเป็นค่าที่ "ถูกบันทึกแล้วคำนวณออกมา" หน้านี้จึงเป็นใบบันทึกผลการทดลองที่กรอกอยู่ตรงหน้า ปฏิเสธการ์ดพาสเทลแบบ edtech และปฏิเสธหน้ากระดาษครีม-เซริฟแบบตำรา
+OWN-WORLD: ฟอร์มสำเนาคาร์บอน — พื้นกระดาษฟ้าอ่อน ช่องกรอกขาว เส้นกรอบดำหนัก ตราปั๊มหมึกม่วง ค่าที่กรอกเขียนด้วยปากกาน้ำเงิน เส้นลากบนกราฟด้วยปากกาแดง กระดาษกราฟเขียวอยู่ในกรอบแนบ
+STORY: ครูเลื่อนเครื่องหมาย t1 t2 ค่าที่ช่องว่างถูกกรอกด้วยปากกาน้ำเงินทันที พอบีบจนชิด ปากกาแดงลากเส้นสัมผัสลงบนกราฟและตราปั๊ม "ณ ขณะหนึ่ง" ถูกกดลงบนฟอร์ม
+FIRST VIEWPORT: หัวฟอร์มเป็นช่องกรอกเรียงกันพร้อมตราปั๊มเอียง ถัดลงมาเป็นกรอบแนบกราฟกระดาษเขียวกินพื้นที่ซ้าย ช่องผลการอ่านค่าพร้อมเส้นประจุดไข่ปลาอยู่ขวา แถบควบคุมเป็นท้ายฟอร์ม
+FORM: ใบบันทึกผลการทดลองแบบสำเนาคาร์บอน อันดับ 6 ของรายการ, staging แบบฟอร์มสามส่วนพื้นฟ้าอ่อน โหมดสว่างอย่างเดียวตามที่ผู้ใช้กำหนด, seed 084537e3
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#D7E2E8;        /* กระดาษสำเนาฟ้าอ่อน */
+  --cell:#FBFCFB;         /* ช่องกรอกสีขาว */
+  --cell-2:#EEF3F0;
+  --ink:#12171A;          /* หมึกพิมพ์ฟอร์ม */
+  --ink-2:#4C575C;
+  --ink-3:#7C878C;
+  --rule:#9AA7AC;
+  --stamp:#5A2E8C;        /* ตราปั๊มหมึกม่วง */
+  --stamp-soft:#E4DAF0;
+  --pen:#17357E;          /* ปากกาน้ำเงิน — ค่าที่กรอก / เส้นตัด */
+  --red:#BE2B1A;          /* ปากกาแดง — เส้นสัมผัส / คำอธิบายของครู */
+  --grid-fine:#B4D2BE;    /* กระดาษกราฟเขียว */
+  --grid-major:#6E9F7C;
+  --sans:"Anuphan",system-ui,sans-serif;
+  --form:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%}
+.sheet{max-width:1400px;margin:0 auto;padding:clamp(30px,3vw,52px) clamp(14px,2vw,34px) clamp(14px,2vw,34px)}
+
+/* ---------- form primitives ---------- */
+.lbl{font-family:var(--form);font-weight:600;font-size:.6em;letter-spacing:.2em;
+  color:var(--ink-3);display:block;line-height:1.7}
+.entry{font-family:var(--form);font-weight:700;color:var(--pen);font-variant-numeric:tabular-nums;
+  display:block;line-height:1.3}
+.box{border:2px solid var(--ink);background:var(--cell)}
+
+/* ---------- header ---------- */
+.hd{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;
+  border:3px solid var(--ink);background:var(--ink);position:relative}
+.hd>div{background:var(--cell);padding:.5em .9em;border:0;outline:1px solid var(--ink);outline-offset:0}
+.hd .wide{grid-column:span 2}
+.hd .entry{font-size:1.05em}
+.stamp{position:absolute;right:clamp(8px,2vw,26px);top:-14px;transform:rotate(-6deg);
+  font-family:var(--form);font-weight:700;font-size:clamp(.68rem,1.1vw,.86rem);letter-spacing:.16em;
+  color:var(--stamp);border:3px double var(--stamp);padding:.35em .8em;background:var(--stamp-soft);
+  z-index:2;box-shadow:0 1px 0 rgba(90,46,140,.25)}
+
+/* ---------- graph attachment frame ---------- */
+.rig{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:0;border:3px solid var(--ink);
+  border-top:0;background:var(--ink)}
+.rig>*{background:var(--cell)}
+.attach{padding:clamp(8px,1.2vw,16px);outline:1px solid var(--ink)}
+.attach .cap{font-family:var(--form);font-weight:600;font-size:.62em;letter-spacing:.2em;
+  color:var(--ink-3);margin-bottom:.4em;display:block}
+svg.chart{display:block;width:100%;height:auto;touch-action:none;border:1px solid var(--rule)}
+.results{padding:clamp(14px,1.5vw,22px);outline:1px solid var(--ink);display:flex;flex-direction:column;gap:1.1em}
+.blank{border-bottom:2px dotted var(--ink-3);padding-bottom:.15em}
+.blank .lbl{margin-bottom:.1em}
+.blank .entry{font-size:clamp(2rem,3.4vw,3.1rem);letter-spacing:-.02em}
+.blank .unit{font-family:var(--form);font-weight:500;font-size:.62em;color:var(--ink-2)}
+.blank.red .entry{color:var(--red)}
+.key{font-family:var(--form);font-size:.7em;font-weight:600;display:flex;flex-direction:column;gap:.45em;
+  border-top:1px solid var(--rule);padding-top:.8em}
+.key i{display:inline-block;width:2.6em;height:0;margin-right:.6em;vertical-align:.3em}
+.key .b i{border-top:4px dashed var(--pen)}
+.key .r i{border-top:4px solid var(--red)}
+.mark{align-self:flex-start;font-family:var(--form);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--stamp);border:3px double var(--stamp);padding:.3em .7em;background:var(--stamp-soft);
+  transform:rotate(-4deg);opacity:0;transition:opacity .25s}
+.mark.on{opacity:1}
+
+/* ---------- control strip = form footer ---------- */
+.foot{border:3px solid var(--ink);border-top:0;background:var(--cell-2);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.8em;align-items:center}
+.foot .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+.foot label{font-family:var(--form);font-weight:700;font-size:.82em;color:var(--pen);white-space:nowrap}
+input[type=range]{flex:1;accent-color:var(--pen);height:1.6em}
+button{font-family:var(--form);font-weight:700;font-size:.74em;letter-spacing:.1em;
+  padding:.7em 1.3em;background:var(--cell);color:var(--ink);border:2px solid var(--ink);cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s, background .12s}
+button:hover{background:var(--stamp);color:#fff;border-color:var(--stamp);box-shadow:3px 3px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+
+/* ---------- prose ---------- */
+h1{font-family:var(--form);font-weight:700;font-size:clamp(2rem,4.2vw,3.8rem);line-height:1.22;
+  letter-spacing:-.02em;margin:1.3em 0 .3em;max-width:24ch}
+h1 u{text-decoration:none;color:var(--red);
+  background:linear-gradient(transparent 62%, rgba(190,43,26,.22) 62%)}
+.dek{font-size:1.08em;color:var(--ink-2);max-width:56ch;margin:0 0 2.4em}
+
+.sec{border:3px solid var(--ink);background:var(--cell);margin-top:2.4em}
+.sec-hd{display:flex;align-items:center;gap:1em;padding:clamp(12px,1.4vw,20px);
+  border-bottom:2px solid var(--ink);background:var(--cell-2)}
+.sec-no{font-family:var(--form);font-weight:700;font-variant-numeric:tabular-nums;font-size:1em;
+  color:var(--stamp);border:3px double var(--stamp);background:var(--stamp-soft);padding:.2em .6em;
+  transform:rotate(-3deg)}
+h2{font-family:var(--form);font-weight:700;font-size:clamp(1.45rem,2.5vw,2.3rem);letter-spacing:-.01em;margin:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.eq{font-family:var(--form);font-weight:600;font-size:clamp(1.35rem,2.7vw,2.3rem);
+  text-align:center;padding:.85em .4em;background:var(--cell-2);border:2px solid var(--ink);margin:0 0 1.5em}
+.eq .neg{color:var(--red)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;
+  border:2px solid var(--ink);background:var(--ink)}
+.notes div{background:var(--cell);padding:1em 1.1em;outline:1px solid var(--ink)}
+.notes b.k{font-family:var(--form);display:block;font-size:.64em;letter-spacing:.18em;
+  color:var(--stamp);margin-bottom:.3em}
+.units{width:100%;border-collapse:collapse;font-family:var(--form);margin-top:1.6em}
+.units th,.units td{border:1px solid var(--ink);padding:.62em .8em;text-align:left;font-weight:500}
+.units th{background:var(--cell-2);font-size:.64em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+.units td:first-child{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--pen)}
+@media (max-width:900px){
+  .rig{grid-template-columns:1fr}
+  .results{flex-direction:row;flex-wrap:wrap}
+  .results .blank{flex:1 1 45%}
+}
+</style>
+
+<div class="sheet">
+
+  <div class="hd">
+    <span class="stamp">บันทึกผลการทดลอง</span>
+    <div class="wide"><span class="lbl">รายวิชา / ระดับชั้น</span><span class="entry">เคมี · มัธยมศึกษาปีที่ 5</span></div>
+    <div><span class="lbl">เรื่อง</span><span class="entry">อัตราการเกิดปฏิกิริยา</span></div>
+    <div><span class="lbl">แผ่นที่</span><span class="entry">01 / 07</span></div>
+    <div><span class="lbl">ปฏิกิริยาที่ศึกษา</span><span class="entry">2H₂O₂ → 2H₂O + O₂</span></div>
+  </div>
+
+  <div class="rig">
+    <div class="attach">
+      <span class="cap">แนบกราฟ · ปริมาตรแก๊สที่เก็บได้เทียบกับเวลา</span>
+      <svg class="chart" id="chart" viewBox="0 0 920 566" role="img"
+           aria-label="กราฟปริมาตรแก๊สออกซิเจนเทียบกับเวลา พร้อมเส้นตัดและเส้นสัมผัสที่ปรับได้">
+        <defs>
+          <clipPath id="cp"><rect x="96" y="30" width="770" height="408"/></clipPath>
+          <pattern id="gp" width="15.4" height="15.4" patternUnits="userSpaceOnUse">
+            <path d="M15.4 0 H0 V15.4" fill="none" stroke="var(--grid-fine)" stroke-width="1"/>
+          </pattern>
+        </defs>
+        
+        <g id="grid"></g>
+        <g id="axes"></g>
+        <g clip-path="url(#cp)">
+          <line id="secant" stroke="var(--pen)" stroke-width="4" stroke-dasharray="14 9" stroke-linecap="round"/>
+          <line id="tangent" stroke="var(--red)" stroke-width="4.5" stroke-linecap="round" opacity="0"/>
+        </g>
+        <path id="curve" fill="none" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round"/>
+        <g id="dtBrace"></g>
+        <g id="handles"></g>
+      </svg>
+    </div>
+
+    <div class="results">
+      <div class="blank">
+        <span class="lbl">อัตราเฉลี่ยในช่วง Δt</span>
+        <span class="entry" id="avg">0.77</span>
+        <span class="unit">cm³ · s⁻¹</span>
+      </div>
+      <div class="blank red">
+        <span class="lbl">อัตรา ณ ขณะหนึ่ง</span>
+        <span class="entry" id="inst">0.74</span>
+        <span class="unit">cm³ · s⁻¹ &nbsp;ที่ t = <span id="tmid">28</span> s</span>
+      </div>
+      <span class="mark" id="mark">Δt → 0 · เส้นสัมผัส</span>
+      <div class="key">
+        <span class="b"><i></i>ปากกาน้ำเงิน = เส้นตัด → อัตราเฉลี่ย</span>
+        <span class="r"><i></i>ปากกาแดง = เส้นสัมผัส → อัตราขณะหนึ่ง</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="grp"><label for="t1">เครื่องหมาย t₁</label><input id="t1" type="range" min="0" max="118" step="1" value="10"></div>
+    <div class="grp"><label for="t2">เครื่องหมาย t₂</label><input id="t2" type="range" min="2" max="120" step="1" value="46"></div>
+    <button id="squeeze">บีบเข้าหากัน ▸</button>
+    <button id="reset">ล้างแบบฟอร์ม</button>
+  </div>
+
+  <h1>ถ้าจะบอกว่าเร็ว ต้องบอกให้ได้ว่า<br><u>อะไรเปลี่ยนไปเท่าไร ในเวลาเท่าไร</u></h1>
+  <p class="dek">ความชันของเส้นที่ลากบนกราฟคืออัตรา — เลื่อนเครื่องหมาย t₁ t₂ เข้าหากันจนชิด แล้วดูว่าเส้นตัดที่ลากด้วยปากกาน้ำเงินค่อย ๆ กลายเป็นเส้นสัมผัสที่ลากด้วยปากกาแดงได้อย่างไร</p>
+
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">1.1</span><h2>นิยามและหน่วย</h2></div>
+    <div class="sec-bd">
+      <div class="eq">อัตรา = <span class="neg">−</span> Δ[สารตั้งต้น] / Δt &nbsp;=&nbsp; + Δ[ผลิตภัณฑ์] / Δt</div>
+      <div class="notes">
+        <div><b class="k">Δ คืออะไร</b>ค่าตอนหลัง ลบ ค่าตอนแรก เสมอ ไม่ใช่ผลต่างแบบไม่สนลำดับ</div>
+        <div><b class="k">ทำไมต้องมีลบ</b>สารตั้งต้นลดลง Δ จึงติดลบ ใส่ลบไปหนึ่งตัวเพื่อให้อัตราเป็นบวกเสมอ</div>
+        <div><b class="k">อ่านว่าอย่างไร</b>“ความเข้มข้นเปลี่ยนไปกี่โมลต่อลูกบาศก์เดซิเมตร ในหนึ่งวินาที”</div>
+      </div>
+      <table class="units">
+        <tr><th>หน่วย</th><th>ใช้เมื่อวัดอะไร</th><th>ตัวอย่างปฏิกิริยา</th></tr>
+        <tr><td>mol·dm⁻³·s⁻¹</td><td>ความเข้มข้นของสารในสารละลาย</td><td>หน่วยมาตรฐานที่ใช้ในสูตร</td></tr>
+        <tr><td>cm³·s⁻¹</td><td>ปริมาตรแก๊สที่เกิดขึ้น</td><td>Mg(s) + 2HCl(aq)</td></tr>
+        <tr><td>g·min⁻¹</td><td>มวลที่หายไปจากระบบ</td><td>CaCO₃(s) + 2HCl(aq)</td></tr>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const VMAX=60, K=0.025, TMAX=120, VTOP=66;
+  const X0=96,X1=866,Y0=30,Y1=438;
+  const V=t=>VMAX*(1-Math.exp(-K*t));
+  const dV=t=>VMAX*K*Math.exp(-K*t);
+  const sx=t=>X0+(t/TMAX)*(X1-X0);
+  const sy=v=>Y1-(v/VTOP)*(Y1-Y0);
+  const S=(n,a)=>{const e=document.createElementNS("http://www.w3.org/2000/svg",n);
+    for(const k in a)e.setAttribute(k,a[k]);return e;};
+
+  const g=document.getElementById("grid"), ax=document.getElementById("axes");
+  for(let t=0;t<=TMAX;t+=2.5){
+    const x=sx(t), major=t%20===0;
+    g.appendChild(S("line",{x1:x,y1:Y0,x2:x,y2:Y1,
+      stroke:major?"var(--grid-major)":"var(--grid-fine)","stroke-width":major?3:1.6}));
+  }
+  for(let v=0;v<=VTOP;v+=2){
+    const y=sy(v), major=v%10===0;
+    g.appendChild(S("line",{x1:X0,y1:y,x2:X1,y2:y,
+      stroke:major?"var(--grid-major)":"var(--grid-fine)","stroke-width":major?3:1.6}));
+  }
+  for(let t=0;t<=TMAX;t+=5){
+    const x=sx(t), major=t%20===0;
+    ax.appendChild(S("line",{x1:x,y1:Y1,x2:x,y2:Y1+(major?16:8),stroke:"var(--ink-2)","stroke-width":major?2.5:1.5}));
+    if(major){const l=S("text",{x:x,y:Y1+40,"text-anchor":"middle",fill:"var(--ink-2)",
+      "font-family":"Bai Jamjuree","font-size":21,"font-weight":600});l.textContent=t;ax.appendChild(l);}
+  }
+  for(let v=0;v<=VTOP;v+=2){
+    const y=sy(v), major=v%10===0;
+    ax.appendChild(S("line",{x1:X0-(major?16:8),y1:y,x2:X0,y2:y,stroke:"var(--ink-2)","stroke-width":major?2.5:1.5}));
+    if(major){const l=S("text",{x:X0-24,y:y+7,"text-anchor":"end",fill:"var(--ink-2)",
+      "font-family":"Bai Jamjuree","font-size":21,"font-weight":600});l.textContent=v;ax.appendChild(l);}
+  }
+  ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":3}));
+  ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":3}));
+  const xl=S("text",{x:X1,y:Y1+104,"text-anchor":"end",fill:"var(--ink-2)",
+    "font-family":"Bai Jamjuree","font-size":23,"font-weight":600,"letter-spacing":"0.14em"});
+  xl.textContent="เวลา (s)"; ax.appendChild(xl);
+  const yl=S("text",{x:0,y:0,"text-anchor":"middle",fill:"var(--ink-2)","font-family":"Bai Jamjuree",
+    "font-size":23,"font-weight":600,"letter-spacing":"0.14em",transform:"translate(28 "+((Y0+Y1)/2)+") rotate(-90)"});
+  yl.textContent="ปริมาตร O₂ (cm³)"; ax.appendChild(yl);
+
+  let d="";
+  for(let t=0;t<=TMAX;t+=0.5) d+=(t?"L":"M")+sx(t).toFixed(2)+" "+sy(V(t)).toFixed(2);
+  document.getElementById("curve").setAttribute("d",d);
+
+  const t1i=document.getElementById("t1"), t2i=document.getElementById("t2");
+  const sec=document.getElementById("secant"), tan=document.getElementById("tangent");
+  const H=document.getElementById("handles"), BR=document.getElementById("dtBrace");
+  const avgEl=document.getElementById("avg"), instEl=document.getElementById("inst");
+  const tmidEl=document.getElementById("tmid"), markEl=document.getElementById("mark");
+
+  function draw(){
+    let a=+t1i.value, b=+t2i.value;
+    if(b<=a){ b=a+1; t2i.value=b; }
+    const m=(V(b)-V(a))/(b-a), mid=(a+b)/2;
+    const ext=t=>({x:sx(t),y:sy(V(a)+m*(t-a))});
+    const p0=ext(-20),p1=ext(TMAX+20);
+    sec.setAttribute("x1",p0.x);sec.setAttribute("y1",p0.y);
+    sec.setAttribute("x2",p1.x);sec.setAttribute("y2",p1.y);
+    const mt=dV(mid), et=t=>({x:sx(t),y:sy(V(mid)+mt*(t-mid))});
+    const q0=et(-20),q1=et(TMAX+20);
+    tan.setAttribute("x1",q0.x);tan.setAttribute("y1",q0.y);
+    tan.setAttribute("x2",q1.x);tan.setAttribute("y2",q1.y);
+    const close=Math.max(0,1-(b-a)/40);
+    tan.setAttribute("opacity",(0.5+0.5*close).toFixed(3));
+    sec.setAttribute("opacity",(1-0.5*close).toFixed(3));
+    markEl.classList.toggle("on", b-a<=6);
+
+    H.innerHTML=""; BR.innerHTML="";
+    [[a,"t₁"],[b,"t₂"]].forEach(function(p){
+      const t=p[0],lab=p[1],x=sx(t),y=sy(V(t));
+      H.appendChild(S("line",{x1:x,y1:Y1,x2:x,y2:y,stroke:"var(--pen)","stroke-width":2,"stroke-dasharray":"5 5"}));
+      H.appendChild(S("circle",{cx:x,cy:y,r:11,fill:"var(--cell)",stroke:"var(--pen)","stroke-width":5}));
+      const l=S("text",{x:x,y:Y1+72,"text-anchor":"middle",fill:"var(--pen)","font-family":"Bai Jamjuree",
+        "font-size":23,"font-weight":700});l.textContent=lab+" = "+t.toFixed(0)+" s";BR.appendChild(l);
+    });
+    const bx1=sx(a),bx2=sx(b),by=Y1+56;
+    BR.appendChild(S("path",{d:"M"+bx1+" "+(by-9)+" L"+bx1+" "+by+" L"+bx2+" "+by+" L"+bx2+" "+(by-9),
+      fill:"none",stroke:"var(--pen)","stroke-width":2.5}));
+    H.appendChild(S("circle",{cx:sx(mid),cy:sy(V(mid)),r:9,fill:"var(--red)"}));
+
+    avgEl.textContent=m.toFixed(2);
+    instEl.textContent=mt.toFixed(2);
+    tmidEl.textContent=mid.toFixed(0);
+  }
+  t1i.addEventListener("input",draw); t2i.addEventListener("input",draw);
+
+  let raf=null;
+  const btn=document.getElementById("squeeze");
+  btn.addEventListener("click",function(){
+    if(raf) return;
+    const step=function(){
+      let a=+t1i.value,b=+t2i.value,mid=(a+b)/2;
+      if(b-a<=1){raf=null;return;}
+      t1i.value=Math.min(mid-0.5,a+(b-a)*0.06+0.4);
+      t2i.value=Math.max(mid+0.5,b-(b-a)*0.06-0.4);
+      draw(); raf=requestAnimationFrame(step);
+    };
+    raf=requestAnimationFrame(step);
+  });
+  document.getElementById("reset").addEventListener("click",function(){
+    if(raf){cancelAnimationFrame(raf);raf=null;}
+    t1i.value=10;t2i.value=46;draw();
+  });
+  draw();
+})();
+</script>
