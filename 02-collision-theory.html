@@ -222,6 +222,8 @@ ol.steps-2col li>b:first-of-type{display:inline;vertical-align:middle;font-size:
 .ex summary::before{content:"▸ ";}
 .ex[open] summary::before{content:"▾ ";}
 .ex-body{padding:1.2em 0 1.6em}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:.8em}
+.tblwrap table{border-collapse:collapse;font-size:.92em;min-width:480px}
 .ex-no{font-family:var(--tech);font-weight:700;color:var(--index);margin-right:.5em}
 .ex-lv{font-family:var(--tech);font-size:.6em;letter-spacing:.18em;color:var(--ink-3);
   border:1px solid var(--rule);padding:.2em .6em;margin-left:.7em;white-space:nowrap}
@@ -723,12 +725,14 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
         </details>
 
         <div class="ex-body"><span class="ex-no">3</span>จากข้อมูลในตารางต่อไปนี้
-          <table style="width:100%;border-collapse:collapse;margin-top:.8em;font-size:.92em">
+          <div class="tblwrap">
+          <table>
             <tr style="background:var(--panel-2)"><th style="border:1px solid var(--rule);padding:.5em">ปฏิกิริยาที่</th><th style="border:1px solid var(--rule);padding:.5em">สมการเคมี</th><th style="border:1px solid var(--rule);padding:.5em">พลังงานก่อกัมมันต์ (kJ/mol)</th><th style="border:1px solid var(--rule);padding:.5em">พลังงานของปฏิกิริยา (kJ/mol)</th></tr>
             <tr><td style="border:1px solid var(--rule);padding:.5em;text-align:center">1</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">A ⟶ B</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">50.56</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">−70.00</td></tr>
             <tr><td style="border:1px solid var(--rule);padding:.5em;text-align:center">2</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">C + D ⟶ E</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">70.45</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">+45.23</td></tr>
             <tr><td style="border:1px solid var(--rule);padding:.5em;text-align:center">3</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">H ⟶ I + J</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">110.00</td><td style="border:1px solid var(--rule);padding:.5em;text-align:center">−25.33</td></tr>
           </table>
+          </div>
           <p style="margin-top:.8em">3.1 เรียงลำดับอัตราการเกิดปฏิกิริยาเคมีของทั้งสามปฏิกิริยาจากมากไปหาน้อย</p>
           <p>3.2 ปฏิกิริยาที่ 1 สารตั้งต้นมีพลังงานมากหรือน้อยกว่าผลิตภัณฑ์เท่าใด</p>
         </div>
@@ -761,7 +765,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     </div>
   </section>
 
-  <footer>มโนทัศน์ที่ 02 จาก 07 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+  <footer>มโนทัศน์ที่ 02 จาก 06 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
 </div>
 
 <script>
