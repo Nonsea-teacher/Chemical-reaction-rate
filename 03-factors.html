@@ -1,0 +1,1197 @@
+<title>แผงปัจจัยที่มีผลต่ออัตรา</title>
+<!--
+THESIS: ปัจจัยมี 5 ตัว แต่กลไกมีแค่ 3 ทาง — ชนบ่อยขึ้น / มีอนุภาคแรงถึงเกณฑ์มากขึ้น / ลดเกณฑ์ลง
+        ทุกปัจจัยในหน้านี้ต้องถูกจัดเข้าหนึ่งในสามทางนี้ได้เสมอ นั่นคือสิ่งที่นักเรียนต้องเดินออกไปพร้อมกับมัน
+OWN-WORLD: หน้าปัดเครื่องมือวัด (สืบทอดจากแผงที่ 01-02) โคบอลต์ = ค่าที่วัดได้/ถูก, ชาด = ค่าที่เน้น/ผิด
+STORY: กิจกรรม 8.4 — ผงหินปูน 48 วิ vs เม็ดหินปูนเกิน 300 วิ ปฏิกิริยาเดียวกันทุกประการ ต่างกันแค่รูปร่าง
+FIRST VIEWPORT: แผ่นป้ายชื่อ แล้วภาพเปรียบเทียบผง/เม็ดหินปูน พร้อมคำถามค้างไว้
+INTERACTIVE: 4 ตัว — ห้องทดลองการชน / ลูกบาศก์หั่นได้ / กราจการกระจายลากได้ / ปุ่มใส่ตัวเร่ง
+              แต่ละตัวตอบคนละกลไก ไม่ซ้ำหน้าที่กัน
+-->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#D9DEDA; --panel:#F7F8F6; --panel-2:#ECEFEB; --panel-3:#E1E6E2;
+  --ink:#171D1B; --ink-2:#5A6461; --ink-3:#8B948F;
+  --rule:#BAC2BD; --rule-2:#D5DBD6;
+  --index:#C0301A; --index-soft:#F2D9D3;
+  --cobalt:#17457F; --cobalt-soft:#D6E0EE;
+  --engrave: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06);
+  --sans:"Anuphan",system-ui,sans-serif;
+  --tech:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%;
+  word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1400px;margin:0 auto;padding:clamp(14px,2vw,32px)}
+img,svg{max-width:100%}
+
+.plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
+.plate>div{background:var(--panel);padding:.55em 1em;box-shadow:var(--engrave)}
+.plate .grow{flex:1 1 320px}
+.plate .lbl{font-family:var(--tech);font-weight:600;font-size:.62em;letter-spacing:.22em;
+  color:var(--ink-3);display:block;line-height:1.6}
+.plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
+.serial{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+
+.panel{border:2px solid var(--ink);display:grid;
+  grid-template-columns:minmax(0,1fr) 320px;gap:2px;background:var(--rule)}
+.panel>*{background:var(--panel)}
+.face{padding:clamp(8px,1.2vw,18px) 0 0 0}
+svg.chart{display:block;width:100%;height:auto;touch-action:none}
+.readout{padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;gap:1.1em;box-shadow:var(--engrave)}
+.win{background:var(--panel-2);border:1px solid var(--rule);padding:.7em .85em}
+.win .lbl{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-2);display:block;margin:-.7em -.85em .55em;padding:.5em .9em}
+.win.is-secant .lbl{background:var(--cobalt)}
+.win.is-tangent .lbl{background:var(--index)}
+.win .num{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.05;letter-spacing:-.02em;display:block}
+.win .unit{font-family:var(--tech);font-weight:500;font-size:.62em;color:var(--ink-2)}
+
+.caliper{border:2px solid var(--ink);border-top:none;background:var(--panel);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.6em;align-items:center}
+.caliper .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+.caliper label{font-family:var(--tech);font-weight:700;font-size:.82em;color:var(--cobalt);white-space:nowrap}
+input[type=range]{flex:1;accent-color:var(--cobalt);height:1.6em;min-width:90px}
+button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
+  padding:.7em 1.2em;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);
+  cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s, background .12s}
+button:hover{background:var(--index);color:#fff;border-color:var(--index)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button.right{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.hint{font-family:var(--tech);font-size:.66em;color:var(--ink-3);flex-basis:100%;margin:0;line-height:1.6}
+
+/* ---------- hook ---------- */
+.hookq{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,2.4vw,1.55rem);color:var(--ink);
+  text-align:center;padding:.9em 1em;margin:0;border:2px solid var(--ink);border-top:0;background:var(--index-soft)}
+
+/* ---------- everyday-life examples: text callouts.
+     ช่องว่างใต้แต่ละข้อเผื่อไว้วางรูปจริงจากสไลด์ทีหลังได้เลย ---------- */
+.reallife{border:2px solid var(--ink);background:var(--panel-2);margin:1.3em 0 1.6em}
+.reallife .kick{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.2em;
+  color:var(--panel);background:var(--ink);padding:.55em 1.1em;display:block}
+.reallife .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));
+  gap:2px;background:var(--rule)}
+.reallife .items>div{background:var(--panel);padding:1.05em 1.2em}
+.reallife b{font-family:var(--tech);display:block;font-size:1.05em;margin-bottom:.2em;color:var(--ink)}
+.reallife p{margin:0;font-size:.9em;color:var(--ink-2)}
+
+/* ---------- flask illustrations (hook + catalyst evidence) ---------- */
+.flaskfig{margin:.6em 0 0;border:2px solid var(--ink);background:var(--panel)}
+.flaskfig svg{display:block;width:100%;height:auto;background:var(--panel-2)}
+.flaskcaps{display:grid;grid-template-columns:1fr 1fr;gap:2px;
+  background:var(--rule);border-top:2px solid var(--ink)}
+.flaskcaps div{background:var(--panel);padding:.8em 1em;text-align:center;box-shadow:var(--engrave)}
+.flaskcaps b{font-family:var(--tech);font-size:.82em;color:var(--ink-2);display:block;font-weight:600}
+.flaskcaps span{font-family:var(--tech);font-weight:700;font-size:1.05em;color:var(--ink);
+  display:block;margin-top:.1em}
+@keyframes bubUp{
+  0%{transform:translateY(6px);opacity:0}
+  15%{opacity:.95}
+  100%{transform:translateY(-52px);opacity:0}
+}
+.bub{animation:bubUp 2s linear infinite}
+@media (prefers-reduced-motion:reduce){.bub{animation:none;opacity:.8}}
+
+.molrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin:1.4em 0}
+.molrow figure{margin:0;background:var(--panel);padding:.9em .9em .75em;text-align:center;box-shadow:var(--engrave)}
+.molrow svg{display:block;width:100%;height:auto;border:1px solid var(--rule);background:var(--panel-2)}
+.molrow figcaption{font-family:var(--tech);font-size:.8em;color:var(--ink-2);margin-top:.7em;line-height:1.5}
+.molrow figcaption b{display:block;color:var(--ink);font-size:1.1em;margin-top:.15em;font-weight:700}
+
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(2.1rem,4.4vw,4rem);line-height:1.2;
+  letter-spacing:-.02em;margin:1.2em 0 .3em;max-width:24ch}
+h1 em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .34em no-repeat}
+.dek{font-size:1.1em;color:var(--ink);max-width:56ch;margin:0 0 2.4em}
+
+.sec{border:2px solid var(--ink);background:var(--panel);margin-top:2.6em}
+.sec-hd{display:flex;align-items:baseline;gap:.7em 1em;flex-wrap:wrap;padding:clamp(14px,1.5vw,22px);
+  border-bottom:2px solid var(--ink);background:var(--panel-2)}
+.sec-no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.6rem,3vw,2.6rem);color:var(--index);line-height:1}
+h2{font-family:var(--tech);font-weight:700;font-size:clamp(1.5rem,2.6vw,2.4rem);letter-spacing:-.01em;margin:0}
+h3{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,1.7vw,1.5rem);margin:2em 0 .4em}
+h3:first-child{margin-top:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.sec-bd>p{max-width:62ch}
+.waytag{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.14em;
+  color:#fff;background:var(--cobalt);padding:.45em .9em;white-space:nowrap;margin-left:auto}
+.waytag.w3{background:var(--index)}
+.waytag.fixed{background:var(--ink-3)}
+.eq{font-family:var(--tech);font-weight:600;font-size:clamp(1.2rem,2.4vw,2rem);
+  text-align:center;padding:.85em .4em;background:var(--panel-2);border:1px solid var(--rule);margin:.2em 0 1.4em}
+
+/* ---------- the three-ways spine ---------- */
+.ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin:1.4em 0 0}
+.ways div{background:var(--panel);padding:1.2em 1.3em;box-shadow:var(--engrave)}
+.ways .n{font-family:var(--tech);font-weight:700;font-size:2.6em;line-height:1;
+  color:var(--cobalt);display:block;margin-bottom:.1em}
+.ways div:nth-child(3) .n{color:var(--index)}
+.ways b{font-family:var(--tech);font-size:1.08em;display:block;margin-bottom:.3em}
+.ways p{margin:0;font-size:.88em;color:var(--ink-2)}
+.ways .who{font-family:var(--tech);font-size:.72em;letter-spacing:.1em;color:var(--ink-3);
+  display:block;margin-top:.7em;border-top:1px solid var(--rule);padding-top:.6em}
+
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.notes div{background:var(--panel);padding:1em 1.1em;outline:1px solid var(--rule)}
+.notes b.k{font-family:var(--tech);display:block;font-size:1.05em;letter-spacing:.02em;
+  color:var(--ink);margin-bottom:.3em}
+
+table{width:100%;border-collapse:collapse;font-family:var(--tech);margin:1.4em 0}
+th,td{border:1px solid var(--rule);padding:.62em .8em;text-align:left;font-weight:500}
+th{background:var(--panel-2);font-size:.66em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tblwrap table{min-width:460px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.cards article{background:var(--panel);padding:1.1em 1.2em;outline:1px solid var(--rule)}
+.cards h4{font-family:var(--tech);font-size:1em;margin:0 0 .5em;letter-spacing:-.01em}
+.cards dl{margin:0;font-size:.86em}
+.cards dt{font-family:var(--tech);font-size:.7em;letter-spacing:.16em;color:var(--ink-3);margin-top:.6em}
+.cards dd{margin:0}
+
+.traps{display:grid;gap:2px;background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.traps div{background:var(--panel);padding:1em 1.2em;outline:1px solid var(--rule);
+  display:grid;grid-template-columns:minmax(0,1fr);gap:.3em 1.4em}
+.traps .x,.traps .o{font-family:var(--tech);font-size:.66em;letter-spacing:.16em}
+.traps .x{color:var(--index)} .traps .o{color:var(--cobalt);margin-top:.5em}
+.traps p{margin:0}
+@media (min-width:760px){
+  .traps div{grid-template-columns:1fr 1fr}
+  .traps .o{margin:0}
+}
+
+/* ---------- synthesis: click to reveal ---------- */
+.synth{display:grid;gap:2px;background:var(--rule);border:2px solid var(--ink);margin-top:1.2em}
+.synth-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:.4em 1.2em;
+  align-items:center;background:var(--panel);padding:1em 1.2em;text-align:left;width:100%;
+  border:0;box-shadow:none;font-family:var(--sans);font-size:1em;letter-spacing:0;cursor:pointer}
+.synth-row:hover{background:var(--panel-2);color:var(--ink)}
+.synth-row .f{font-family:var(--tech);font-weight:700;font-size:1.02em}
+.synth-row .f small{display:block;font-family:var(--sans);font-weight:400;font-size:.72em;
+  color:var(--ink-2);letter-spacing:0;margin-top:.15em}
+.synth-row .m{font-family:var(--tech);font-weight:700;font-size:.92em;color:var(--cobalt)}
+.synth-row[aria-expanded="false"] .m{color:var(--ink-3);font-weight:500;font-style:italic}
+.synth-row.w3[aria-expanded="true"] .m{color:var(--index)}
+.synth-row.fixed[aria-expanded="true"] .m{color:var(--ink-2)}
+@media (max-width:620px){.synth-row{grid-template-columns:1fr}}
+
+.checkhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.2em;
+  color:var(--cobalt);margin:1.8em 0 .2em;display:block}
+.check{border:2px solid var(--cobalt);background:var(--cobalt-soft);padding:0 clamp(14px,1.6vw,24px)}
+.check .ex-body{padding-top:1.1em}
+.check .ex-no{color:var(--cobalt)}
+.check .ex{border-top:2px solid var(--cobalt)}
+.check .ex summary{color:var(--cobalt)}
+.check .ans{border-color:var(--cobalt-soft);background:var(--panel)}
+.ex{border-top:2px solid var(--ink)}
+.ex:first-child{border-top:0}
+.ex summary{list-style:none;cursor:pointer;font-family:var(--tech);font-weight:700;font-size:.76em;
+  letter-spacing:.12em;color:var(--cobalt);padding:.7em 0 0;display:inline-block}
+.ex summary::-webkit-details-marker{display:none}
+.ex summary::before{content:"▸ ";}
+.ex[open] summary::before{content:"▾ ";}
+.ex-body{padding:1.2em 0 1.6em}
+.ex-no{font-family:var(--tech);font-weight:700;color:var(--index);margin-right:.5em}
+.ans{background:var(--panel-2);border:1px solid var(--rule);padding:1em 1.2em;margin:.6em 0 1.4em}
+.srcnote{font-family:var(--tech);font-size:.66em;color:var(--ink-3);border:1px dashed var(--rule);
+  padding:.7em 1em;margin:1.4em 0 0;line-height:1.7}
+
+footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.6em 0 1em;text-align:center}
+
+@media (max-width:900px){
+  .panel{grid-template-columns:1fr}
+  .readout{flex-direction:row;flex-wrap:wrap}
+  .readout .win{flex:1 1 40%}
+}
+#labSparks circle{pointer-events:none}
+</style>
+
+<div class="wrap" lang="th">
+
+  <div class="plate">
+    <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
+    <div><span class="lbl">มโนทัศน์</span><span class="val serial">03 / 06</span></div>
+    <div><span class="lbl">แผงวัด</span><span class="val serial">CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + H₂O(l) + CO₂(g)</span></div>
+  </div>
+
+  <section class="hook">
+    <figure class="flaskfig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="ขวดรูปกรวยสองใบ ใบซ้ายใส่ผงหินปูนเกิดฟองแก๊สพุ่งขึ้นเต็มขวด ใบขวาใส่ก้อนหินปูนแทบไม่มีฟอง">
+        <g id="hookG"></g>
+      </svg>
+      <div class="eq" style="border:0;background:transparent;margin:0;padding:.7em .6em .5em;font-size:clamp(.95rem,1.9vw,1.35rem)">CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + H₂O(l) + CO₂(g)</div>
+      <div class="flaskcaps">
+        <div><b>ผง CaCO₃ 0.3 g + HCl 0.2 M</b><span>หมดฟองใน 48 วินาที</span></div>
+        <div><b>ก้อน CaCO₃ 0.3 g + HCl 0.2 M</b><span>ผ่านไป 300 วินาทียังไม่หมด</span></div>
+      </div>
+    </figure>
+    <p class="hookq">หินปูนหนักเท่ากัน กรดเข้มข้นเท่ากัน ทำไมใช้เวลาไม่เท่ากัน ?</p>
+  </section>
+
+  <h1>เร่งให้เร็วขึ้น<br>ชะลอให้ช้าลง <em>ทำได้อย่างไร</em></h1>
+  <p class="dek">หน้านี้มีปัจจัย 5 ตัว แต่ขอให้จำแค่เรื่องเดียว — ปัจจัยทั้ง 5 ทำงานผ่านกลไกเพียง <b>3 ทาง</b> เท่านั้น และทั้งสามทางนั้นมาจากทฤษฎีการชนในมโนทัศน์ที่ 2 ทั้งหมด ถ้าจับสามทางนี้ได้ ปัจจัยไหนโผล่มาก็อธิบายได้เอง</p>
+
+  <!-- ============ 3.1 nature of substances ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">3.1</span><h2>ธรรมชาติของสาร</h2><span class="waytag fixed">เปลี่ยนไม่ได้</span></div>
+    <div class="sec-bd">
+      <p>ก่อนจะไปดูว่าเราทำอะไรได้บ้าง ต้องยอมรับก่อนว่าปฏิกิริยาแต่ละอันมีความเร็วพื้นฐานไม่เท่ากันตั้งแต่ต้น</p>
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>โซเดียมใส่น้ำ ลุกทันทีในไม่กี่วินาที</b><p>โลหะโซเดียมทำปฏิกิริยากับน้ำอย่างรุนแรง เกิดฟองแก๊สไฮโดรเจนพล่านและความร้อนสูงจนบางครั้งติดไฟได้เอง</p></div>
+          <div><b>ตะปูเหล็กแช่น้ำ เป็นสัปดาห์กว่าจะขึ้นสนิม</b><p>เหล็กชิ้นเดียวกันแช่ในน้ำเหมือนกัน แต่ทำปฏิกิริยาช้ามาก ต้องรอเป็นวันเป็นสัปดาห์ถึงจะเริ่มเห็นสนิมสีน้ำตาล</p></div>
+        </div>
+      </div>
+      <p>โลหะสองชนิดนี้อยู่ในน้ำเหมือนกัน อุณหภูมิเดียวกัน แต่อัตราต่างกันมหาศาล เพราะ<b>ตัวสารเองไม่เหมือนกัน</b> — ลึกลงไปอีกชั้น ความต่างนี้มาจากชนิดของพันธะเคมีที่ต้องสลายหรือสร้างขึ้นใหม่</p>
+      <div class="cards">
+        <article>
+          <h4>พันธะไอออนิก — เร็ว</h4>
+          <dl>
+            <dt>ตัวอย่าง</dt><dd>AgNO₃(aq) + NaCl(aq) → AgCl(s) + NaNO₃(aq)</dd>
+            <dt>เพราะอะไร</dt><dd>ไอออนแยกกันอยู่ในสารละลายอยู่แล้ว ไม่ต้องสลายพันธะอะไรก่อน ชนแล้วรวมตัวได้เลย <b>Eₐ ต่ำมาก</b></dd>
+          </dl>
+        </article>
+        <article>
+          <h4>พันธะโคเวเลนต์ — ช้า</h4>
+          <dl>
+            <dt>ตัวอย่าง</dt><dd>CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(g)</dd>
+            <dt>เพราะอะไร</dt><dd>ต้องสลายพันธะ C–H และ O=O เดิมก่อนสร้างพันธะใหม่ ใช้พลังงานมาก <b>Eₐ สูง</b> จึงต้องมีประกายไฟมาเริ่มให้</dd>
+          </dl>
+        </article>
+      </div>
+      <p style="margin-top:1.4em">ธรรมชาติของสารเป็นตัวกำหนด <b>Eₐ ตั้งต้น</b> ของปฏิกิริยา และเป็นปัจจัยเดียวในหน้านี้ที่เราเปลี่ยนไม่ได้ — เลือกสารมาแล้วก็ได้ Eₐ มาเท่านั้น <b>ส่วนอีก 4 อย่างที่เหลือ เราคุมได้ทั้งหมด</b></p>
+    </div>
+  </section>
+
+  <!-- ============ the spine: three ways ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>มีอยู่แค่ 3 ทางเท่านั้น</h2></div>
+    <div class="sec-bd">
+      <p>ย้อนกลับไปที่ทฤษฎีการชน ปฏิกิริยาจะเกิดได้ต้องครบสามอย่าง — <b>อนุภาคต้องชนกัน</b> · <b>ชนแล้วพลังงานต้องถึงเกณฑ์ Eₐ</b> · <b>และต้องหันด้านที่ถูกเข้าหากัน</b> ถ้าอยากให้เร็วขึ้น จึงมีทางทำได้แค่ 3 ทาง</p>
+      <div class="ways">
+        <div>
+          <span class="n">①</span>
+          <b>ทำให้ชนกันบ่อยขึ้น</b>
+          <p>เพิ่มจำนวนครั้งที่อนุภาคเจอกันต่อวินาที โดยที่เกณฑ์ Eₐ ยังเท่าเดิม และสัดส่วนที่ผ่านเกณฑ์ก็เท่าเดิม แค่มีการชนให้ลุ้นมากขึ้น</p>
+          <span class="who">ความเข้มข้น · พื้นที่ผิว</span>
+        </div>
+        <div>
+          <span class="n">②</span>
+          <b>ทำให้อนุภาคที่แรงถึงเกณฑ์มีมากขึ้น</b>
+          <p>ไม่ได้เพิ่มจำนวนการชนเป็นหลัก แต่ทำให้แต่ละครั้งที่ชนมีโอกาสผ่านเกณฑ์สูงขึ้น เพราะอนุภาคมีพลังงานสูงขึ้น</p>
+          <span class="who">อุณหภูมิ</span>
+        </div>
+        <div>
+          <span class="n">③</span>
+          <b>ลดเกณฑ์ลงมา</b>
+          <p>ไม่ยุ่งกับอนุภาคเลย แต่ไปลด Eₐ ให้ต่ำลง อนุภาคชุดเดิมที่เคยไม่ผ่านก็ผ่านได้ทันทีโดยไม่ต้องเพิ่มอุณหภูมิ</p>
+          <span class="who">ตัวเร่งปฏิกิริยา</span>
+        </div>
+      </div>
+      <p style="margin-top:1.6em">ปัจจัยที่เหลือทั้งหมดในหน้านี้ <b>ไม่มีอันไหนหลุดจากสามข้อนี้เลย</b> เวลาเจอโจทย์ที่ถามว่า "ทำไมเร็วขึ้น" ให้ถามตัวเองก่อนว่ามันไปทางไหนใน 3 ทางนี้</p>
+    </div>
+  </section>
+
+  <!-- ============ INTERACTIVE 1: collision lab ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>ห้องทดลองการชน</h2></div>
+    <div class="sec-bd">
+      <p>กล่องนี้มีอนุภาคเคลื่อนที่ชนกันจริง ๆ <b>อนุภาคสีแดง</b> คือตัวที่มีพลังงานถึงเกณฑ์ Eₐ แล้ว <b>สีฟ้าจาง</b> คือตัวที่ยังไม่ถึง การชนจะ "สำเร็จ" ก็ต่อเมื่อ<b>แดงชนแดง</b>เท่านั้น — ลองปรับทีละตัวแล้วสังเกตว่าตัวเลขไหนขยับ</p>
+      <div class="panel">
+        <div class="face">
+          <svg class="chart" id="labBox" viewBox="0 0 460 300" role="img" aria-label="กล่องจำลองอนุภาคเคลื่อนที่ชนกัน ปรับจำนวนอนุภาค อุณหภูมิ และใส่ตัวเร่งได้">
+            <rect x="2" y="2" width="456" height="296" fill="var(--panel-2)" stroke="var(--ink)" stroke-width="2"/>
+            <g id="labSparks"></g>
+            <g id="labParticles"></g>
+          </svg>
+        </div>
+        <div class="readout">
+          <div class="win"><span class="lbl">การชนทั้งหมด / 5 วินาที</span><span class="num" id="labAll">0</span><span class="unit">ครั้ง</span></div>
+          <div class="win is-tangent"><span class="lbl">การชนที่สำเร็จ / 5 วินาที</span><span class="num" id="labOk">0</span><span class="unit">ครั้ง (แดงชนแดง)</span></div>
+          <div class="win is-secant"><span class="lbl">อนุภาคที่พลังงานถึงเกณฑ์</span><span class="num" id="labFrac" style="font-size:1.8rem">0%</span><span class="unit">ของทั้งหมด</span></div>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp"><label>จำนวนอนุภาค</label><input type="range" id="labN" min="6" max="34" value="18" step="1"></div>
+        <div class="grp"><label>อุณหภูมิ</label><input type="range" id="labT" min="1" max="10" value="4" step="1"></div>
+        <div class="grp" style="flex:0 0 auto"><button id="labCat" type="button">ใส่ตัวเร่งปฏิกิริยา</button></div>
+        <p class="hint">ลองทีละอย่าง — <b>เพิ่มจำนวนอนุภาค</b> การชนทั้งหมดขึ้น แต่เปอร์เซ็นต์แดงเท่าเดิม (ทาง ①) · <b>เพิ่มอุณหภูมิ</b> เปอร์เซ็นต์แดงพุ่ง (ทาง ②) · <b>ใส่ตัวเร่ง</b> เกณฑ์ลดลง แดงเพิ่มทันทีทั้งที่อุณหภูมิเท่าเดิม (ทาง ③)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.2 concentration ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">3.2</span><h2>ความเข้มข้น</h2><span class="waytag">ทาง ① ชนบ่อยขึ้น</span></div>
+    <div class="sec-bd">
+      <p>ลองนึกถึงสองสถานการณ์นี้ก่อน</p>
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>น้ำยาล้างห้องน้ำสูตรเข้มข้น</b><p>ขจัดคราบได้เร็วกว่าสูตรที่ผสมน้ำจนเจือจาง ทั้งที่เป็นน้ำยาตัวเดียวกัน เพราะในปริมาตรเท่ากัน สูตรเข้มข้นมีอนุภาคสารออกฤทธิ์อยู่มากกว่า</p></div>
+          <div><b>ห้องครัวตอนงานปาร์ตี้</b><p>คนแน่นจนเดินไปไหนก็ชนคนอื่น ต่างจากห้องโล่งที่มีกันอยู่สามสี่คนแล้วเดินทั้งวันก็แทบไม่เจอกัน</p></div>
+        </div>
+      </div>
+      <p>ทั้งสองอย่างคือเรื่องเดียวกัน — <b>ยิ่งอนุภาคอยู่ชิดกันมาก ยิ่งมีโอกาสชนกันบ่อย</b> ข้อมูลจริงจากกิจกรรม 8.4 ในหนังสือเรียน ใช้ผง CaCO₃ ปริมาณเท่ากัน เปลี่ยนแค่ความเข้มข้นของกรด</p>
+      <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
+        <figure>
+          <svg class="chart" id="barConc" viewBox="0 0 460 220" role="img" aria-label="แผนภูมิแท่งเปรียบเทียบเวลาที่ใช้เมื่อความเข้มข้นของกรดต่างกัน">
+            <g id="barConcG"></g>
+          </svg>
+          <figcaption>เวลาที่ใช้จนฟองแก๊สหมด (ผง CaCO₃ 0.3 g เท่ากันทั้งคู่)<b>HCl 0.2 M ใช้ 48 วิ · HCl 0.5 M ใช้ 36 วิ</b></figcaption>
+        </figure>
+      </div>
+      <p>อธิบายด้วยทฤษฎีการชน: สารละลายที่เข้มข้นกว่ามีอนุภาคกรดต่อหน่วยปริมาตรมากกว่า โอกาสที่ H⁺ จะเข้าไปชน CaCO₃ จึงถี่ขึ้น — <b>ความถี่การชนเพิ่มขึ้น แต่ Eₐ ไม่ขยับ</b> สัดส่วนของการชนที่ผ่านเกณฑ์ยังเท่าเดิมทุกประการ ตรงกับที่เห็นในห้องทดลองการชนตอนเลื่อนจำนวนอนุภาค</p>
+      <div class="notes">
+        <div><b class="k">สำหรับสารละลาย</b>เพิ่มความเข้มข้น (โมลาร์) = เพิ่มจำนวนอนุภาคต่อหน่วยปริมาตร</div>
+        <div><b class="k">สำหรับแก๊ส</b>เพิ่มความดัน หรือลดปริมาตรภาชนะ ให้ผลเทียบเท่ากับการเพิ่มความเข้มข้น เพราะอนุภาคถูกบีบให้อยู่ชิดกันขึ้น</div>
+      </div>
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>เติมน้ำเพิ่มให้สารละลายมีปริมาตรมากขึ้น อัตราก็จะเพิ่มขึ้นเพราะมีสารมากขึ้น</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>ต้องดูที่<b>ความเข้มข้น</b> ไม่ใช่ปริมาตร เติมน้ำคือการ<b>เจือจาง</b> ทำให้อนุภาคห่างกันออก อัตราจะ<b>ช้าลง</b>ด้วยซ้ำ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.3 surface area ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">3.3</span><h2>พื้นที่ผิว</h2><span class="waytag">ทาง ① ชนบ่อยขึ้น</span></div>
+    <div class="sec-bd">
+      <p>สองอย่างนี้เจอกันแทบทุกวัน</p>
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>หมูชาบูหั่นบาง สุกไวกว่าหมูก้อน</b><p>เนื้อชิ้นเดียวกัน น้ำซุปเดือดเท่ากัน แต่หั่นบางแล้วสุกในไม่กี่วินาที ส่วนก้อนหนาต้องรอเป็นนาที</p></div>
+          <div><b>น้ำตาลทรายละลายไวกว่าน้ำตาลก้อน</b><p>กาแฟแก้วเดียวกัน น้ำตาลปริมาณเท่ากัน แต่ก้อนเดียวจมอยู่ก้นแก้วนานกว่ามาก</p></div>
+        </div>
+      </div>
+      <p>ทำไมแค่หั่นให้เล็กลงถึงต่างกันขนาดนั้น ทั้งที่ปริมาณเท่าเดิม — ลองกดดูเอง</p>
+
+      <div class="molrow" style="grid-template-columns:1fr;max-width:560px;margin-inline:auto">
+        <figure>
+          <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
+            <div class="grp" style="flex:0 0 auto;gap:.5em">
+              <button id="cut0" type="button" class="right">ไม่หั่น</button>
+              <button id="cut1" type="button">หั่น 1 ครั้ง</button>
+              <button id="cut2" type="button">หั่น 2 ครั้ง</button>
+            </div>
+          </div>
+          <svg class="chart" id="cubeSvg" viewBox="0 0 460 300" role="img" aria-label="ลูกบาศก์ที่ถูกหั่นเป็นชิ้นเล็กลง แสดงพื้นที่ผิวรวมที่เพิ่มขึ้นขณะที่ปริมาตรเท่าเดิม">
+            <g id="cubeG"></g>
+          </svg>
+          <figcaption id="cubeCap">ปริมาตรเท่าเดิมทุกครั้ง แต่พื้นที่ผิวเพิ่มเป็นสองเท่าทุกครั้งที่หั่น</figcaption>
+        </figure>
+      </div>
+      <div class="tblwrap">
+        <table id="cubeTbl">
+          <tr><th>สถานะ</th><th>จำนวนก้อน</th><th>ปริมาตรรวม</th><th>พื้นที่ผิวรวม</th></tr>
+          <tr><td>ไม่หั่น</td><td class="n">1</td><td class="n">64</td><td class="n">96</td></tr>
+          <tr><td>หั่น 1 ครั้ง</td><td class="n">8</td><td class="n">64</td><td class="n">192</td></tr>
+          <tr><td>หั่น 2 ครั้ง</td><td class="n">64</td><td class="n">64</td><td class="n">384</td></tr>
+        </table>
+      </div>
+      <p>ปริมาตรไม่เปลี่ยนเลย เพราะไม่ได้เอาอะไรออกไป แต่<b>ทุกครั้งที่หั่น จะเกิดผิวหน้าใหม่ขึ้นมาที่เมื่อก่อนซ่อนอยู่ข้างใน</b> — และผิวใหม่นั่นแหละคือที่ที่กรดเข้าไปชนได้เพิ่ม</p>
+      <p>เพราะปฏิกิริยาของแข็ง–ของเหลวเกิดขึ้น<b>เฉพาะที่ผิวสัมผัสเท่านั้น</b> เนื้อในก้อนที่กรดเข้าไม่ถึงก็ได้แต่รอ ผงหินปูนจึงมีจุดที่กรดลงมือได้พร้อมกันมากกว่าก้อนมหาศาล ข้อมูลจริงจากกิจกรรม 8.4 ชุดเดียวกัน เปลี่ยนแค่รูปร่างของ CaCO₃</p>
+      <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
+        <figure>
+          <svg class="chart" id="barSurf" viewBox="0 0 460 220" role="img" aria-label="แผนภูมิแท่งเปรียบเทียบเวลาที่ใช้เมื่อพื้นที่ผิวของหินปูนต่างกัน">
+            <g id="barSurfG"></g>
+          </svg>
+          <figcaption>เวลาที่ใช้จนฟองแก๊สหมด (HCl 0.2 M เท่ากันทั้งคู่)<b>ผง CaCO₃ ใช้ 48 วิ · เม็ด CaCO₃ ใช้เกิน 300 วิ</b></figcaption>
+        </figure>
+      </div>
+
+      <h3>จุดที่พลาดกันบ่อยที่สุด</h3>
+      <p>เมื่อเปลี่ยนความเข้มข้นหรือพื้นที่ผิว โดยใช้<b>สารตั้งต้นปริมาณเท่ากัน</b> เส้นกราฟจะ<b>ชันต่างกัน แต่ไปจบที่ปริมาตรแก๊สสุดท้ายเท่ากัน</b> เพราะได้ผลิตภัณฑ์เท่าเดิม เพียงแต่ไปถึงเร็วช้าต่างกัน</p>
+      <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
+        <figure>
+          <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
+            <div class="grp" style="flex:0 0 auto;gap:.5em">
+              <button id="toggleConc" type="button" class="right">เทียบความเข้มข้น</button>
+              <button id="toggleSurf" type="button">เทียบพื้นที่ผิว</button>
+            </div>
+          </div>
+          <svg class="chart" id="chartVT" viewBox="0 0 400 280" role="img" aria-label="กราฟปริมาตรแก๊สสะสมเทียบกับเวลา เปรียบเทียบเงื่อนไขเร็วกับช้า ปริมาตรสุดท้ายเท่ากัน">
+            <g id="gridVT"></g><g id="axesVT"></g>
+            <path id="curveSlowVT" fill="none" stroke-width="3.5" stroke-dasharray="8 6"/>
+            <path id="curveFastVT" fill="none" stroke-width="3.5"/>
+            <g id="markVT"></g>
+          </svg>
+          <figcaption id="capVT"></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.4 temperature ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">3.4</span><h2>อุณหภูมิ</h2><span class="waytag">ทาง ② แรงถึงเกณฑ์มากขึ้น</span></div>
+    <div class="sec-bd">
+      <p>เหตุผลที่เราทำกันทุกวันจนไม่ทันคิด</p>
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>ทำไมต้องแช่ตู้เย็น</b><p>การเน่าเสียของอาหารก็เป็นปฏิกิริยาเคมี ความเย็นทำให้มันช้าลงมากจนเก็บได้เป็นสัปดาห์ — สังเกตว่า<b style="display:inline">ไม่ได้หยุด</b> แค่ช้าลง ทิ้งไว้นานพอก็เสียอยู่ดี</p></div>
+          <div><b>ทำไมต้องตั้งไฟ</b><p>อีกด้านหนึ่งของเรื่องเดียวกัน เราตั้งไฟก็เพื่อเร่งปฏิกิริยาการสุกที่ถ้าปล่อยไว้ในอุณหภูมิห้องจะไม่เกิดเลย</p></div>
+        </div>
+      </div>
+      <p>ข้อมูลจริงจากกิจกรรม 8.4 ชุดเดิม (ผง CaCO₃ + HCl 0.2 M) เปลี่ยนแค่อุ่นสารละลายให้ร้อนขึ้นก่อนเริ่มจับเวลา</p>
+      <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
+        <figure>
+          <svg class="chart" id="barTemp" viewBox="0 0 460 220" role="img" aria-label="แผนภูมิแท่งเปรียบเทียบเวลาที่ใช้เมื่ออุณหภูมิต่างกัน">
+            <g id="barTempG"></g>
+          </svg>
+          <figcaption>เวลาที่ใช้จนฟองแก๊สหมด (ผง CaCO₃ + HCl 0.2 M เท่ากันทั้งคู่)<b>อุณหภูมิห้องใช้ 48 วิ · อุ่นขึ้นใช้ 25 วิ</b></figcaption>
+        </figure>
+      </div>
+      <p>อุณหภูมิเป็นปัจจัย<b>เดียว</b>ในหน้านี้ที่ไม่ได้ทำงานด้วยการเพิ่มความถี่การชนเป็นหลัก แต่ไปเปลี่ยน<b>การกระจายพลังงาน</b>ของอนุภาค — อนุภาคในภาชนะเดียวกันไม่ได้เร็วเท่ากันทุกตัว บางตัวช้า บางตัวเร็ว และเพราะพลังงานจลน์แปรผันตามอัตราเร็วยกกำลังสอง ตัวที่เร็วพอเท่านั้นที่มีพลังงานถึงเกณฑ์ Eₐ กราฟด้านล่างคือหน้าตาของการกระจายนั้น — <b>ลากดูเองว่าเกิดอะไรขึ้นเมื่ออุ่นขึ้น</b></p>
+      <div class="panel">
+        <div class="face">
+          <svg class="chart" id="distSvg" viewBox="0 0 460 300" role="img" aria-label="กราฟการกระจายพลังงานจลน์ของอนุภาคที่ปรับอุณหภูมิได้ พื้นที่แรเงาทางขวาของเส้น Ea คือสัดส่วนที่ทำปฏิกิริยาได้">
+            <g id="distAxes"></g><g id="distArea"></g><g id="distCurve"></g><g id="distMark"></g>
+          </svg>
+        </div>
+        <div class="readout">
+          <div class="win is-secant"><span class="lbl">อุณหภูมิ</span><span class="num" id="distT">25</span><span class="unit">°C</span></div>
+          <div class="win is-tangent"><span class="lbl">อนุภาคที่พลังงาน ≥ Eₐ</span><span class="num" id="distPct" style="font-size:1.8rem">0%</span><span class="unit">ของทั้งหมด</span></div>
+          <div class="win"><span class="lbl">เทียบกับที่ 25 °C</span><span class="num" id="distRatio" style="font-size:1.8rem">×1</span><span class="unit">เท่า</span></div>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp"><label>อุณหภูมิ</label><input type="range" id="distSlider" min="25" max="100" value="25" step="1"></div>
+        <p class="hint">สังเกตว่า<b>เส้นประเกณฑ์ Eₐ ไม่ขยับเลย</b> ที่โตขึ้นคือพื้นที่แรเงาใต้หางกราฟ — ไม่มีใครลดเกณฑ์ให้ แต่มีอนุภาคผ่านเกณฑ์เดิมได้มากขึ้น และสังเกตว่ายอดกราฟ<b>เตี้ยลงและกว้างออก</b> เพราะจำนวนอนุภาคทั้งหมดเท่าเดิม เส้นประจาง ๆ คือรูปกราฟตอน 25 °C ไว้เทียบ · ในการทดลองจริง อุณหภูมิที่เพิ่มขึ้นทุก ๆ 10 °C มักทำให้อัตราเพิ่มขึ้นราวสองเท่า</p>
+      </div>
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>เพิ่มอุณหภูมิทำให้ Eₐ ลดลง ปฏิกิริยาจึงเกิดเร็วขึ้น</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p><b>Eₐ ไม่เปลี่ยนเลย</b> — เปลี่ยนแค่สัดส่วนของอนุภาคที่มีพลังงานถึงเกณฑ์เดิม ตัวที่ไปลด Eₐ ได้จริงมีอยู่ตัวเดียวคือตัวเร่งปฏิกิริยา</p>
+        </div>
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>ปฏิกิริยาคายพลังงาน พออุ่นเข้าไปอีกก็ต้องช้าลงสิ</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>ไม่ว่าปฏิกิริยาจะดูดหรือคายพลังงาน การเพิ่มอุณหภูมิทำให้<b>อัตราเพิ่มขึ้นเสมอ</b> เพราะ ΔE เป็นคนละเรื่องกับอัตรา</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.5 catalyst ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">3.5</span><h2>ตัวเร่งปฏิกิริยา</h2><span class="waytag w3">ทาง ③ ลดเกณฑ์</span></div>
+    <div class="sec-bd">
+      <p>ทำไมสูตรหมักเนื้อหลายสูตรถึงต้องมีผลไม้ผสมอยู่ด้วย</p>
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>สับปะรดและมะละกอหมักเนื้อให้นุ่ม</b><p>ทั้งคู่มีเอนไซม์ (โบรมีเลนในสับปะรด พาเพนในมะละกอ) ที่ช่วยเร่งการสลายโปรตีนในเนื้อ หมักไม่กี่สิบนาทีก็นุ่ม ทั้งที่ถ้าปล่อยไว้เฉย ๆ ต้องใช้เวลานานกว่ามาก และเมื่อหมักเสร็จ เอนไซม์ก็ยังอยู่ ไม่ได้หายไปไหน</p></div>
+          <div><b>น้ำยาล้างแผลที่ฟู่บนแผล</b><p>ไฮโดรเจนเปอร์ออกไซด์ในขวดอยู่ได้เป็นปีโดยไม่ฟู่ แต่พอแตะแผล เอนไซม์ในเลือดของเราเร่งให้มันสลายตัวทันทีจนเห็นฟองขาว</p></div>
+        </div>
+      </div>
+      <p>นี่คือ<b>ตัวเร่งปฏิกิริยา</b> — สารที่ทำให้ปฏิกิริยาเร็วขึ้นโดย<b>ตัวมันเองไม่ถูกใช้ไป</b> ในหนังสือเรียนมีกิจกรรม 8.5: ไฮโดรเจนเปอร์ออกไซด์สลายตัวเองได้อยู่แล้ว แต่ช้ามากจนแทบไม่เห็นฟอง พอหยดสารละลายโพแทสเซียมไอโอไดด์ลงไปนิดเดียว ฟองแก๊สพุ่งขึ้นทันที</p>
+      <div class="eq">2H₂O₂(aq) ⟶ 2H₂O(l) + O₂(g)</div>
+      <figure class="flaskfig" style="margin:1.4em 0 0">
+        <svg viewBox="0 0 640 300" role="img" aria-label="ขวดรูปกรวยสองใบ ใบซ้ายไฮโดรเจนเปอร์ออกไซด์อย่างเดียวของเหลวนิ่งสนิท ใบขวาเติมโพแทสเซียมไอโอไดด์แล้วเกิดฟองพุ่งล้นปากขวด">
+          <g id="catFlaskG"></g>
+        </svg>
+        <div class="flaskcaps">
+          <div><b>H₂O₂ อย่างเดียว</b><span>แทบไม่เห็นฟอง</span></div>
+          <div><b>H₂O₂ + KI (ตัวเร่ง)</b><span>ฟองพุ่งขึ้นทันที</span></div>
+        </div>
+      </figure>
+      <p style="margin-top:1.2em">ปริมาณ O₂ ที่ได้ในที่สุด<b>เท่ากันทั้งสองใบ</b> ต่างกันแค่ใช้เวลาไปถึงจุดนั้นนานแค่ไหน — และเมื่อจบปฏิกิริยา KI ยังอยู่ครบ ไม่ได้ถูกใช้ไป</p>
+
+      <h3>ตัวเร่งทำอะไรกันแน่</h3>
+      <p>ตัวเร่งไม่ได้ไปดันสารตั้งต้นให้มีพลังงานสูงขึ้น และไม่ได้ทำให้อนุภาควิ่งเร็วขึ้นเหมือนการเพิ่มอุณหภูมิ สิ่งที่มันทำคือ<b>เปิดเส้นทางใหม่ที่มี Eₐ ต่ำกว่าเดิม</b> — กดปุ่มดูว่าเกิดอะไรขึ้นกับกราฟทั้งสองฝั่งพร้อมกัน</p>
+      <div class="molrow" style="grid-template-columns:1fr">
+        <figure>
+          <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
+            <div class="grp" style="flex:0 0 auto"><button id="catBtn" type="button">ใส่ตัวเร่งปฏิกิริยา</button></div>
+          </div>
+          <svg class="chart" id="catSvg" viewBox="0 0 900 300" role="img" aria-label="ซ้าย กราฟพลังงานที่เนินลดลงเมื่อใส่ตัวเร่ง ขวา กราฟการกระจายพลังงานที่เส้น Ea ขยับซ้ายทำให้พื้นที่แรเงาโตขึ้น">
+            <g id="catE"></g><g id="catD"></g>
+          </svg>
+          <figcaption id="catCap"></figcaption>
+        </figure>
+      </div>
+      <div class="notes">
+        <div><b class="k">Eₐ ลดลง</b>เนินที่ต้องปีนเตี้ยลง อนุภาคชุดเดิมที่อุณหภูมิเดิมจึงผ่านได้มากขึ้นทันที</div>
+        <div><b class="k">ΔE เท่าเดิม</b>ระดับพลังงานของสารตั้งต้นและผลิตภัณฑ์ไม่ขยับ ปฏิกิริยาดูดหรือคายพลังงานเท่าไรก็เท่าเดิม</div>
+        <div><b class="k">ตัวเร่งไม่ถูกใช้ไป</b>เมื่อจบปฏิกิริยา ตัวเร่งยังอยู่ครบ เอาไปใช้ซ้ำได้ จึงใช้ปริมาณน้อยมากก็พอ</div>
+      </div>
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>ใส่ตัวเร่งแล้วจะได้ผลิตภัณฑ์มากขึ้นกว่าเดิม</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>ได้<b>ปริมาณเท่าเดิม</b> เพียงแต่ถึงเร็วกว่า ตัวเร่งเปลี่ยนแค่ความเร็ว ไม่ได้เปลี่ยนปลายทาง</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ synthesis ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>สรุป — ปัจจัยไหนไปทางไหน</h2></div>
+    <div class="sec-bd">
+      <p>ลองตอบในใจก่อนว่าแต่ละปัจจัยทำงานด้วยกลไกไหน แล้วค่อยกดดูเฉลย ถ้าตอบได้ครบทั้ง 5 แถว แปลว่าจับแก่นของบทนี้ได้แล้ว</p>
+      <div class="synth" id="synth">
+        <button class="synth-row fixed" type="button" aria-expanded="false">
+          <span class="f">ธรรมชาติของสาร<small>ไอออนิกเร็ว โคเวเลนต์ช้า</small></span>
+          <span class="m" data-a="เปลี่ยนไม่ได้ — เป็นตัวกำหนด Eₐ ตั้งต้น">กดเพื่อดูกลไก</span>
+        </button>
+        <button class="synth-row" type="button" aria-expanded="false">
+          <span class="f">ความเข้มข้น<small>เพิ่มโมลาร์ / เพิ่มความดันแก๊ส</small></span>
+          <span class="m" data-a="ทาง ① — อนุภาคต่อปริมาตรมากขึ้น จึงชนบ่อยขึ้น">กดเพื่อดูกลไก</span>
+        </button>
+        <button class="synth-row" type="button" aria-expanded="false">
+          <span class="f">พื้นที่ผิว<small>บดของแข็งให้เป็นผง</small></span>
+          <span class="m" data-a="ทาง ① — ผิวสัมผัสมากขึ้น จึงชนบ่อยขึ้น">กดเพื่อดูกลไก</span>
+        </button>
+        <button class="synth-row" type="button" aria-expanded="false">
+          <span class="f">อุณหภูมิ<small>อุ่นขึ้น / แช่เย็น</small></span>
+          <span class="m" data-a="ทาง ② — สัดส่วนอนุภาคที่พลังงานถึง Eₐ เพิ่มขึ้น">กดเพื่อดูกลไก</span>
+        </button>
+        <button class="synth-row w3" type="button" aria-expanded="false">
+          <span class="f">ตัวเร่งปฏิกิริยา<small>เอนไซม์ / KI / โลหะบางชนิด</small></span>
+          <span class="m" data-a="ทาง ③ — เปิดเส้นทางที่ Eₐ ต่ำกว่า โดย ΔE เท่าเดิม">กดเพื่อดูกลไก</span>
+        </button>
+      </div>
+      <p style="margin-top:1.4em">สังเกตว่ามีเพียง<b>ตัวเร่งปฏิกิริยาตัวเดียว</b>ที่ไปแตะ Eₐ ปัจจัยอื่นทั้งหมดปล่อยให้ Eₐ อยู่ที่เดิม แล้วไปเล่นกับจำนวนการชนหรือพลังงานของอนุภาคแทน — ถ้าจำได้ข้อเดียว ให้จำข้อนี้</p>
+    </div>
+  </section>
+
+  <!-- ============ exercises ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>แบบฝึกหัดท้ายบท</h2></div>
+    <div class="sec-bd">
+      <span class="checkhd">ชวนคิด (จากหนังสือเรียน)</span>
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>เมื่อใส่ผงแมกนีเซียม 0.5 กรัม (ประมาณหนึ่งเม็ดถั่วเขียว) ลงในสารละลายกรดไฮโดรคลอริกความเข้มข้น 1.0 โมลาร์ ปริมาตร 10 มิลลิลิตร และ 20 มิลลิลิตร อัตราการเกิดปฏิกิริยาเคมีในสารละลายทั้งสองต่างกันหรือไม่ อย่างไร</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p><b>ไม่ต่างกัน</b> เพราะสารละลายทั้งสองมี<b>ความเข้มข้นเท่ากัน</b> (1.0 M ทั้งคู่) — ปริมาตรที่มากกว่าไม่ได้แปลว่าเข้มข้นกว่า อัตราขึ้นกับจำนวนอนุภาคต่อหน่วยปริมาตร ไม่ใช่จำนวนอนุภาคทั้งหมด</p></div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>หากทำการทดลองดังข้อ 1 โดยเปลี่ยนไปใช้สารละลายต่อไปนี้แทน — กรดไฮโดรคลอริก 1.0 โมลาร์ 10 มิลลิลิตร, 0.5 โมลาร์ 20 มิลลิลิตร, และ 0.2 โมลาร์ 50 มิลลิลิตร — อัตราการเกิดปฏิกิริยาเคมีในสารละลายใดมีค่ามากที่สุด เพราะเหตุใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p>สารละลาย <b>1.0 M ปริมาตร 10 mL</b> มีอัตรามากที่สุด เพราะมีความเข้มข้นสูงที่สุดในสามตัวเลือก (สังเกตว่าทั้งสามมีจำนวนโมลของกรดเท่ากันคือ 0.01 โมล แต่ความเข้มข้นต่างกัน — และอัตราดูที่ความเข้มข้น)</p></div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">3</span>จากกิจกรรม 8.4 บีกเกอร์ที่ใช้ผง CaCO₃ + HCl 0.2 M (48 วินาที) เทียบกับบีกเกอร์ที่ใช้เม็ด CaCO₃ + HCl 0.2 M (เกิน 300 วินาที) ต่างกันที่ปัจจัยใด และอธิบายด้วยทฤษฎีการชนว่าทำไมจึงทำให้อัตราต่างกัน</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p>ต่างกันที่<b>พื้นที่ผิว</b> เนื่องจากปฏิกิริยาของแข็ง–ของเหลวเกิดที่ผิวสัมผัสเท่านั้น ผงที่มีมวลเท่ากับเม็ดมีพื้นที่ผิวรวมมากกว่ามาก จุดที่กรดเข้าชน CaCO₃ ได้พร้อมกันจึงมากกว่า <b>ความถี่การชนที่มีประสิทธิภาพเพิ่มขึ้น</b> โดย Eₐ ไม่เปลี่ยน — เป็นกลไกทาง ①</p></div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">4</span>ในบรรดาปัจจัยทั้งหมดที่เรียนมา มีปัจจัยใดบ้างที่ทำให้ค่าพลังงานก่อกัมมันต์ (Eₐ) ของปฏิกิริยาเปลี่ยนไปจริง ๆ และปัจจัยที่เหลือทำงานด้วยวิธีใดแทน</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p>มีเพียง<b>ตัวเร่งปฏิกิริยา</b>เท่านั้นที่ทำให้ Eₐ ของเส้นทางที่ใช้จริงลดลง (โดยการเปิดเส้นทางใหม่ ไม่ใช่การกดเนินเดิมให้เตี้ยลง)</p>
+            <p style="margin-top:.6em">ส่วนที่เหลือ — <b>ความเข้มข้น</b>และ<b>พื้นที่ผิว</b>เพิ่มความถี่การชน (ทาง ①) · <b>อุณหภูมิ</b>เพิ่มสัดส่วนอนุภาคที่มีพลังงานถึงเกณฑ์เดิม (ทาง ②) · <b>ธรรมชาติของสาร</b>เป็นตัวกำหนด Eₐ มาตั้งแต่ต้น ไม่ใช่สิ่งที่เราไปเปลี่ยนระหว่างทาง</p>
+          </div>
+        </details>
+      </div>
+      <p class="srcnote">ข้อมูลเชิงตัวเลขในหน้านี้อ้างอิงกิจกรรม 8.4 และ 8.5 จากคู่มือครูรายวิชาเพิ่มเติมวิทยาศาสตร์และเทคโนโลยี เคมี ชั้นมัธยมศึกษาปีที่ 5 เล่ม 3 (สสวท. ฉบับปรับปรุง พ.ศ. 2566) · กราฟการกระจายพลังงานและกราฟปริมาตร–เวลาเป็นภาพประกอบหลักการ ไม่ใช่ข้อมูลการทดลองจริง</p>
+    </div>
+  </section>
+
+  <footer>มโนทัศน์ที่ 03 จาก 06 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function S(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function txt(x,y,s,o){var a={x:x,y:y,"font-family":"Bai Jamjuree","font-size":21,"font-weight":600,
+    fill:"var(--ink-2)"};for(var k in (o||{}))a[k]=o[k];var e=S("text",a);e.textContent=s;return e;}
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild);}
+
+  /* ============ conical-flask illustrations (hook + catalyst evidence) ============ */
+  (function(){
+    var NT=44, NB=112, BOT=252, NW=17, BW=76, RAD=14;
+    /* half-width of the flask interior at height y */
+    function hw(y){ return y<=NB ? NW : NW+(BW-NW)*(y-NB)/(BOT-NB); }
+    function seeded(s){ return function(){ s=(s*1103515245+12345)&0x7fffffff; return s/0x7fffffff; }; }
+    function bottomRun(cx){
+      return " L"+(cx-BW)+" "+(BOT-RAD)+
+             " Q"+(cx-BW)+" "+BOT+" "+(cx-BW+RAD)+" "+BOT+
+             " L"+(cx+BW-RAD)+" "+BOT+
+             " Q"+(cx+BW)+" "+BOT+" "+(cx+BW)+" "+(BOT-RAD);
+    }
+    function glass(cx){
+      return "M"+(cx-NW)+" "+NT+" L"+(cx-NW)+" "+NB+bottomRun(cx)+
+             " L"+(cx+NW)+" "+NB+" L"+(cx+NW)+" "+NT;
+    }
+    function liquid(cx,lv){
+      var w=hw(lv);
+      return "M"+(cx-w).toFixed(1)+" "+lv+bottomRun(cx)+" L"+(cx+w).toFixed(1)+" "+lv+" Z";
+    }
+    function build(g,cx,cfg){
+      var rnd=seeded(cfg.seed), i;
+      g.appendChild(S("path",{d:liquid(cx,cfg.level),fill:"var(--cobalt-soft)"}));
+
+      /* undissolved solid sitting on the bottom */
+      if(cfg.solid==="powder"){
+        for(i=0;i<54;i++){
+          var py=BOT-5-rnd()*14, pw=hw(py)-9;
+          g.appendChild(S("circle",{cx:(cx-pw+rnd()*2*pw).toFixed(1),cy:py.toFixed(1),
+            r:(1.3+rnd()*1.4).toFixed(1),fill:"var(--ink-2)"}));
+        }
+      }else if(cfg.solid==="chunks"){
+        /* one single fused lump, not several small chunks — closer to what
+           "ก้อน" actually means, and a single low-surface-area mass reads as a
+           stronger contrast against the powder than a scattered pile does.
+           Vertices reach up to `s` left/right/up and 0.95·s down, so the
+           footprint below is sized from that instead of guessed offsets. */
+        var s=18;
+        var y=BOT-6-0.95*s;
+        var maxDx=hw(y)-4-s;
+        var x=cx+Math.max(-maxDx,Math.min(0,maxDx));
+        var pts=[[-s,0.15*s],[-0.75*s,-0.55*s],[-0.15*s,-s],[0.5*s,-0.85*s],
+          [s,-0.1*s],[0.85*s,0.5*s],[0.25*s,s],[-0.5*s,0.8*s]];
+        g.appendChild(S("path",{d:"M"+pts.map(function(p){
+          return (x+p[0]).toFixed(1)+" "+(y+p[1]).toFixed(1);}).join(" L")+" Z",
+          fill:"var(--ink-3)",stroke:"var(--ink-2)","stroke-width":1.8,"stroke-linejoin":"round"}));
+      }else if(cfg.solid==="grains"){
+        for(i=0;i<22;i++){
+          var gy=BOT-5-rnd()*10, gw=hw(gy)-10;
+          g.appendChild(S("circle",{cx:(cx-gw+rnd()*2*gw).toFixed(1),cy:gy.toFixed(1),
+            r:(1.6+rnd()*1.2).toFixed(1),fill:"var(--index)"}));
+        }
+      }
+
+      /* rising bubbles — every bubble on the page now actually moves (no static
+         foam pile), so "vigorous" reads through motion/density instead.
+         Each one travels TRAVEL px upward (matches the CSS keyframe), so it
+         must stay inside the glass across its WHOLE path, not just its spawn
+         point — sized against the width at the top of its travel, which is
+         always the narrowest point since the flask only widens downward. */
+      var TRAVEL=52;
+      for(i=0;i<cfg.bubbles;i++){
+        var r=2.4+rnd()*3.6;
+        var by=cfg.riseTop+rnd()*(BOT-10-cfg.riseTop);
+        var topY=Math.max(by-TRAVEL,NT+2);
+        var bw2=Math.max(hw(topY)-r-2,2);
+        var c=S("circle",{cx:(cx-bw2+rnd()*2*bw2).toFixed(1),cy:by.toFixed(1),
+          r:r.toFixed(1),fill:"none",stroke:"var(--cobalt)","stroke-width":1.7});
+        c.setAttribute("class","bub");
+        c.setAttribute("style","animation-duration:"+(1.5+rnd()*1.2).toFixed(2)+
+          "s;animation-delay:"+(-rnd()*2.4).toFixed(2)+"s");
+        g.appendChild(c);
+      }
+
+      g.appendChild(S("path",{d:glass(cx),fill:"none",stroke:"var(--ink)","stroke-width":3.2,
+        "stroke-linejoin":"round","stroke-linecap":"round"}));
+      g.appendChild(S("line",{x1:cx-NW-7,y1:NT,x2:cx+NW+7,y2:NT,
+        stroke:"var(--ink)","stroke-width":3.2,"stroke-linecap":"round"}));
+    }
+
+    var hook=document.getElementById("hookG");
+    if(hook){
+      build(hook,168,{seed:7,level:168,solid:"powder",bubbles:48,riseTop:95});
+      build(hook,472,{seed:23,level:168,solid:"chunks",bubbles:3,riseTop:200});
+    }
+    var cat=document.getElementById("catFlaskG");
+    if(cat){
+      build(cat,168,{seed:11,level:172,solid:null,bubbles:2,riseTop:200});
+      build(cat,472,{seed:41,level:172,solid:"grains",bubbles:58,riseTop:90});
+    }
+  })();
+
+  /* ============ INTERACTIVE 1 — collision lab ============ */
+  (function(){
+    var gP=document.getElementById("labParticles");
+    if(!gP) return;
+    var gS=document.getElementById("labSparks");
+    var sN=document.getElementById("labN"), sT=document.getElementById("labT");
+    var btn=document.getElementById("labCat");
+    var outAll=document.getElementById("labAll"), outOk=document.getElementById("labOk"),
+        outFrac=document.getElementById("labFrac");
+    var W=460,H=300,PAD=8,R=8;
+    /* tuned so the default state reads ~18% hot, hot at max temperature ~56%,
+       and the catalyst alone lifts the default to ~50% without touching temperature */
+    var VT_NORM=1.30, VT_CAT=0.82;
+    var particles=[], allTimes=[], okTimes=[], hotSamples=[], catalyst=false;
+
+    function sigma(){ return 0.30+parseInt(sT.value,10)*0.10; }
+    function threshold(){ return catalyst?VT_CAT:VT_NORM; }
+    /* Rayleigh draw — the 2-D speed distribution of an ideal gas */
+    function drawSpeed(){
+      var u=Math.random(); if(u<1e-9)u=1e-9;
+      return sigma()*Math.sqrt(-2*Math.log(u));
+    }
+    function makeParticle(){
+      var ang=Math.random()*Math.PI*2, sp=drawSpeed();
+      var el=S("circle",{r:R});
+      gP.appendChild(el);
+      return {x:PAD+R+Math.random()*(W-2*PAD-2*R),
+              y:PAD+R+Math.random()*(H-2*PAD-2*R),
+              dx:Math.cos(ang), dy:Math.sin(ang), sp:sp, el:el};
+    }
+    function syncCount(){
+      var n=parseInt(sN.value,10);
+      while(particles.length<n) particles.push(makeParticle());
+      while(particles.length>n){ var p=particles.pop(); gP.removeChild(p.el); }
+    }
+    function reheat(){ particles.forEach(function(p){ p.sp=drawSpeed(); }); }
+    syncCount();
+    sN.addEventListener("input",syncCount);
+    sT.addEventListener("input",reheat);
+    btn.addEventListener("click",function(){
+      catalyst=!catalyst;
+      btn.textContent=catalyst?"เอาตัวเร่งออก":"ใส่ตัวเร่งปฏิกิริยา";
+      btn.classList.toggle("right",catalyst);
+    });
+
+    function spark(x,y){
+      var c=S("circle",{cx:x,cy:y,r:3,fill:"var(--index)",opacity:1});
+      gS.appendChild(c);
+      var t0=null;
+      function fade(t){
+        if(t0===null)t0=t;
+        var dt=t-t0;
+        if(dt>380){ if(c.parentNode)gS.removeChild(c); return; }
+        c.setAttribute("r",(3+dt/380*13).toFixed(1));
+        c.setAttribute("opacity",(1-dt/380).toFixed(2));
+        requestAnimationFrame(fade);
+      }
+      requestAnimationFrame(fade);
+    }
+
+    var PX=1.05;
+    function step(){
+      var vt=threshold();
+      particles.forEach(function(p){
+        p.x+=p.dx*p.sp*PX; p.y+=p.dy*p.sp*PX;
+        if(p.x<PAD+R){p.x=PAD+R;p.dx=Math.abs(p.dx);}
+        if(p.x>W-PAD-R){p.x=W-PAD-R;p.dx=-Math.abs(p.dx);}
+        if(p.y<PAD+R){p.y=PAD+R;p.dy=Math.abs(p.dy);}
+        if(p.y>H-PAD-R){p.y=H-PAD-R;p.dy=-Math.abs(p.dy);}
+      });
+      var now=performance.now();
+      for(var i=0;i<particles.length;i++){
+        for(var j=i+1;j<particles.length;j++){
+          var a=particles[i],b=particles[j];
+          var ddx=b.x-a.x, ddy=b.y-a.y;
+          var dist=Math.sqrt(ddx*ddx+ddy*ddy), minD=2*R;
+          if(dist<minD && dist>0.0001){
+            var nx=ddx/dist, ny=ddy/dist, ov=(minD-dist)/2;
+            a.x-=nx*ov; a.y-=ny*ov; b.x+=nx*ov; b.y+=ny*ov;
+            var tdx=a.dx,tdy=a.dy;
+            a.dx=b.dx; a.dy=b.dy; b.dx=tdx; b.dy=tdy;
+            /* redraw both speeds from the current distribution: a collision is where
+               particles exchange energy, so this keeps the population thermalised
+               instead of freezing whatever the first random draw happened to give */
+            a.sp=drawSpeed(); b.sp=drawSpeed();
+            allTimes.push(now);
+            if(a.sp>=vt && b.sp>=vt){ okTimes.push(now); spark((a.x+b.x)/2,(a.y+b.y)/2); }
+          }
+        }
+      }
+      var hot=0;
+      particles.forEach(function(p){
+        var isHot=p.sp>=vt;
+        if(isHot)hot++;
+        p.el.setAttribute("cx",p.x.toFixed(1));
+        p.el.setAttribute("cy",p.y.toFixed(1));
+        p.el.setAttribute("fill",isHot?"var(--index)":"var(--cobalt-soft)");
+        p.el.setAttribute("stroke",isHot?"var(--index)":"var(--cobalt)");
+        p.el.setAttribute("stroke-width",isHot?0:1.5);
+      });
+      allTimes=allTimes.filter(function(t){return now-t<5000;});
+      okTimes=okTimes.filter(function(t){return now-t<5000;});
+      outAll.textContent=allTimes.length;
+      outOk.textContent=okTimes.length;
+      /* average the hot fraction over ~2.5 s — the instantaneous count of a dozen
+         particles is far too jumpy to read a trend off */
+      if(particles.length) hotSamples.push({t:now,f:hot/particles.length});
+      hotSamples=hotSamples.filter(function(s){return now-s.t<2500;});
+      if(hotSamples.length){
+        var sum=0; hotSamples.forEach(function(s){sum+=s.f;});
+        outFrac.textContent=Math.round(sum/hotSamples.length*100)+"%";
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  })();
+
+  /* ============ reusable comparison bar chart ============ */
+  function buildBarChart(gid,bars,unitLabel){
+    var g=document.getElementById(gid);
+    if(!g) return;
+    var X0=140,X1=440,Y0=20,Y1=170;
+    var maxVal=0; bars.forEach(function(b){ if(b.display>maxVal)maxVal=b.display; });
+    maxVal*=1.15;
+    var barH=(Y1-Y0-16*(bars.length-1))/bars.length;
+    bars.forEach(function(b,i){
+      var y=Y0+i*(barH+16), w=(b.display/maxVal)*(X1-X0);
+      g.appendChild(S("rect",{x:X0,y:y,width:X1-X0,height:barH,fill:"var(--panel-2)",stroke:"var(--rule)"}));
+      g.appendChild(S("rect",{x:X0,y:y,width:w,height:barH,fill:b.color}));
+      g.appendChild(txt(X0-10,y+barH/2+7,b.label,{"font-size":16,"font-weight":700,fill:"var(--ink)","text-anchor":"end"}));
+      g.appendChild(txt(X0+w+10,y+barH/2+7,b.valueLabel,{"font-size":17,"font-weight":700,fill:b.color}));
+    });
+    g.appendChild(txt((X0+X1)/2,205,unitLabel,{"font-size":13,fill:"var(--ink-3)","text-anchor":"middle"}));
+  }
+  buildBarChart("barConcG",[
+    {label:"HCl 0.2 M",display:48,valueLabel:"48 วิ",color:"var(--ink-3)"},
+    {label:"HCl 0.5 M",display:36,valueLabel:"36 วิ",color:"var(--cobalt)"}
+  ],"เวลาที่ใช้ (วินาที) — ยิ่งสั้นยิ่งเร็ว");
+  buildBarChart("barSurfG",[
+    {label:"ผง CaCO₃",display:48,valueLabel:"48 วิ",color:"var(--cobalt)"},
+    {label:"เม็ด CaCO₃",display:300,valueLabel:"> 300 วิ",color:"var(--ink-3)"}
+  ],"เวลาที่ใช้ (วินาที) — ยิ่งสั้นยิ่งเร็ว");
+  buildBarChart("barTempG",[
+    {label:"อุณหภูมิห้อง",display:48,valueLabel:"48 วิ",color:"var(--ink-3)"},
+    {label:"อุ่นขึ้น",display:25,valueLabel:"25 วิ",color:"var(--index)"}
+  ],"เวลาที่ใช้ (วินาที) — ยิ่งสั้นยิ่งเร็ว");
+
+  /* ============ INTERACTIVE 2 — the cutting cube ============ */
+  (function(){
+    var g=document.getElementById("cubeG");
+    if(!g) return;
+    var cap=document.getElementById("cubeCap");
+    var CX=230, CY=190, BASE=104;
+    var COS=Math.cos(Math.PI/6), SIN=Math.sin(Math.PI/6);
+    var levels=[
+      {n:1,gap:0,  pieces:1, area:96,  label:"ก้อนเดียว ผิวรวม 96 หน่วย"},
+      {n:2,gap:9,  pieces:8, area:192, label:"หั่นครั้งเดียว ได้ 8 ก้อน ผิวรวม 192 หน่วย — เพิ่มเป็น 2 เท่า"},
+      {n:4,gap:5,  pieces:64,area:384, label:"หั่นสองครั้ง ได้ 64 ก้อน ผิวรวม 384 หน่วย — เพิ่มเป็น 4 เท่าของก้อนเดิม"}
+    ];
+    /* three faces of a unit cube whose topmost vertex sits at (px,py) */
+    function facePath(px,py,s,which){
+      var hx=s*COS, hy=s*SIN;
+      var T=[px,py], Rt=[px+hx,py+hy], B=[px,py+2*hy], L=[px-hx,py+hy];
+      function dn(p){return [p[0],p[1]+s];}
+      function poly(pts){
+        return "M"+pts.map(function(p){return p[0].toFixed(2)+" "+p[1].toFixed(2);}).join(" L")+" Z";
+      }
+      if(which==="top")  return poly([T,Rt,B,L]);
+      if(which==="left") return poly([L,B,dn(B),dn(L)]);
+      return poly([Rt,B,dn(B),dn(Rt)]);
+    }
+    function render(li){
+      var L=levels[li];
+      clear(g);
+      var n=L.n, s=BASE/n, gap=L.gap;
+      var pitch=s+gap;
+      var cubes=[];
+      for(var i=0;i<n;i++) for(var j=0;j<n;j++) for(var k=0;k<n;k++) cubes.push([i,j,k]);
+      cubes.sort(function(a,b){ return (a[0]+a[1]+a[2])-(b[0]+b[1]+b[2]); });
+      cubes.forEach(function(c){
+        var i=c[0],j=c[1],k=c[2];
+        var ox=(i-j)*pitch*COS;
+        var oy=(i+j)*pitch*SIN - k*pitch;
+        var px=CX+ox, py=CY+oy-s;
+        var sw=n>2?0.9:1.3;
+        g.appendChild(S("path",{d:facePath(px,py,s,"top"),
+          fill:"var(--cobalt-soft)",stroke:"var(--cobalt)","stroke-width":sw,"stroke-linejoin":"round"}));
+        g.appendChild(S("path",{d:facePath(px,py,s,"left"),
+          fill:"#B4C6DF",stroke:"var(--cobalt)","stroke-width":sw,"stroke-linejoin":"round"}));
+        g.appendChild(S("path",{d:facePath(px,py,s,"right"),
+          fill:"#8AA4C7",stroke:"var(--cobalt)","stroke-width":sw,"stroke-linejoin":"round"}));
+      });
+      g.appendChild(txt(30,42,"ปริมาตรรวม",{"font-size":13,fill:"var(--ink-3)"}));
+      g.appendChild(txt(30,68,"64 หน่วย",{"font-size":24,"font-weight":700,fill:"var(--ink)"}));
+      g.appendChild(txt(30,90,"(ไม่เปลี่ยนเลย)",{"font-size":12,fill:"var(--ink-3)"}));
+      g.appendChild(txt(430,42,"พื้นที่ผิวรวม",{"font-size":13,fill:"var(--index)","text-anchor":"end"}));
+      g.appendChild(txt(430,70,L.area+" หน่วย",{"font-size":27,"font-weight":700,fill:"var(--index)","text-anchor":"end"}));
+      g.appendChild(txt(430,92,L.pieces+" ก้อน",{"font-size":13,fill:"var(--ink-3)","text-anchor":"end"}));
+      cap.textContent=L.label;
+      ["cut0","cut1","cut2"].forEach(function(id,idx){
+        document.getElementById(id).classList.toggle("right",idx===li);
+      });
+    }
+    ["cut0","cut1","cut2"].forEach(function(id,idx){
+      document.getElementById(id).addEventListener("click",function(){render(idx);});
+    });
+    render(0);
+  })();
+
+  /* ============ 3.3 idealized volume-vs-time toggle graph ============ */
+  (function(){
+    var g=document.getElementById("gridVT");
+    if(!g) return;
+    var X0=50,X1=375,Y0=18,Y1=225;
+    function sx(p){return X0+p*(X1-X0);}
+    function sy(v){return Y1-v*(Y1-Y0);}
+    var ax=document.getElementById("axesVT");
+    for(var i=0;i<=4;i++){var y=sy(i/4);g.appendChild(S("line",{x1:X0,y1:y,x2:X1,y2:y,stroke:"var(--rule-2)","stroke-width":1}));}
+    ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(txt(X1,Y1+24,"เวลา",{"text-anchor":"end","font-size":13}));
+    ax.appendChild(txt(0,0,"ปริมาตรแก๊สสะสม",{"text-anchor":"middle","font-size":13,
+      transform:"translate(14 "+((Y0+Y1)/2)+") rotate(-90)"}));
+    ax.appendChild(S("line",{x1:X0,y1:sy(1),x2:X1,y2:sy(1),stroke:"var(--ink-3)","stroke-width":1.3,"stroke-dasharray":"5 4"}));
+    ax.appendChild(txt(X0-8,sy(1)+5,"Vสุดท้าย",{"font-size":12,fill:"var(--ink-3)","text-anchor":"end"}));
+    function sm(t){return t*t*(3-2*t);}
+    function riseCurve(thresh){
+      var d="";
+      for(var p=0;p<=1.001;p+=0.02){
+        var t=Math.min(p/thresh,1);
+        d+=(p===0?"M":"L")+sx(p).toFixed(2)+" "+sy(sm(t)).toFixed(2);
+      }
+      return d;
+    }
+    var fastEl=document.getElementById("curveFastVT"), slowEl=document.getElementById("curveSlowVT");
+    fastEl.setAttribute("stroke","var(--cobalt)");
+    slowEl.setAttribute("stroke","var(--ink-3)");
+    var mk=document.getElementById("markVT"), capEl=document.getElementById("capVT");
+    var modes={
+      conc:{thFast:0.30,thSlow:0.62,fastLbl:"HCl 0.5 M",slowLbl:"HCl 0.2 M",
+        cap:"เข้มข้นกว่า เส้นชันกว่า ถึงปริมาตรสุดท้ายไวกว่า<b>แต่ปริมาตรแก๊สสุดท้ายเท่ากันทั้งสองเส้น</b>"},
+      surf:{thFast:0.22,thSlow:0.95,fastLbl:"ผง CaCO₃",slowLbl:"เม็ด CaCO₃",
+        cap:"พื้นที่ผิวมากกว่า เส้นชันกว่ามาก<b>แต่ปริมาตรแก๊สสุดท้ายเท่ากัน เพราะมวลสารตั้งต้นเท่ากัน</b>"}
+    };
+    function render(mode){
+      var m=modes[mode];
+      fastEl.setAttribute("d",riseCurve(m.thFast));
+      slowEl.setAttribute("d",riseCurve(m.thSlow));
+      clear(mk);
+      mk.appendChild(txt(sx(m.thFast)+6,sy(1)-10,m.fastLbl,{"font-size":13,"font-weight":700,fill:"var(--cobalt)"}));
+      mk.appendChild(txt(sx(Math.min(m.thSlow+0.05,0.78)),sy(0.55),m.slowLbl,{"font-size":13,"font-weight":700,fill:"var(--ink-3)"}));
+      capEl.innerHTML=m.cap;
+      document.getElementById("toggleConc").classList.toggle("right",mode==="conc");
+      document.getElementById("toggleSurf").classList.toggle("right",mode==="surf");
+    }
+    render("conc");
+    document.getElementById("toggleConc").addEventListener("click",function(){render("conc");});
+    document.getElementById("toggleSurf").addEventListener("click",function(){render("surf");});
+  })();
+
+  /* ---- shared Maxwell-Boltzmann helpers ----
+     Plotted against SPEED, f(v) = v²·exp(-v²/2σ²), which is the familiar
+     textbook hump: it peaks at v=√2σ, roughly a third of the way across, so the
+     curve reads properly. (An energy-axis plot peaks at E=kT/2, which forces the
+     hump flat against the y-axis for any realistic Eₐ/kT — visually useless.)
+     Kinetic energy ∝ v², so a speed threshold is exactly an energy threshold.
+     EMAX = how far the curve is drawn; IMAX = how far it is integrated, kept
+     well beyond EMAX so normalisation and the reported fractions stay accurate. */
+  var EMAX=1.0, IMAX=2.5, NSTEP=300;
+  function mb(sig){ return function(v){ return v*v*Math.exp(-(v*v)/(2*sig*sig)); }; }
+  function mbNorm(sig){
+    var f=mb(sig), s=0, h=IMAX/NSTEP;
+    for(var i=0;i<=NSTEP;i++) s+=f(i*h)*h;
+    return s;
+  }
+  function mbFraction(sig,vt){
+    var f=mb(sig), h=IMAX/NSTEP, s=0;
+    for(var i=0;i<=NSTEP;i++){ var v=i*h; if(v>=vt) s+=f(v)*h; }
+    return s/mbNorm(sig);
+  }
+  function sigOf(degC){ return 0.212+(degC-25)/75*0.177; }
+  var VT_BASE=0.74;
+
+  /* ============ INTERACTIVE 3 — draggable distribution ============ */
+  (function(){
+    var axes=document.getElementById("distAxes");
+    if(!axes) return;
+    var gArea=document.getElementById("distArea"), gCurve=document.getElementById("distCurve"),
+        gMark=document.getElementById("distMark");
+    var slider=document.getElementById("distSlider");
+    var outT=document.getElementById("distT"), outPct=document.getElementById("distPct"),
+        outRatio=document.getElementById("distRatio");
+    var X0=54,X1=436,Y0=26,Y1=248;
+    function sx(v){return X0+(v/EMAX)*(X1-X0);}
+    var PEAK=0;
+    (function(){ /* fix vertical scale to the coldest curve so growth reads honestly */
+      var f=mb(sigOf(25)), n=mbNorm(sigOf(25)), m=0;
+      for(var i=0;i<=NSTEP;i++){ var v=f(i*EMAX/NSTEP)/n; if(v>m)m=v; }
+      PEAK=m*1.06;
+    })();
+    function sy(v){return Y1-(v/PEAK)*(Y1-Y0);}
+    axes.appendChild(S("line",{x1:X0,y1:Y0-8,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    axes.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    axes.appendChild(txt(X1,Y1+26,"อัตราเร็วของอนุภาค →",{"text-anchor":"end","font-size":13}));
+    axes.appendChild(txt(0,0,"สัดส่วนอนุภาค",{"text-anchor":"middle","font-size":13,
+      transform:"translate(16 "+((Y0+Y1)/2)+") rotate(-90)"}));
+    function pathOf(sig,close){
+      var f=mb(sig), n=mbNorm(sig), d="", h=EMAX/NSTEP;
+      for(var i=0;i<=NSTEP;i++){
+        var v=i*h;
+        d+=(i===0?"M":"L")+sx(v).toFixed(2)+" "+sy(f(v)/n).toFixed(2);
+      }
+      if(close) d+=" L"+sx(EMAX).toFixed(2)+" "+sy(0).toFixed(2)+" L"+sx(0).toFixed(2)+" "+sy(0).toFixed(2)+" Z";
+      return d;
+    }
+    function areaOf(sig){
+      var f=mb(sig), n=mbNorm(sig), h=EMAX/NSTEP;
+      var d="M"+sx(VT_BASE).toFixed(2)+" "+sy(0).toFixed(2);
+      for(var v=VT_BASE;v<=EMAX+1e-9;v+=h) d+="L"+sx(v).toFixed(2)+" "+sy(f(v)/n).toFixed(2);
+      d+=" L"+sx(EMAX).toFixed(2)+" "+sy(0).toFixed(2)+" Z";
+      return d;
+    }
+    var ghost=S("path",{d:pathOf(sigOf(25),false),fill:"none",stroke:"var(--ink-3)",
+      "stroke-width":1.6,"stroke-dasharray":"5 5",opacity:.7});
+    function render(){
+      var T=parseInt(slider.value,10), sig=sigOf(T);
+      clear(gArea); clear(gCurve); clear(gMark);
+      gArea.appendChild(S("path",{d:areaOf(sig),fill:"var(--index-soft)"}));
+      gCurve.appendChild(ghost);
+      gCurve.appendChild(S("path",{d:pathOf(sig,false),fill:"none",stroke:"var(--index)","stroke-width":3.2}));
+      gMark.appendChild(S("line",{x1:sx(VT_BASE),y1:Y0-8,x2:sx(VT_BASE),y2:Y1,
+        stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"7 5"}));
+      gMark.appendChild(txt(sx(VT_BASE)-8,Y0+6,"เกณฑ์ Eₐ (อยู่ที่เดิมเสมอ)",{"font-size":14,"font-weight":700,fill:"var(--ink)","text-anchor":"end"}));
+      gMark.appendChild(txt(X1-4,Y1-14,"พื้นที่แรเงา = อนุภาคที่ทำปฏิกิริยาได้",
+        {"font-size":12,fill:"var(--index)","text-anchor":"end"}));
+      var frac=mbFraction(sig,VT_BASE), base=mbFraction(sigOf(25),VT_BASE);
+      outT.textContent=T;
+      outPct.textContent=(frac*100<1?(frac*100).toFixed(2):(frac*100).toFixed(1))+"%";
+      outRatio.textContent="×"+(frac/base).toFixed(frac/base<10?1:0);
+    }
+    slider.addEventListener("input",render);
+    render();
+  })();
+
+  /* ============ INTERACTIVE 4 — catalyst: hill drops, threshold moves ============ */
+  (function(){
+    var gE=document.getElementById("catE");
+    if(!gE) return;
+    var gD=document.getElementById("catD");
+    var btn=document.getElementById("catBtn"), cap=document.getElementById("catCap");
+    var on=false;
+    var VT_CAT=0.54, T_FIX=40;
+
+    /* --- left: energy profile --- */
+    var EX0=40,EX1=410,EY0=40,EY1=250;
+    function ex(p){return EX0+p*(EX1-EX0);}
+    function ey(h){return EY1-h*(EY1-EY0);}
+    var REACT=0.42, PROD=0.20;
+    function triU(cx,cy,s,c){return S("path",{d:"M"+cx+" "+cy+" l"+(-s)+" "+(s*1.7)+" l"+(2*s)+" 0 Z",fill:c});}
+    function triD(cx,cy,s,c){return S("path",{d:"M"+cx+" "+cy+" l"+(-s)+" "+(-s*1.7)+" l"+(2*s)+" 0 Z",fill:c});}
+    function hillPath(peak){
+      var d="";
+      for(var p=0;p<=1.001;p+=0.01){
+        var h;
+        if(p<0.18) h=REACT;
+        else if(p>0.82) h=PROD;
+        else{
+          var t=(p-0.18)/0.64;
+          var bump=Math.sin(Math.PI*t);
+          var base=REACT+(PROD-REACT)*t;
+          h=base+(peak-base)*bump;   /* apex lands exactly on `peak` at t=0.5 */
+        }
+        d+=(p===0?"M":"L")+ex(p).toFixed(2)+" "+ey(h).toFixed(2);
+      }
+      return d;
+    }
+
+    /* --- right: distribution with a movable threshold --- */
+    var DX0=500,DX1=870,DY0=40,DY1=250;
+    function dx(v){return DX0+(v/EMAX)*(DX1-DX0);}
+    var DPEAK=(function(){
+      var f=mb(sigOf(T_FIX)),n=mbNorm(sigOf(T_FIX)),m=0;
+      for(var i=0;i<=NSTEP;i++){var v=f(i*EMAX/NSTEP)/n; if(v>m)m=v;}
+      return m*1.08;
+    })();
+    function dy(v){return DY1-(v/DPEAK)*(DY1-DY0);}
+
+    function render(){
+      clear(gE); clear(gD);
+      var peak = on?0.62:0.86;
+      var ea = on?VT_CAT:VT_BASE;
+
+      /* axes (left) */
+      gE.appendChild(S("line",{x1:EX0,y1:EY0-14,x2:EX0,y2:EY1,stroke:"var(--ink)","stroke-width":1.5}));
+      gE.appendChild(S("line",{x1:EX0,y1:EY1,x2:EX1,y2:EY1,stroke:"var(--ink)","stroke-width":1.5}));
+      gE.appendChild(txt(EX1,EY1+24,"การดำเนินไปของปฏิกิริยา →",{"text-anchor":"end","font-size":13}));
+      gE.appendChild(txt(0,0,"พลังงาน",{"text-anchor":"middle","font-size":13,
+        transform:"translate(16 "+((EY0+EY1)/2)+") rotate(-90)"}));
+      /* ghost of the uncatalysed hill */
+      if(on) gE.appendChild(S("path",{d:hillPath(0.86),fill:"none",stroke:"var(--ink-3)",
+        "stroke-width":1.6,"stroke-dasharray":"5 5",opacity:.65}));
+      gE.appendChild(S("path",{d:hillPath(peak),fill:"none",
+        stroke:on?"var(--index)":"var(--cobalt)","stroke-width":3.4}));
+      /* level guides */
+      gE.appendChild(S("line",{x1:EX0,y1:ey(REACT),x2:EX1,y2:ey(REACT),
+        stroke:"var(--rule)","stroke-width":1.2,"stroke-dasharray":"4 4"}));
+      gE.appendChild(S("line",{x1:EX0,y1:ey(PROD),x2:EX1,y2:ey(PROD),
+        stroke:"var(--rule)","stroke-width":1.2,"stroke-dasharray":"4 4"}));
+      /* Ea arrow, from reactant level up to the peak */
+      var ax=ex(0.5), tip=4.5*1.7;
+      gE.appendChild(S("line",{x1:ax,y1:ey(REACT)-tip,x2:ax,y2:ey(peak)+tip,
+        stroke:on?"var(--index)":"var(--cobalt)","stroke-width":2}));
+      gE.appendChild(triU(ax,ey(peak),4.5,on?"var(--index)":"var(--cobalt)"));
+      gE.appendChild(triD(ax,ey(REACT),4.5,on?"var(--index)":"var(--cobalt)"));
+      gE.appendChild(txt(ax+10,(ey(REACT)+ey(peak))/2,on?"Eₐ ใหม่ (ต่ำลง)":"Eₐ เดิม",
+        {"font-size":15,"font-weight":700,fill:on?"var(--index)":"var(--cobalt)"}));
+      /* delta E bracket, always identical — label sits above the bracket so it
+         never collides with the ผลิตภัณฑ์ caption on the product line */
+      var dxp=ex(0.95);
+      gE.appendChild(S("line",{x1:dxp,y1:ey(REACT),x2:dxp,y2:ey(PROD),stroke:"var(--ink-2)","stroke-width":1.8}));
+      gE.appendChild(S("line",{x1:dxp-6,y1:ey(REACT),x2:dxp+6,y2:ey(REACT),stroke:"var(--ink-2)","stroke-width":1.8}));
+      gE.appendChild(S("line",{x1:dxp-6,y1:ey(PROD),x2:dxp+6,y2:ey(PROD),stroke:"var(--ink-2)","stroke-width":1.8}));
+      gE.appendChild(txt(dxp-10,ey(REACT)-10,"ΔE เท่าเดิม",
+        {"font-size":13,"font-weight":700,fill:"var(--ink-2)","text-anchor":"end"}));
+      gE.appendChild(txt(EX0+6,ey(REACT)-10,"สารตั้งต้น",{"font-size":13,fill:"var(--ink-2)"}));
+      gE.appendChild(txt(ex(0.70),ey(PROD)-10,"ผลิตภัณฑ์",{"font-size":13,fill:"var(--ink-2)","text-anchor":"middle"}));
+
+      /* right chart */
+      var sig=sigOf(T_FIX), f=mb(sig), n=mbNorm(sig), h=EMAX/NSTEP;
+      gD.appendChild(S("line",{x1:DX0,y1:DY0-14,x2:DX0,y2:DY1,stroke:"var(--ink)","stroke-width":1.5}));
+      gD.appendChild(S("line",{x1:DX0,y1:DY1,x2:DX1,y2:DY1,stroke:"var(--ink)","stroke-width":1.5}));
+      gD.appendChild(txt(DX1,DY1+24,"อัตราเร็วของอนุภาค →",{"text-anchor":"end","font-size":13}));
+      gD.appendChild(txt(DX0+6,DY0-2,"อุณหภูมิคงที่ "+T_FIX+" °C ตลอด",{"font-size":13,fill:"var(--ink-3)"}));
+      var d="M"+dx(ea).toFixed(2)+" "+dy(0).toFixed(2);
+      for(var v=ea;v<=EMAX+1e-9;v+=h) d+="L"+dx(v).toFixed(2)+" "+dy(f(v)/n).toFixed(2);
+      d+=" L"+dx(EMAX).toFixed(2)+" "+dy(0).toFixed(2)+" Z";
+      gD.appendChild(S("path",{d:d,fill:"var(--index-soft)"}));
+      var dc="";
+      for(var i=0;i<=NSTEP;i++){var vi=i*h; dc+=(i===0?"M":"L")+dx(vi).toFixed(2)+" "+dy(f(vi)/n).toFixed(2);}
+      gD.appendChild(S("path",{d:dc,fill:"none",stroke:"var(--cobalt)","stroke-width":3}));
+      gD.appendChild(S("line",{x1:dx(ea),y1:DY0-14,x2:dx(ea),y2:DY1,
+        stroke:on?"var(--index)":"var(--ink)","stroke-width":2.2,"stroke-dasharray":"7 5"}));
+      if(on) gD.appendChild(S("line",{x1:dx(VT_BASE),y1:DY0-14,x2:dx(VT_BASE),y2:DY1,
+        stroke:"var(--ink-3)","stroke-width":1.4,"stroke-dasharray":"4 5",opacity:.8}));
+      gD.appendChild(txt(dx(ea)+8,DY0+6,on?"Eₐ ใหม่":"Eₐ",
+        {"font-size":15,"font-weight":700,fill:on?"var(--index)":"var(--ink)"}));
+      var frac=mbFraction(sig,ea), base=mbFraction(sig,VT_BASE);
+      gD.appendChild(txt(DX1-4,DY1-52,"อนุภาคที่ผ่านเกณฑ์",{"font-size":13,fill:"var(--ink-3)","text-anchor":"end"}));
+      gD.appendChild(txt(DX1-4,DY1-22,(frac*100).toFixed(1)+"%",
+        {"font-size":30,"font-weight":700,fill:"var(--index)","text-anchor":"end"}));
+
+      cap.innerHTML = on
+        ? "ใส่ตัวเร่งแล้ว — เนินเตี้ยลง เส้น Eₐ ทางขวาขยับมาทางซ้าย พื้นที่แรเงาโตขึ้นทันที<b>อุณหภูมิเท่าเดิมทุกประการ อนุภาคผ่านเกณฑ์เพิ่มจาก "+(base*100).toFixed(1)+"% เป็น "+(frac*100).toFixed(1)+"% (×"+(frac/base).toFixed(1)+")</b>"
+        : "ยังไม่ใส่ตัวเร่ง — เนินสูง เส้น Eₐ อยู่ไกลไปทางขวา มีอนุภาคเพียงส่วนน้อยที่ผ่านได้<b>กดปุ่มด้านบนเพื่อดูว่าตัวเร่งเปลี่ยนอะไร</b>";
+      btn.textContent = on?"เอาตัวเร่งออก":"ใส่ตัวเร่งปฏิกิริยา";
+      btn.classList.toggle("right",on);
+    }
+    btn.addEventListener("click",function(){ on=!on; render(); });
+    render();
+  })();
+
+  /* ============ synthesis rows — click to reveal ============ */
+  (function(){
+    var box=document.getElementById("synth");
+    if(!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll(".synth-row"),function(row){
+      var m=row.querySelector(".m"), ans=m.getAttribute("data-a"), shut="กดเพื่อดูกลไก";
+      row.addEventListener("click",function(){
+        var openNow=row.getAttribute("aria-expanded")==="true";
+        row.setAttribute("aria-expanded",openNow?"false":"true");
+        m.textContent=openNow?shut:ans;
+      });
+    });
+  })();
+})();
+</script>
