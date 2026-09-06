@@ -57,6 +57,8 @@ svg.chart{display:block;width:100%;height:auto;touch-action:none}
 .caliper{border:2px solid var(--ink);border-top:none;background:var(--panel);
   padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.6em;align-items:center}
 .caliper .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+/* rows of choice buttons must wrap on narrow screens instead of running off the panel */
+.caliper .grp.btns{flex:0 1 auto;flex-wrap:wrap;justify-content:center}
 .caliper label{font-family:var(--tech);font-weight:700;font-size:.82em;color:var(--cobalt);white-space:nowrap}
 input[type=range]{flex:1;accent-color:var(--cobalt);height:1.6em;min-width:90px}
 button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
@@ -221,6 +223,9 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
   .panel{grid-template-columns:1fr}
   .readout{flex-direction:row;flex-wrap:wrap}
   .readout .win{flex:1 1 40%}
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
 }
 #labSparks circle{pointer-events:none}
 </style>
@@ -407,7 +412,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       <div class="molrow" style="grid-template-columns:1fr;max-width:560px;margin-inline:auto">
         <figure>
           <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
-            <div class="grp" style="flex:0 0 auto;gap:.5em">
+            <div class="grp btns" style="gap:.5em">
               <button id="cut0" type="button" class="right">ไม่หั่น</button>
               <button id="cut1" type="button">หั่นเป็น 8 ก้อน</button>
               <button id="cut2" type="button">หั่นเป็น 64 ก้อน</button>
@@ -443,7 +448,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
         <figure>
           <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
-            <div class="grp" style="flex:0 0 auto;gap:.5em">
+            <div class="grp btns" style="gap:.5em">
               <button id="toggleConc" type="button" class="right">เทียบความเข้มข้น</button>
               <button id="toggleSurf" type="button">เทียบพื้นที่ผิว</button>
             </div>
@@ -883,9 +888,9 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     function triR(cx,cy,s,c){return S("path",{d:"M"+cx+","+(cy-s)+" L"+cx+","+(cy+s)+" L"+(cx+s*1.7)+","+cy+" Z",fill:c});}
     ax.appendChild(triU(X0,Y0,3.5,"var(--ink)"));
     ax.appendChild(triR(X1,Y1,3.5,"var(--ink)"));
-    ax.appendChild(txt(X1,Y1+24,"การดำเนินไปของปฏิกิริยา",{"text-anchor":"end","font-size":13,"letter-spacing":"0.04em"}));
-    ax.appendChild(txt(0,0,"พลังงาน",{"text-anchor":"middle","font-size":13,"letter-spacing":"0.04em",
-      transform:"translate(15 "+((Y0+Y1)/2)+") rotate(-90)"}));
+    ax.appendChild(txt(X1,Y1+26,"การดำเนินไปของปฏิกิริยา",{"text-anchor":"end","font-size":16,"letter-spacing":"0.04em"}));
+    ax.appendChild(txt(0,0,"พลังงาน",{"text-anchor":"middle","font-size":16,"letter-spacing":"0.04em",
+      transform:"translate(17 "+((Y0+Y1)/2)+") rotate(-90)"}));
 
     var reactant=0.20, product=0.13, peakIon=0.32, peakCov=0.90;
     var xPeakIon=0.30, xPeakCov=0.48;
@@ -916,14 +921,14 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     mk.appendChild(S("line",{x1:sx(xPeakIon),y1:yR-arrowTip,x2:sx(xPeakIon),y2:yPi+arrowTip,stroke:"var(--cobalt)","stroke-width":1.6}));
     mk.appendChild(triD(sx(xPeakIon),yR-arrowTip,3.5,"var(--cobalt)"));
     mk.appendChild(triU(sx(xPeakIon),yPi+arrowTip,3.5,"var(--cobalt)"));
-    mk.appendChild(txt(sx(xPeakIon)-11,(yR+yPi)/2+6,"Eₐ ต่ำ",{"font-size":14,"font-weight":700,fill:"var(--cobalt)","text-anchor":"end"}));
+    mk.appendChild(txt(sx(xPeakIon)-11,(yR+yPi)/2+6,"Eₐ ต่ำ",{"font-size":18,"font-weight":700,fill:"var(--cobalt)","text-anchor":"end"}));
     mk.appendChild(S("line",{x1:sx(xPeakCov),y1:yR-arrowTip,x2:sx(xPeakCov),y2:yPc+arrowTip,stroke:"var(--index)","stroke-width":1.6}));
     mk.appendChild(triD(sx(xPeakCov),yR-arrowTip,3.5,"var(--index)"));
     mk.appendChild(triU(sx(xPeakCov),yPc+arrowTip,3.5,"var(--index)"));
-    mk.appendChild(txt(sx(xPeakCov)+11,(yR+yPc)/2+6,"Eₐ สูง",{"font-size":14,"font-weight":700,fill:"var(--index)"}));
-    mk.appendChild(txt(sx(0.16),yPi-10,"ไอออนิก",{"font-size":13,"font-weight":700,fill:"var(--cobalt)","text-anchor":"middle"}));
-    mk.appendChild(txt(sx(0.30),yPc-10,"โคเวเลนต์",{"font-size":13,"font-weight":700,fill:"var(--index)","text-anchor":"middle"}));
-    mk.appendChild(txt(sx(0.02),yR+18,"สารตั้งต้น (จุดเริ่มต้นเดียวกัน)",{"font-size":12,"font-weight":600,fill:"var(--ink-2)"}));
+    mk.appendChild(txt(sx(xPeakCov)+11,(yR+yPc)/2+6,"Eₐ สูง",{"font-size":18,"font-weight":700,fill:"var(--index)"}));
+    mk.appendChild(txt(sx(0.15),yPi-12,"ไอออนิก",{"font-size":17,"font-weight":700,fill:"var(--cobalt)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(0.30),yPc-12,"โคเวเลนต์",{"font-size":17,"font-weight":700,fill:"var(--index)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(0.02),yR+20,"จุดเริ่มต้นเดียวกัน",{"font-size":15,"font-weight":600,fill:"var(--ink-2)"}));
     mk.appendChild(S("circle",{cx:sx(0),cy:yR,r:5,fill:"var(--ink)"}));
   })();
 
@@ -1146,8 +1151,24 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     var on=false;
     var VT_CAT=0.54, T_FIX=40;
 
-    /* --- left: energy profile --- */
-    var EX0=40,EX1=410,EY0=40,EY1=250;
+    /* Two charts share one SVG. Side by side they are unreadable once the page is phone-width
+       (each half ends up ~150px wide), so on a narrow screen they stack and the viewBox grows
+       instead — same drawing code, only the two coordinate frames move. */
+    var svg=document.getElementById("catSvg");
+    var EX0,EX1,EY0,EY1,DX0,DX1,DY0,DY1;
+    function layout(){
+      if(window.matchMedia("(max-width:760px)").matches){
+        svg.setAttribute("viewBox","0 0 460 640");
+        EX0=48; EX1=430; EY0=44;  EY1=254;
+        DX0=48; DX1=430; DY0=390; DY1=600;
+      } else {
+        svg.setAttribute("viewBox","0 0 900 300");
+        EX0=40;  EX1=410; EY0=40; EY1=250;
+        DX0=500; DX1=870; DY0=40; DY1=250;
+      }
+    }
+
+    /* --- left (or top): energy profile --- */
     function ex(p){return EX0+p*(EX1-EX0);}
     function ey(h){return EY1-h*(EY1-EY0);}
     var REACT=0.42, PROD=0.20;
@@ -1170,8 +1191,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       return d;
     }
 
-    /* --- right: distribution with a movable threshold --- */
-    var DX0=500,DX1=870,DY0=40,DY1=250;
+    /* --- right (or bottom): distribution with a movable threshold --- */
     function dx(v){return DX0+(v/EMAX)*(DX1-DX0);}
     var DPEAK=(function(){
       var f=mb(sigOf(T_FIX)),n=mbNorm(sigOf(T_FIX)),m=0;
@@ -1251,7 +1271,12 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       btn.classList.toggle("right",on);
     }
     btn.addEventListener("click",function(){ on=!on; render(); });
-    render();
+    var rt;
+    window.addEventListener("resize",function(){
+      clearTimeout(rt);
+      rt=setTimeout(function(){ layout(); render(); },150);
+    });
+    layout(); render();
   })();
 
   /* ============ synthesis rows — click to reveal ============ */

@@ -241,6 +241,9 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
   .panel{grid-template-columns:1fr}
   .readout{flex-direction:row;flex-wrap:wrap}
   .readout .win{flex:1 1 45%}
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
 }
 
 /* ---------- hook collision animations ---------- */

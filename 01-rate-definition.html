@@ -6,6 +6,7 @@ STORY: ครูลากขีดดัชนีสองอันเข้า�
 FIRST VIEWPORT: แผ่นป้ายชื่อด้านบน แผงหน้าปัดเต็มความกว้าง กราฟสลักกลางแผง สเกลเวลาอยู่ขอบล่าง สเกลปริมาตรอยู่ขอบซ้าย หน้าต่างอ่านค่าตัวเลขใหญ่อยู่ขวา คานคาลิเปอร์อยู่ใต้แผง
 FORM: หน้าปัดเครื่องมือวัด อันดับ 4 ของรายการ, staging แบบแผงอีนาเมลพื้นสว่างเพื่อสู้แสงโปรเจกเตอร์ โหมดสว่างอย่างเดียวตามที่ผู้ใช้กำหนด, seed dbee39ad
 -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -228,6 +229,9 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
   .panel{grid-template-columns:1fr}
   .readout{flex-direction:row;flex-wrap:wrap}
   .readout .win{flex:1 1 45%}
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
 }
 </style>
 

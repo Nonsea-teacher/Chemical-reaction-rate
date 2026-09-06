@@ -53,6 +53,12 @@ h1 em{font-style:normal;color:var(--index);
 
 footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
   padding:2.6em 0 1em;text-align:center}
+
+@media (max-width:900px){
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
+}
 </style>
 </head>
 <body>
@@ -60,7 +66,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
 
   <div class="plate">
     <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
-    <div><span class="lbl">จำนวนแผง</span><span class="val">3 / 6 พร้อมใช้</span></div>
+    <div><span class="lbl">จำนวนแผง</span><span class="val">4 / 6 พร้อมใช้</span></div>
   </div>
 
   <h1>สื่อการสอน<br><em>อัตราการเกิดปฏิกิริยาเคมี</em></h1>
@@ -82,10 +88,10 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       <span><span class="tt">ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยา</span><span class="dd">ธรรมชาติของสาร · ความเข้มข้น · พื้นที่ผิว · อุณหภูมิ · ตัวเร่งปฏิกิริยา</span></span>
       <span class="go">เข้าสู่ Chapter ▸</span>
     </a>
-    <a class="soon">
+    <a href="04-rate-law.html">
       <span class="no">04</span>
-      <span><span class="tt">กฎอัตราและอันดับของปฏิกิริยา</span><span class="dd">กำลังจัดทำ</span></span>
-      <span class="go">เร็ว ๆ นี้</span>
+      <span><span class="tt">กฎอัตราและอันดับของปฏิกิริยา</span><span class="dd">กฎอัตรา · อันดับจากการทดลอง · วิธีอัตราเริ่มต้น · ค่าคงที่ k และหน่วย</span></span>
+      <span class="go">เข้าสู่ Chapter ▸</span>
     </a>
     <a class="soon">
       <span class="no">05</span>

@@ -1,0 +1,1010 @@
+<title>แผงกฎอัตราและอันดับปฏิกิริยา</title>
+<!--
+THESIS: เลขสองชุดหน้าตาเหมือนกันแต่มาจากคนละที่ — สัมประสิทธิ์มาจากสมการดุล (กระดาษ)
+        อันดับมาจากการทดลองเท่านั้น (โต๊ะแล็บ) ทั้งหน้าตอบคำถามเดียว "เลขตัวนี้มาจากไหน"
+OWN-WORLD: หน้าปัดเครื่องมือวัด (สืบทอดจากแผงที่ 01-03) โคบอลต์ = ค่าที่วัดได้/ถูก, ชาด = ค่าที่เน้น/ผิด
+STORY: ตาราง A + B → A₂B จากแบบฝึกหัด 8.3 ข้อ 2 — เพิ่ม B สามเท่าแล้วผลิตภัณฑ์เท่าเดิมเป๊ะ
+       ตารางเดียวกันนี้หักล้างความเชื่อ "อันดับ = สัมประสิทธิ์" ได้ด้วยตัวมันเอง (สมการคือ 2A + B)
+FIRST VIEWPORT: แผ่นป้ายชื่อ แล้วกราฟแท่ง 4 การทดลอง พร้อมคำถามค้างไว้
+INTERACTIVE: 3 ตัว — ตารางเลือกคู่เทียบ (ชิ้นเอก) / กราฟ rate–[A] สลับอันดับ / เครื่องคิดหน่วยของ k
+-->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#D9DEDA; --panel:#F7F8F6; --panel-2:#ECEFEB; --panel-3:#E1E6E2;
+  --ink:#171D1B; --ink-2:#5A6461; --ink-3:#8B948F;
+  --rule:#BAC2BD; --rule-2:#D5DBD6;
+  --index:#C0301A; --index-soft:#F2D9D3;
+  --cobalt:#17457F; --cobalt-soft:#D6E0EE;
+  --engrave: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06);
+  --sans:"Anuphan",system-ui,sans-serif;
+  --tech:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%;
+  word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1400px;margin:0 auto;padding:clamp(14px,2vw,32px)}
+img,svg{max-width:100%}
+
+.plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
+.plate>div{background:var(--panel);padding:.55em 1em;box-shadow:var(--engrave)}
+.plate .grow{flex:1 1 320px}
+.plate .lbl{font-family:var(--tech);font-weight:600;font-size:.62em;letter-spacing:.22em;
+  color:var(--ink-3);display:block;line-height:1.6}
+.plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
+.serial{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+
+.panel{border:2px solid var(--ink);display:grid;
+  grid-template-columns:minmax(0,1fr) 320px;gap:2px;background:var(--rule)}
+.panel>*{background:var(--panel)}
+.panel.solo{grid-template-columns:1fr}
+.face{padding:clamp(8px,1.2vw,18px) 0 0 0}
+svg.chart{display:block;width:100%;height:auto;touch-action:none}
+.readout{padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;gap:1.1em;box-shadow:var(--engrave)}
+.win{background:var(--panel-2);border:1px solid var(--rule);padding:.7em .85em}
+.win .lbl{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-2);display:block;margin:-.7em -.85em .55em;padding:.5em .9em}
+.win.is-hi .lbl{background:var(--index)}
+.win.is-lo .lbl{background:var(--cobalt)}
+.win .num{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.05;letter-spacing:-.02em;display:block}
+.win .unit{font-family:var(--tech);font-weight:500;font-size:.62em;color:var(--ink-2)}
+
+.caliper{border:2px solid var(--ink);border-top:none;background:var(--panel);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.6em;align-items:center}
+.caliper .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+.caliper label{font-family:var(--tech);font-weight:700;font-size:.82em;color:var(--cobalt);white-space:nowrap}
+button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
+  padding:.7em 1.2em;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);
+  cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s, background .12s}
+button:hover{background:var(--index);color:#fff;border-color:var(--index)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button.right{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.hint{font-family:var(--tech);font-size:.66em;color:var(--ink-3);flex-basis:100%;margin:0;line-height:1.6}
+
+/* ---------- hook ---------- */
+.hookfig{margin:0;border:2px solid var(--ink);background:var(--panel)}
+.hookfig svg{display:block;width:100%;height:auto;background:var(--panel-2)}
+.hookq{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,2.4vw,1.55rem);color:var(--ink);
+  text-align:center;padding:.9em 1em;margin:0;border:2px solid var(--ink);border-top:0;background:var(--index-soft)}
+
+/* ---------- everyday-life examples ---------- */
+.reallife{border:2px solid var(--ink);background:var(--panel-2);margin:1.3em 0 1.6em}
+.reallife .kick{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.2em;
+  color:var(--panel);background:var(--ink);padding:.55em 1.1em;display:block}
+.reallife .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));
+  gap:2px;background:var(--rule)}
+.reallife .items>div{background:var(--panel);padding:1.05em 1.2em}
+.reallife b{font-family:var(--tech);display:block;font-size:1.05em;margin-bottom:.2em;color:var(--ink)}
+.reallife p{margin:0;font-size:.9em;color:var(--ink-2)}
+
+.molrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin:1.4em 0}
+.molrow figure{margin:0;background:var(--panel);padding:.9em .9em .75em;text-align:center;box-shadow:var(--engrave)}
+.molrow svg{display:block;width:100%;height:auto;border:1px solid var(--rule);background:var(--panel-2)}
+.molrow figcaption{font-family:var(--tech);font-size:.8em;color:var(--ink-2);margin-top:.7em;line-height:1.5}
+.molrow figcaption b{display:block;color:var(--ink);font-size:1.1em;margin-top:.15em;font-weight:700}
+
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(2.1rem,4.4vw,4rem);line-height:1.2;
+  letter-spacing:-.02em;margin:1.2em 0 .3em;max-width:24ch}
+h1 em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .34em no-repeat}
+.dek{font-size:1.1em;color:var(--ink);max-width:56ch;margin:0 0 2.4em}
+
+.sec{border:2px solid var(--ink);background:var(--panel);margin-top:2.6em}
+.sec-hd{display:flex;align-items:baseline;gap:.7em 1em;flex-wrap:wrap;padding:clamp(14px,1.5vw,22px);
+  border-bottom:2px solid var(--ink);background:var(--panel-2)}
+.sec-no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.6rem,3vw,2.6rem);color:var(--index);line-height:1}
+h2{font-family:var(--tech);font-weight:700;font-size:clamp(1.5rem,2.6vw,2.4rem);letter-spacing:-.01em;margin:0}
+h3{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,1.7vw,1.5rem);margin:2em 0 .4em}
+h3:first-child{margin-top:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.sec-bd>p{max-width:62ch}
+.keytag{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.14em;
+  color:#fff;background:var(--cobalt);padding:.45em .9em;white-space:nowrap;margin-left:auto}
+.keytag.hot{background:var(--index)}
+.eq{font-family:var(--tech);font-weight:600;font-size:clamp(1.2rem,2.4vw,2rem);
+  text-align:center;padding:.85em .4em;background:var(--panel-2);border:1px solid var(--rule);margin:.2em 0 1.4em}
+.eq.long{font-size:clamp(1rem,2vw,1.5rem)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;line-height:1.05;
+  margin:0 .16em;text-align:center}
+.frac i{font-style:normal;white-space:nowrap;padding:0 .1em}
+.frac i.n{border-bottom:1.5px solid currentColor;padding-bottom:.06em}
+.frac i.d{padding-top:.06em}
+.eq .frac{margin:0 .35em}
+.eq .frac i.n{border-bottom-width:2px;padding-bottom:.1em}
+
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.notes div{background:var(--panel);padding:1em 1.1em;outline:1px solid var(--rule)}
+.notes b.k{font-family:var(--tech);display:block;font-size:1.05em;letter-spacing:.02em;
+  color:var(--ink);margin-bottom:.3em}
+
+ol.steps{list-style:none;counter-reset:s;margin:1.2em 0 0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule)}
+ol.steps li{counter-increment:s;background:var(--panel);padding:1.1em 1.2em;position:relative;outline:1px solid var(--rule)}
+ol.steps li::before{content:counter(s);font-family:var(--tech);font-weight:700;font-size:1.6em;
+  color:var(--index);display:block;line-height:1;margin-bottom:.25em}
+ol.steps b{font-family:var(--tech);display:block;margin-bottom:.2em}
+
+table{width:100%;border-collapse:collapse;font-family:var(--tech);margin:1.4em 0}
+th,td{border:1px solid var(--rule);padding:.62em .8em;text-align:left;font-weight:500}
+th{background:var(--panel-2);font-size:.66em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+th.n{text-align:center}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tblwrap table{min-width:460px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.cards article{background:var(--panel);padding:1.1em 1.2em;outline:1px solid var(--rule)}
+.cards h4{font-family:var(--tech);font-size:1em;margin:0 0 .5em;letter-spacing:-.01em}
+.cards dl{margin:0;font-size:.86em}
+.cards dt{font-family:var(--tech);font-size:.7em;letter-spacing:.16em;color:var(--ink-3);margin-top:.6em}
+.cards dd{margin:0}
+.cards dt.warn{color:var(--index);font-size:.85em;font-weight:700}
+.cards dd.warn{color:var(--index);font-weight:700;background:var(--index-soft);
+  display:inline-block;padding:.35em .6em;margin-top:.3em}
+
+.traps{display:grid;gap:10px;background:transparent;border:none;margin-top:1.2em}
+.traps div{outline:1px solid var(--rule);
+  display:grid;grid-template-columns:1fr;
+  grid-template-areas:"xlabel" "xtext" "olabel" "otext";gap:0}
+.traps .x,.traps .o{font-family:var(--tech);font-size:.7em;font-weight:700;letter-spacing:.16em;
+  display:flex;align-items:center;padding:.7em 1.1em;margin:0}
+.traps .x{grid-area:xlabel;color:var(--index);background:var(--index-soft)}
+.traps .o{grid-area:olabel;color:var(--cobalt);background:var(--cobalt-soft)}
+.traps p{margin:0;padding:.9em 1.1em}
+.traps p:nth-of-type(1){grid-area:xtext;background:var(--index-soft)}
+.traps p:nth-of-type(2){grid-area:otext;background:var(--cobalt-soft)}
+@media (min-width:760px){
+  .traps div{grid-template-columns:auto 1fr;
+    grid-template-areas:"xlabel xtext" "olabel otext"}
+}
+
+.cite{border:2px solid var(--cobalt);background:var(--cobalt-soft);margin-top:1.4em;
+  padding:clamp(14px,1.6vw,24px)}
+.cite-hd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--cobalt);display:block;margin-bottom:.6em}
+.cite p{margin:.6em 0;max-width:none}
+.cite table{background:var(--panel)}
+.cite th{background:var(--panel-2)}
+.cite .ex{border-top:2px solid var(--cobalt);margin-top:1em}
+.cite .ex summary{color:var(--cobalt)}
+.cite .ex:first-of-type{border-top:0}
+
+/* ---------- INTERACTIVE 1: pick-two-rows experiment table ---------- */
+.exptbl{margin:0}
+.exptbl tbody tr{cursor:pointer;background:var(--panel);transition:background .1s}
+.exptbl tbody tr:hover{background:var(--panel-2)}
+.exptbl tbody tr:focus-visible{outline:3px solid var(--cobalt);outline-offset:-3px}
+.exptbl tbody tr.sel{background:var(--cobalt-soft)}
+.exptbl tbody tr.sel td{font-weight:700;color:var(--ink)}
+.exptbl td.pick{text-align:center;width:3.2em}
+.exptbl .box{display:inline-block;width:1.05em;height:1.05em;border:2px solid var(--ink-3);
+  vertical-align:middle;background:var(--panel)}
+.exptbl tr.sel .box{border-color:var(--cobalt);background:var(--cobalt);
+  box-shadow:inset 0 0 0 2px var(--panel)}
+.verdict{border:2px solid var(--ink);border-top:none;background:var(--panel)}
+.verdict .vhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-3);padding:.6em 1.1em;display:block}
+.verdict.good .vhd{background:var(--cobalt)}
+.verdict.bad .vhd{background:var(--index)}
+.verdict .vbd{padding:clamp(14px,1.6vw,24px)}
+.verdict p{margin:0 0 .6em}
+.verdict p:last-child{margin-bottom:0}
+.vsteps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px;
+  background:var(--rule);border:1px solid var(--rule);margin:0 0 1em}
+.vsteps div{background:var(--panel-2);padding:.8em 1em}
+.vsteps .k{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.16em;
+  color:var(--ink-3);display:block}
+.vsteps .v{font-family:var(--tech);font-weight:700;font-size:1.05em;
+  font-variant-numeric:tabular-nums;display:block;margin-top:.15em}
+.vconc{font-family:var(--tech);font-weight:700;font-size:clamp(1.05rem,2vw,1.4rem);
+  padding:.7em 1em;background:var(--cobalt);color:#fff;text-align:center}
+.verdict.bad .vconc{background:var(--index)}
+
+/* ---------- INTERACTIVE 3: units of k ---------- */
+.unitbox{border:2px solid var(--ink);background:var(--panel);margin-top:1.4em}
+.unitbox .uhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink);padding:.6em 1.1em;display:block}
+.unitpick{display:flex;flex-wrap:wrap;gap:.6em;padding:clamp(12px,1.4vw,18px);
+  border-bottom:1px solid var(--rule)}
+.unitout{padding:clamp(16px,2vw,28px);text-align:center}
+.unitout .big{font-family:var(--tech);font-weight:700;font-size:clamp(1.5rem,3.4vw,2.6rem);
+  display:block;margin-bottom:.35em}
+.unitout .deriv{font-family:var(--tech);font-size:.82em;color:var(--ink-2);display:block}
+.unitout .egs{font-family:var(--tech);font-size:.78em;color:var(--ink-3);display:block;margin-top:.7em}
+
+.checkhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.2em;
+  color:var(--cobalt);margin:1.8em 0 .2em;display:block}
+.check{border:2px solid var(--cobalt);background:var(--cobalt-soft);padding:0 clamp(14px,1.6vw,24px)}
+.check .ex-body{padding-top:1.1em}
+.check .ex-no{color:var(--cobalt)}
+.check .ex{border-top:2px solid var(--cobalt)}
+.check .ex summary{color:var(--cobalt)}
+.check .ans{border-color:var(--cobalt-soft);background:var(--panel)}
+.ex{border-top:2px solid var(--ink)}
+.ex:first-child{border-top:0}
+.ex summary{list-style:none;cursor:pointer;font-family:var(--tech);font-weight:700;font-size:.76em;
+  letter-spacing:.12em;color:var(--cobalt);padding:.7em 0 0;display:inline-block}
+.ex summary::-webkit-details-marker{display:none}
+.ex summary::before{content:"▸ ";}
+.ex[open] summary::before{content:"▾ ";}
+.ex-body{padding:1.2em 0 1.6em}
+.ex-no{font-family:var(--tech);font-weight:700;color:var(--index);margin-right:.5em}
+.ans{background:var(--panel-2);border:1px solid var(--rule);padding:1em 1.2em;margin:.6em 0 1.4em}
+.work{font-family:var(--tech);font-variant-numeric:tabular-nums}
+
+footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.6em 0 1em;text-align:center}
+
+@media (max-width:900px){
+  .panel{grid-template-columns:1fr}
+  .readout{flex-direction:row;flex-wrap:wrap}
+  .readout .win{flex:1 1 40%}
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
+}
+</style>
+
+<div class="wrap" lang="th">
+
+  <div class="plate">
+    <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
+    <div><span class="lbl">มโนทัศน์</span><span class="val serial">04 / 06</span></div>
+    <div><span class="lbl">แผงวัด</span><span class="val serial">rate = k[A]ᵐ[B]ⁿ</span></div>
+  </div>
+
+  <section class="hook">
+    <figure class="hookfig">
+      <svg viewBox="0 0 900 356" role="img" aria-label="กราฟแท่งพร้อมตารางข้อมูลที่คอลัมน์ตรงกัน เปรียบเทียบการทดลอง 4 ชุด การทดลอง 1-3 ได้ผลิตภัณฑ์เท่ากันแม้ความเข้มข้นของ B เพิ่มขึ้นเรื่อย ๆ ส่วนการทดลอง 4 ที่ลดความเข้มข้นของ A ลงครึ่งหนึ่งได้ผลิตภัณฑ์ครึ่งเดียว">
+        <g id="hookG"></g>
+      </svg>
+    </figure>
+    <p class="hookq">เพิ่มความเข้มข้นของ B ถึงสามเท่า แต่ได้ผลิตภัณฑ์เท่าเดิมเป๊ะ — เป็นไปได้อย่างไร ?</p>
+  </section>
+
+  <h1>ความเข้มข้นมีผล<br><em>มากแค่ไหน</em></h1>
+  <p class="dek">มโนทัศน์ที่ 3 ตอบว่า "เพิ่มความเข้มข้นแล้วเร็วขึ้น" หน้านี้ตอบให้ละเอียดกว่านั้นว่า <b>เร็วขึ้นกี่เท่า</b> — และบางครั้งคำตอบคือ <b>ไม่เร็วขึ้นเลย</b> ตัวเลขที่บอกเรื่องนี้เรียกว่า <b>อันดับของปฏิกิริยา</b> และมีทางเดียวที่จะรู้ค่ามัน คือลงมือทดลองวัด</p>
+
+  <!-- ============ 4.1 what a rate law is ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">4.1</span><h2>กฎอัตรา</h2></div>
+    <div class="sec-bd">
+      <div class="cite">
+        <span class="cite-hd">หลักการตั้งต้น — Law of Mass Action</span>
+        <p style="font-size:1.1em;font-weight:700">อัตราการเกิดปฏิกิริยาเคมีจะเป็น<b>สัดส่วนโดยตรง</b>กับความเข้มข้นของสารตั้งต้นที่เข้าทำปฏิกิริยา</p>
+      </div>
+
+      <p>ที่ผ่านมาเราพูดถึงความเข้มข้นแบบหยาบ ๆ ว่า "มาก = เร็ว" ถ้าอยากได้คำตอบที่เป็นตัวเลข ต้องเขียนความสัมพันธ์ระหว่างอัตรากับความเข้มข้นออกมาเป็นสมการ สมการนั้นเรียกว่า <b>กฎอัตรา (rate law)</b></p>
+
+      <div class="eq">rate = k[A]<sup>m</sup>[B]<sup>n</sup></div>
+
+      <div class="notes">
+        <div><b class="k">[A], [B]</b>ความเข้มข้นของสารตั้งต้นแต่ละตัว (โมลาร์) — ตัวแปรที่เราปรับได้ในการทดลอง</div>
+        <div><b class="k">m, n — อันดับของปฏิกิริยา</b>บอกว่าอัตรา<b>ไวต่อความเข้มข้นของสารตัวนั้นแค่ไหน</b> เช่น m = 2 หมายความว่าเพิ่ม [A] เป็น 2 เท่า อัตราจะเพิ่มเป็น 2² = 4 เท่า ส่วน m = 0 หมายความว่าเพิ่ม [A] เท่าไรอัตราก็ไม่ขยับ</div>
+        <div><b class="k">k — ค่าคงที่อัตรา</b>ตัวเลขประจำปฏิกิริยานั้นที่อุณหภูมินั้น ยิ่ง k มาก ปฏิกิริยายิ่งเร็ว · <b>k ไม่ขึ้นกับความเข้มข้น</b> แต่ขึ้นกับอุณหภูมิและตัวเร่งปฏิกิริยา (ดูหัวข้อ 4.5)</div>
+      </div>
+
+      <p style="margin-top:1.4em">อันดับรวมของปฏิกิริยา คือผลบวก <b>m + n</b> ซึ่งจะเป็นตัวกำหนดหน่วยของ k ด้วย (หัวข้อ 4.5) ในระดับนี้ค่า m และ n ที่เจอบ่อยที่สุดคือ 0, 1 และ 2</p>
+    </div>
+  </section>
+
+  <!-- ============ 4.2 where the exponents come from — the spine ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">4.2</span><h2>m กับ n มาจากไหน</h2><span class="keytag hot">หัวใจของหน้านี้</span></div>
+    <div class="sec-bd">
+      <p>ถึงจุดนี้นักเรียนเกือบทุกคนจะเดาเหมือนกันหมดว่า "ก็เอาเลขหน้าสารในสมการมาใส่สิ" — และนั่นคือจุดที่เสียคะแนนมากที่สุดของทั้งบท ปัญหาคือในสมการเคมีมีตัวเลขอยู่สองชุดที่หน้าตาคล้ายกันมาก แต่มาจากคนละที่และใช้คนละงาน</p>
+
+      <div class="cards">
+        <article>
+          <h4>เลขสัมประสิทธิ์ — มาจากกระดาษ</h4>
+          <dl>
+            <dt>ได้มาอย่างไร</dt><dd>ดุลสมการเคมีให้อะตอมสองข้างเท่ากัน ไม่ต้องทดลองเลยก็รู้ได้</dd>
+            <dt>ใช้ทำอะไร</dt><dd>แปลงอัตราของสารหนึ่งเป็นอีกสารหนึ่ง (มโนทัศน์ที่ 1) — งานนี้<b>ใช้ได้จริง เชื่อถือได้เสมอ</b></dd>
+            <dt class="warn">✗ ใช้ทำอะไรไม่ได้</dt><dd class="warn">ทำนายว่าอัตราจะไวต่อความเข้มข้นแค่ไหนไม่ได้!</dd>
+          </dl>
+        </article>
+        <article>
+          <h4>อันดับ m, n — มาจากโต๊ะทดลอง</h4>
+          <dl>
+            <dt>ได้มาอย่างไร</dt><dd>วัดอัตราจริงหลาย ๆ รอบ แล้วเทียบกัน — <b>ไม่มีทางรู้จากสมการ</b></dd>
+            <dt>ใช้ทำอะไร</dt><dd>เขียนกฎอัตรา หาค่า k และทำนายอัตราที่ความเข้มข้นใหม่</dd>
+            <dt>สังเกต</dt><dd>อาจตรงกับเลขสัมประสิทธิ์ก็ได้ แต่นั่นเป็นเรื่องบังเอิญ ไม่ใช่กฎ</dd>
+          </dl>
+        </article>
+      </div>
+
+      <h3>ข้อมูลในหน้าแรกหักล้างความเชื่อนี้ด้วยตัวมันเอง</h3>
+      <p>กลับไปดูตารางที่เปิดหน้านี้ สาร A กับ B ทำปฏิกิริยากันได้ผลิตภัณฑ์ A₂B แปลว่าสมการดุลแล้วคือ</p>
+
+      <div class="eq">2A + B ⟶ A₂B</div>
+
+      <p>ถ้าอันดับมาจากเลขสัมประสิทธิ์จริง กฎอัตราต้องเป็น rate = k[A]²[B]¹ ซึ่งทำนายว่า<b>เพิ่ม [B] เป็น 3 เท่า อัตราต้องเพิ่มเป็น 3 เท่า</b> แต่ผลการทดลองบอกว่าผลิตภัณฑ์ที่ได้เท่าเดิมเป๊ะทั้งสามการทดลอง อันดับของ B จึงเป็น <b>0</b> ไม่ใช่ 1 — และเราจะเห็นในหัวข้อถัดไปว่าอันดับของ A ก็เป็น 1 ไม่ใช่ 2</p>
+
+      <div class="eq long">ทำนายจากสัมประสิทธิ์: rate = k[A]<sup>2</sup>[B]<sup>1</sup> &nbsp;&nbsp;✗&nbsp;&nbsp; วัดจริงได้: rate = k[A]<sup>1</sup>[B]<sup>0</sup> = k[A]</div>
+
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>ดุลสมการเสร็จก็เขียนกฎอัตราได้เลย เอาเลขหน้าสารมาเป็นเลขชี้กำลัง</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>กฎอัตรา<b>เขียนจากสมการไม่ได้</b> ต้องมีข้อมูลการทดลองเสมอ ถ้าโจทย์ให้มาแค่สมการเคมีอย่างเดียวแล้วถามหาอันดับ ให้ตอบว่าข้อมูลไม่พอ</p>
+        </div>
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>สารทุกตัวในสมการต้องโผล่ในกฎอัตรา เพราะมันเป็นสารตั้งต้นเหมือนกัน</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>สารที่มี<b>อันดับเป็นศูนย์จะหายไปจากกฎอัตรา</b> (เพราะ [B]⁰ = 1) ทั้งที่ยังต้องใส่ลงไปให้ปฏิกิริยาเกิดได้ตามปกติ — B ในหน้านี้คือตัวอย่างนั้น</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.3 initial-rates method + INTERACTIVE 1 ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">4.3</span><h2>หาอันดับด้วยวิธีอัตราเริ่มต้น</h2></div>
+    <div class="sec-bd">
+      <p>ในเมื่ออันดับต้องมาจากการทดลอง คำถามต่อไปคือทดลองอย่างไร วิธีมาตรฐานชื่อว่า <b>วิธีอัตราเริ่มต้น (initial rates)</b> และหลักการของมันมีอยู่ข้อเดียว — <b>เปลี่ยนทีละหนึ่งอย่าง</b></p>
+
+      <ol class="steps">
+        <li><b>เลือกคู่ที่ต่างกันแค่ตัวเดียว</b>หาสองการทดลองที่ความเข้มข้นของสารอื่นคงที่หมด เหลือเปลี่ยนแค่สารที่เราสนใจ</li>
+        <li><b>ดูว่าความเข้มข้นเปลี่ยนกี่เท่า</b>เช่น จาก 0.50 เป็น 1.50 คือเพิ่มเป็น 3 เท่า</li>
+        <li><b>ดูว่าอัตราเปลี่ยนกี่เท่า</b>เทียบอัตราของสองการทดลองนั้น</li>
+        <li><b>ถอดเลขชี้กำลังออกมา</b>ถามว่า "ความเข้มข้นกี่เท่า ยกกำลังเท่าไร ถึงได้อัตรากี่เท่า" เช่น เข้มข้น ×2 อัตรา ×4 → 2ᵐ = 4 → m = 2</li>
+      </ol>
+
+      <h3>ตัวอย่าง</h3>
+      <div class="cards">
+        <article>
+          <h4>การทดลองที่ 1 กับ 2 — เทียบ B</h4>
+          <dl>
+            <dt>คงที่</dt><dd>[A] = 1.00 M ทั้งคู่</dd>
+            <dt>เปลี่ยน</dt><dd>[B] จาก 0.50 → 1.00 M &nbsp;(×2)</dd>
+            <dt>ผลิตภัณฑ์</dt><dd>0.40 → 0.40 M &nbsp;(×1 — ไม่ขยับเลย)</dd>
+          </dl>
+          <p style="margin-top:.7em">ตั้งสมการ: 2<sup>n</sup> = 1 → <b>n = 0</b> อัตราไม่ขึ้นกับ [B] เลย</p>
+        </article>
+        <article>
+          <h4>การทดลองที่ 1 กับ 4 — เทียบ A</h4>
+          <dl>
+            <dt>คงที่</dt><dd>[B] = 0.50 M ทั้งคู่</dd>
+            <dt>เปลี่ยน</dt><dd>[A] จาก 1.00 → 0.50 M &nbsp;(×0.5)</dd>
+            <dt>ผลิตภัณฑ์</dt><dd>0.40 → 0.20 M &nbsp;(×0.5 — ลดตามกันพอดี)</dd>
+          </dl>
+          <p style="margin-top:.7em">ตั้งสมการ: 0.5<sup>m</sup> = 0.5 → <b>m = 1</b> อัตราแปรผันตรงกับ [A]</p>
+        </article>
+      </div>
+
+      <h3>ลองเลือกคู่ด้วยตัวเอง</h3>
+      <p>กดเลือกการทดลอง 2 แถวเพื่อเปรียบเทียบ ระบบจะตรวจให้ว่าคู่ที่เลือก<b>ใช้หาอันดับได้หรือไม่</b> — เพราะถ้าเผลอเลือกคู่ที่เปลี่ยนสองอย่างพร้อมกัน จะแยกไม่ออกว่าอัตราที่เปลี่ยนไปเป็นผลของตัวไหน นี่คือจุดที่พลาดกันมากที่สุด</p>
+
+      <div class="panel solo">
+        <div class="face" style="padding:0">
+          <div class="tblwrap">
+            <table class="exptbl" id="expTbl">
+              <thead><tr id="expHead"></tr></thead>
+              <tbody id="expBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp" style="flex:0 0 auto;gap:.5em;flex-wrap:wrap">
+          <button id="dsBook" type="button" class="right">ชุดข้อมูลจากหนังสือ</button>
+          <button id="dsExam" type="button">ชุดข้อมูลแนวข้อสอบ</button>
+          <button id="dsBasic" type="button">ชุดฝึกพื้นฐาน</button>
+          <button id="dsTriple" type="button">ชุดสามตัวแปร</button>
+        </div>
+        <div class="grp" style="flex:0 0 auto"><button id="dsClear" type="button">ล้างที่เลือก</button></div>
+        <p class="hint" id="dsNote"></p>
+      </div>
+      <div class="verdict" id="verdict">
+        <span class="vhd" id="vHd">ผลการเปรียบเทียบ</span>
+        <div class="vbd" id="vBd"><p>ยังไม่ได้เลือก — กดเลือกการทดลอง 2 แถวจากตารางด้านบน</p></div>
+      </div>
+
+      <span class="checkhd">ตรวจสอบความเข้าใจ</span>
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>ในชุดข้อมูลจากหนังสือ ทำไมจึงใช้การทดลองที่ 2 คู่กับการทดลองที่ 4 เพื่อหาอันดับของ A ไม่ได้</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p>เพราะคู่นี้<b>เปลี่ยนสองอย่างพร้อมกัน</b> — [A] ลดจาก 1.00 เหลือ 0.50 และ [B] ก็ลดจาก 1.00 เหลือ 0.50 ด้วย เมื่อผลิตภัณฑ์ที่ได้ลดลง เราแยกไม่ออกว่าเป็นเพราะ A หรือเพราะ B (หรือทั้งคู่) คู่ที่ใช้ได้ต้องมี [B] เท่ากัน คือการทดลองที่ 1 กับ 4</p></div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>ถ้าอีกปฏิกิริยาหนึ่งพบว่าเพิ่ม [A] เป็น 3 เท่าแล้วอัตราเพิ่มเป็น 9 เท่า อันดับของ A เป็นเท่าใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p class="work">3<sup>m</sup> = 9 = 3² &nbsp;→&nbsp; <b>m = 2</b> (อันดับสองเทียบกับ A)</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.4 what each order means + INTERACTIVE 2 ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">4.4</span><h2>อันดับ 0, 1, 2 หมายความว่าอะไร</h2></div>
+    <div class="sec-bd">
+      <p>อันดับไม่ใช่แค่ตัวเลขไว้คำนวณ มันบอกพฤติกรรมของปฏิกิริยาที่เห็นได้จริง ลองกดสลับดูว่ารูปกราฟระหว่างอัตรากับความเข้มข้นเปลี่ยนไปอย่างไร</p>
+
+      <div class="panel">
+        <div class="face">
+          <svg class="chart" id="ordChart" viewBox="0 0 700 440" role="img"
+               aria-label="กราฟความสัมพันธ์ระหว่างอัตราการเกิดปฏิกิริยากับความเข้มข้น เปลี่ยนรูปตามอันดับที่เลือก">
+            <g id="ordGrid"></g>
+            <g id="ordAxes"></g>
+            <path id="ordCurve" fill="none" stroke="var(--cobalt)" stroke-width="4"/>
+            <g id="ordMark"></g>
+          </svg>
+        </div>
+        <div class="readout">
+          <div class="win is-lo">
+            <span class="lbl">อันดับที่เลือก</span>
+            <span class="num" id="ordNum">1</span>
+            <span class="unit" id="ordName">อันดับหนึ่ง</span>
+          </div>
+          <div class="win is-hi">
+            <span class="lbl">เพิ่มความเข้มข้น 2 เท่า</span>
+            <span class="num" id="ordFactor">×2</span>
+            <span class="unit">อัตราจะเปลี่ยนเป็นกี่เท่า</span>
+          </div>
+          <div class="win">
+            <span class="lbl">รูปกราฟ</span>
+            <span class="unit" id="ordShape" style="font-size:.82em;line-height:1.6">เส้นตรงผ่านจุดกำเนิด — อัตราแปรผันตรงกับความเข้มข้น</span>
+          </div>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp" style="flex:0 0 auto;gap:.5em">
+          <button id="ord0" type="button">อันดับ 0</button>
+          <button id="ord1" type="button" class="right">อันดับ 1</button>
+          <button id="ord2" type="button">อันดับ 2</button>
+        </div>
+        <p class="hint">จุดสองจุดบนกราฟคือความเข้มข้นที่ต่างกัน 2 เท่า ให้ดูว่าความสูงของจุดทั้งสอง (อัตรา) ต่างกันกี่เท่าเมื่อสลับอันดับ</p>
+      </div>
+
+      <div class="notes">
+        <div><b class="k">อันดับศูนย์ — อัตราคงที่</b>เปลี่ยนความเข้มข้นเท่าไรอัตราก็เท่าเดิม มักเกิดเมื่อมีอย่างอื่นเป็นคอขวดอยู่แล้ว เช่น ตัวเร่งหรือเอนไซม์ทำงานเต็มกำลังจนรับเพิ่มไม่ไหว</div>
+        <div><b class="k">อันดับหนึ่ง — แปรผันตรง</b>เข้มข้นเป็น 2 เท่า อัตราเป็น 2 เท่า เป็นกรณีที่พบบ่อยที่สุด</div>
+        <div><b class="k">อันดับสอง — แปรผันกับกำลังสอง</b>เข้มข้นเป็น 2 เท่า อัตราพุ่งเป็น 4 เท่า ไวต่อความเข้มข้นมากที่สุดในสามแบบนี้</div>
+      </div>
+
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>แอลกอฮอล์ในเลือด สลายด้วยอัตราคงที่</b><p>ตับใช้เอนไซม์ตัวหนึ่งย่อยแอลกอฮอล์ และเอนไซม์นั้นทำงานเต็มกำลังตลอดเวลาอยู่แล้ว ดื่มมากขึ้นจึงไม่ได้ทำให้ร่างกายกำจัดได้เร็วขึ้น เป็นปฏิกิริยาอันดับศูนย์ — จึงไม่มีทางลัดใด ๆ นอกจากรอเวลา</p></div>
+          <div><b>ยาส่วนใหญ่ในกระแสเลือด เป็นอันดับหนึ่ง</b><p>ยิ่งมียาในเลือดมาก ร่างกายก็ขับออกเร็วขึ้นตามสัดส่วน อัตราแปรผันตรงกับความเข้มข้น — เป็นเหตุผลที่ฉลากยาระบุเวลาให้กินห่างกันเป็นช่วง ๆ ได้</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.5 the rate constant k + INTERACTIVE 3 ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">4.5</span><h2>ค่าคงที่อัตรา k และหน่วยของมัน</h2></div>
+    <div class="sec-bd">
+      <p>เมื่อรู้อันดับครบทุกตัวแล้ว แทนข้อมูลการทดลองแถวใดก็ได้กลับเข้าไปในกฎอัตรา จะได้ค่า k ออกมา ข้อควรระวังคือ <b>k มีหน่วย และหน่วยเปลี่ยนไปตามอันดับรวม</b> ซึ่งเป็นจุดที่เสียคะแนนกันบ่อยมากทั้งที่คำนวณตัวเลขถูกแล้ว</p>
+
+      <div class="eq">k = <span class="frac"><i class="n">rate</i><i class="d">[A]<sup>m</sup>[B]<sup>n</sup></i></span></div>
+
+      <p>เหตุผลที่หน่วยไม่คงที่ก็ตรงไปตรงมา — ฝั่งซ้ายของสมการคืออัตรา ซึ่งมีหน่วย <span class="frac"><i class="n">mol</i><i class="d">dm³·s</i></span> เสมอ ดังนั้นหน่วยของ k ต้องปรับตัวเองเพื่อหักล้างหน่วยของความเข้มข้นที่คูณเข้ามาให้พอดี ยิ่งอันดับรวมสูง ก็ยิ่งต้องหักล้างมาก</p>
+
+      <div class="unitbox">
+        <span class="uhd">เครื่องคิดหน่วยของ k</span>
+        <div class="unitpick">
+          <button id="u0" type="button">อันดับรวม 0</button>
+          <button id="u1" type="button" class="right">อันดับรวม 1</button>
+          <button id="u2" type="button">อันดับรวม 2</button>
+          <button id="u3" type="button">อันดับรวม 3</button>
+        </div>
+        <div class="unitout">
+          <span class="big" id="uBig"></span>
+          <span class="deriv" id="uDeriv"></span>
+          <span class="egs" id="uEg"></span>
+        </div>
+      </div>
+
+      <h3>ตัวอย่างการหา k แบบครบขั้นตอน</h3>
+      <p>ใช้ชุดข้อมูลแนวข้อสอบจากหัวข้อ 4.3 ซึ่งหาอันดับได้แล้วว่า m = 2 (เทียบกับ A) และ n = 1 (เทียบกับ B) อันดับรวมจึงเป็น 3</p>
+      <div class="ans">
+        <p class="work"><b>1. เขียนกฎอัตรา</b> &nbsp; rate = k[A]²[B]</p>
+        <p class="work"><b>2. แทนค่าจากการทดลองที่ 1</b> &nbsp; 2.0×10⁻³ = k (0.10)² (0.10)</p>
+        <p class="work"><b>3. คำนวณ</b> &nbsp; k = <span class="frac"><i class="n">2.0×10⁻³</i><i class="d">1.0×10⁻³</i></span> = <b>2.0</b></p>
+        <p class="work"><b>4. ใส่หน่วยตามอันดับรวม 3</b> &nbsp; k = 2.0 <span class="frac"><i class="n">dm⁶</i><i class="d">mol²·s</i></span></p>
+        <p class="work" style="margin-top:.8em;color:var(--ink-2)">ตรวจสอบ: แทนการทดลองแถวอื่นต้องได้ k เท่าเดิม เช่น แถวที่ 2 → 8.0×10⁻³ ÷ [(0.20)²(0.10)] = 8.0×10⁻³ ÷ 4.0×10⁻³ = 2.0 ✓</p>
+      </div>
+
+      <h3>k ขึ้นกับอะไรบ้าง</h3>
+      <p>ประเด็นนี้เชื่อมกลับไปที่มโนทัศน์ที่ 2 และ 3 โดยตรง — ปัจจัยที่ไป<b>แตะ Eₐ หรือแตะพลังงานของอนุภาค</b>เท่านั้นที่เปลี่ยนค่า k ได้ ส่วนปัจจัยที่แค่เพิ่มความถี่การชนจะไม่เปลี่ยน k เลย แต่ไปเปลี่ยนค่า [A] ในสมการแทน</p>
+      <div class="tblwrap">
+        <table>
+          <tr><th>ปัจจัย</th><th>เปลี่ยน k หรือไม่</th><th>เพราะอะไร</th></tr>
+          <tr><td>อุณหภูมิ</td><td style="color:var(--index);font-weight:700">เปลี่ยน</td><td>สัดส่วนอนุภาคที่มีพลังงานถึง Eₐ เปลี่ยนไป (ทาง ② ของมโนทัศน์ 3)</td></tr>
+          <tr><td>ตัวเร่งปฏิกิริยา</td><td style="color:var(--index);font-weight:700">เปลี่ยน</td><td>เปิดเส้นทางที่ Eₐ ต่ำกว่าเดิม (ทาง ③)</td></tr>
+          <tr><td>ความเข้มข้น</td><td style="color:var(--cobalt);font-weight:700">ไม่เปลี่ยน</td><td>ไปเปลี่ยนค่า [A] ในสมการแทน ไม่ได้แตะ k</td></tr>
+          <tr><td>พื้นที่ผิว</td><td style="color:var(--cobalt);font-weight:700">ไม่เปลี่ยน</td><td>เพิ่มความถี่การชนเช่นกัน ไม่ได้แตะ Eₐ (ทาง ①)</td></tr>
+        </table>
+      </div>
+
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>เพิ่มความเข้มข้นแล้วอัตราเพิ่ม แสดงว่า k เพิ่มด้วย</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p><b>k คงที่ตลอด</b>ตราบใดที่อุณหภูมิเท่าเดิมและไม่มีตัวเร่งใหม่ — ที่เพิ่มขึ้นคือค่า [A] ที่คูณอยู่กับ k ต่างหาก นี่คือเหตุผลที่แทนข้อมูลแถวไหนก็ต้องได้ k เท่ากัน และเป็นวิธีตรวจคำตอบที่ดีที่สุด</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ exercises ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>แบบฝึกหัดท้ายบท</h2></div>
+    <div class="sec-bd">
+
+      <div class="cite">
+        <span class="cite-hd">จากหนังสือเรียน — แบบฝึกหัด 8.3 ข้อ 2</span>
+        <p>เมื่อนำสาร A และสาร B ที่มีความเข้มข้นต่าง ๆ มาทำปฏิกิริยากันเป็นเวลา 10 นาที พบว่าได้ผลิตภัณฑ์เป็น A₂B ซึ่งมีความเข้มข้นดังตาราง</p>
+        <div class="tblwrap">
+          <table>
+            <tr><th>การทดลองที่</th><th class="n">A เริ่มต้น (M)</th><th class="n">B เริ่มต้น (M)</th><th class="n">A₂B ที่ 10 นาที (M)</th></tr>
+            <tr><td class="n">1</td><td class="n">1.00</td><td class="n">0.50</td><td class="n">0.40</td></tr>
+            <tr><td class="n">2</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">0.40</td></tr>
+            <tr><td class="n">3</td><td class="n">1.00</td><td class="n">1.50</td><td class="n">0.40</td></tr>
+            <tr><td class="n">4</td><td class="n">0.50</td><td class="n">0.50</td><td class="n">0.20</td></tr>
+          </table>
+        </div>
+        <details class="ex"><summary>2.1 เขียนสมการเคมีแสดงปฏิกิริยาเคมีที่เกิดขึ้น — ดูเฉลย</summary>
+          <div class="ans"><p class="work" style="text-align:center;font-size:1.15em">2A + B ⟶ A₂B</p>
+          <p style="margin-top:.6em">ผลิตภัณฑ์ A₂B มี A สองอะตอมต่อ B หนึ่งอะตอม สมการที่ดุลแล้วจึงต้องใช้ A สองส่วนต่อ B หนึ่งส่วน</p></div>
+        </details>
+        <details class="ex"><summary>2.2 อัตราการเกิดปฏิกิริยาเคมีขึ้นกับความเข้มข้นเริ่มต้นของสาร A และ B อย่างไร — ดูเฉลย</summary>
+          <div class="ans">
+            <p><b>ขึ้นกับ [A] แต่ไม่ขึ้นกับ [B] เลย</b></p>
+            <p class="work" style="margin-top:.6em">เทียบการทดลองที่ 1 กับ 3 &nbsp;([A] คงที่) — [B] เพิ่ม 3 เท่า แต่ผลิตภัณฑ์เท่าเดิม (0.40) → อัตราไม่ขึ้นกับ B</p>
+            <p class="work">เทียบการทดลองที่ 1 กับ 4 &nbsp;([B] คงที่) — [A] ลดครึ่ง ผลิตภัณฑ์ลดครึ่งพอดี (0.40 → 0.20) → อัตราแปรผันตรงกับ A</p>
+            <p style="margin-top:.6em">เขียนเป็นกฎอัตราได้ว่า <b>rate = k[A]</b> — สังเกตว่าไม่ตรงกับเลขสัมประสิทธิ์ในสมการ 2A + B เลยแม้แต่ตัวเดียว</p>
+          </div>
+        </details>
+      </div>
+
+      <span class="checkhd">โจทย์ครบวงจร (แนวข้อสอบ)</span>
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>ปฏิกิริยา X + 2Y ⟶ Z มีข้อมูลอัตราเริ่มต้นดังตาราง
+          <div class="tblwrap">
+            <table>
+              <tr><th>การทดลองที่</th><th class="n">[X] (M)</th><th class="n">[Y] (M)</th><th class="n">อัตราเริ่มต้น (M/s)</th></tr>
+              <tr><td class="n">1</td><td class="n">0.20</td><td class="n">0.20</td><td class="n">1.2×10⁻²</td></tr>
+              <tr><td class="n">2</td><td class="n">0.40</td><td class="n">0.20</td><td class="n">2.4×10⁻²</td></tr>
+              <tr><td class="n">3</td><td class="n">0.20</td><td class="n">0.40</td><td class="n">1.2×10⁻²</td></tr>
+            </table>
+          </div>
+          จงหา (ก) อันดับเทียบกับ X และ Y (ข) กฎอัตราและอันดับรวม (ค) ค่า k พร้อมหน่วย (ง) อัตราเมื่อ [X] = 0.50 M และ [Y] = 0.10 M
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p class="work"><b>(ก) หาอันดับ</b></p>
+            <p class="work">เทียบ 1 กับ 2 ([Y] คงที่ 0.20): [X] ×2 → อัตรา ×2 &nbsp;→&nbsp; 2ᵐ = 2 &nbsp;→&nbsp; <b>m = 1</b></p>
+            <p class="work">เทียบ 1 กับ 3 ([X] คงที่ 0.20): [Y] ×2 → อัตราเท่าเดิม &nbsp;→&nbsp; 2ⁿ = 1 &nbsp;→&nbsp; <b>n = 0</b></p>
+            <p class="work" style="margin-top:.7em"><b>(ข) กฎอัตรา</b> &nbsp; rate = k[X]<sup>1</sup>[Y]<sup>0</sup> = <b>k[X]</b> &nbsp; อันดับรวม = 1 + 0 = <b>1</b></p>
+            <p class="work" style="margin-top:.7em"><b>(ค) หา k</b> &nbsp; แทนการทดลองที่ 1: 1.2×10⁻² = k(0.20)</p>
+            <p class="work">k = 1.2×10⁻² ÷ 0.20 = <b>6.0×10⁻² s⁻¹</b> &nbsp;(อันดับรวม 1 หน่วยของ k คือ <span class="frac"><i class="n">1</i><i class="d">s</i></span>)</p>
+            <p class="work" style="margin-top:.7em"><b>(ง) ทำนายอัตรา</b> &nbsp; rate = (6.0×10⁻²)(0.50) = <b>3.0×10⁻² M/s</b></p>
+            <p style="margin-top:.8em;color:var(--ink-2)">สังเกตว่า [Y] = 0.10 M ที่โจทย์ให้มาเป็นข้อมูลที่<b>ไม่ต้องใช้เลย</b> เพราะอันดับของ Y เป็นศูนย์ — และสังเกตอีกครั้งว่าสัมประสิทธิ์ของ Y คือ 2 แต่อันดับของมันคือ 0</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>ปฏิกิริยาหนึ่งมีกฎอัตรา rate = k[A]²[B] ถ้าเพิ่มความเข้มข้นของ A เป็น 2 เท่าและเพิ่ม B เป็น 3 เท่าพร้อมกัน อัตราจะเปลี่ยนเป็นกี่เท่าของเดิม</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p class="work">อัตราใหม่ ÷ อัตราเดิม = (2)² × (3)¹ = 4 × 3 = <b>12 เท่า</b></p>
+          <p style="margin-top:.6em">เมื่อเปลี่ยนหลายตัวพร้อมกัน ให้คูณผลของแต่ละตัวเข้าด้วยกัน — แต่ย้ำว่าวิธีนี้ใช้ได้ก็ต่อเมื่อ<b>รู้อันดับมาก่อนแล้ว</b> ถ้ายังไม่รู้อันดับ ห้ามเปลี่ยนสองอย่างพร้อมกันในการทดลอง</p></div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">3</span>นักเรียนคนหนึ่งเขียนว่า "ปฏิกิริยา 2NO + O₂ ⟶ 2NO₂ ต้องมีกฎอัตรา rate = k[NO]²[O₂] เพราะอ่านจากสมการได้เลย" ข้อสรุปนี้ถูกต้องหรือไม่ เพราะเหตุใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans"><p><b>ยังสรุปแบบนั้นไม่ได้</b> ถึงแม้กฎอัตราที่วัดได้จริงของปฏิกิริยานี้จะบังเอิญออกมาเป็น rate = k[NO]²[O₂] จริง ๆ ก็ตาม</p>
+          <p style="margin-top:.6em">เหตุผลคือ<b>วิธีที่ใช้หาคำตอบผิด</b> — อันดับต้องมาจากข้อมูลการทดลองเท่านั้น การอ่านจากสมการแล้วบังเอิญตรงไม่ได้ทำให้วิธีนั้นถูกต้อง ถ้าใช้วิธีเดียวกันนี้กับปฏิกิริยา 2A + B ⟶ A₂B ในหน้านี้ จะได้คำตอบผิดทันที</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer>มโนทัศน์ที่ 04 จาก 06 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function S(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function txt(x,y,s,o){var a={x:x,y:y,"font-family":"Bai Jamjuree","font-size":21,"font-weight":600,
+    fill:"var(--ink-2)"};for(var k in (o||{}))a[k]=o[k];var e=S("text",a);e.textContent=s;return e;}
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild);}
+
+  /* ============ hook: the book's four experiments as bars ============ */
+  (function(){
+    var g=document.getElementById("hookG");
+    if(!g) return;
+    var rows=[
+      {no:1,A:"1.00",B:"0.50",out:0.40},
+      {no:2,A:"1.00",B:"1.00",out:0.40},
+      {no:3,A:"1.00",B:"1.50",out:0.40},
+      {no:4,A:"0.50",B:"0.50",out:0.20}
+    ];
+    /* one experiment per row, laid out the same way as the table in the textbook: the bar runs
+       rightward off its own row, so [A], [B] and the outcome all sit on one line for the eye */
+    var CNO=69, CA=175, CB=289;                 /* column centres */
+    var CELL_A=[122,228], CELL_B=[236,342];     /* highlight-cell bounds */
+    var BX0=366, BXW=450, MAXV=0.5;             /* bar track */
+    var HDR=46, RH=50;
+    function rowTop(i){return HDR+RH*i;}
+    function rowMid(i){return HDR+RH*i+RH/2+7;} /* +7 puts text on the optical centre */
+    function barW(v){return (v/MAXV)*BXW;}
+    var ALIGN=BX0+barW(0.40);                   /* where the three equal bars all stop */
+
+    /* column headers — sit right at the top now that the blue headline has moved
+       down to pair with the red one (see footnotes below) */
+    g.appendChild(txt(CNO,34,"การทดลองที่",{"font-size":16,"font-weight":700,fill:"var(--ink)","text-anchor":"middle"}));
+    g.appendChild(txt(CA,34,"[A] เริ่มต้น (M)",{"font-size":16,"font-weight":700,fill:"var(--ink)","text-anchor":"middle"}));
+    g.appendChild(txt(CB,34,"[B] เริ่มต้น (M)",{"font-size":16,"font-weight":700,fill:"var(--ink)","text-anchor":"middle"}));
+    g.appendChild(txt(BX0,34,"[A₂B] ที่ 10 นาที (M)",{"font-size":16,"font-weight":700,fill:"var(--ink)"}));
+    g.appendChild(S("line",{x1:20,y1:HDR,x2:880,y2:HDR,stroke:"var(--ink)","stroke-width":3}));
+
+    /* highlight only the cells that were changed */
+    [0,1,2].forEach(function(i){
+      g.appendChild(S("rect",{x:CELL_B[0],y:rowTop(i)+3,width:CELL_B[1]-CELL_B[0],height:RH-6,
+        fill:"var(--cobalt-soft)"}));
+    });
+    g.appendChild(S("rect",{x:CELL_A[0],y:rowTop(3)+3,width:CELL_A[1]-CELL_A[0],height:RH-6,
+      fill:"var(--index-soft)"}));
+
+    rows.forEach(function(r,i){
+      var my=rowMid(i), cutA=(r.no===4), riseB=(r.no<=3);
+      var col=cutA?"var(--index)":"var(--cobalt)";
+      if(i>0) g.appendChild(S("line",{x1:20,y1:rowTop(i),x2:880,y2:rowTop(i),
+        stroke:"var(--rule-2)","stroke-width":1.5}));
+      g.appendChild(txt(CNO,my,String(r.no),
+        {"font-size":21,"font-weight":700,fill:"var(--ink)","text-anchor":"middle"}));
+      g.appendChild(txt(CA,my,r.A,
+        {"font-size":20,"font-weight":(cutA?700:500),fill:(cutA?"var(--index)":"var(--ink-2)"),"text-anchor":"middle"}));
+      g.appendChild(txt(CB,my,r.B,
+        {"font-size":20,"font-weight":(riseB?700:500),fill:(riseB?"var(--cobalt)":"var(--ink-2)"),"text-anchor":"middle"}));
+      var w=barW(r.out);
+      g.appendChild(S("rect",{x:BX0,y:rowTop(i)+11,width:w,height:RH-22,fill:col}));
+      g.appendChild(txt(BX0+w+14,my,r.out.toFixed(2),
+        {"font-size":25,"font-weight":700,fill:col}));
+    });
+    g.appendChild(S("line",{x1:20,y1:rowTop(4),x2:880,y2:rowTop(4),stroke:"var(--rule)","stroke-width":1.5}));
+
+    /* the flush bar ends are the evidence — draw the line the eye is already looking for.
+       Extended down through row 4 too (not just stopping after row 3) so the same glance
+       that confirms "these three line up" also shows "and this one falls way short of it" */
+    g.appendChild(S("line",{x1:ALIGN,y1:HDR,x2:ALIGN,y2:rowTop(4)-6,
+      stroke:"var(--cobalt)","stroke-width":2,"stroke-dasharray":"6 5"}));
+
+    /* --- footnotes ---
+       Both "here's the point" statements now live together below the chart,
+       stacked in the order the eye should read them: red (A's story, right
+       next to the row it describes) then blue (B's story, which needs all
+       three rows as evidence so it reads better as a wrap-up than a headline).
+       Same size/weight for both so neither outranks the other. The neutral
+       setup note is last and plain weight — quieter background info, not a
+       third competing statement. */
+    /* two side-by-side boxes: neutral setup note on its own on the left,
+       the two colour-coded punchlines stacked together on the right —
+       separates "background info" from "the point" instead of stacking
+       all three as one block of text */
+    var FY0=rowTop(4)+14, FBH=78, FPAD=16;
+    var FL0=20, FLW=400, FR0=440, FRW=440;
+    g.appendChild(S("rect",{x:FL0,y:FY0,width:FLW,height:FBH,fill:"var(--panel)",stroke:"var(--rule)","stroke-width":1.5}));
+    g.appendChild(S("rect",{x:FR0,y:FY0,width:FRW,height:FBH,fill:"var(--panel)",stroke:"var(--rule)","stroke-width":1.5}));
+    g.appendChild(txt(FL0+FPAD,FY0+32,"ปฏิกิริยาเดียวกัน · เวลาเท่ากัน 10 นาที",
+      {"font-size":15,"font-weight":500,fill:"var(--ink)"}));
+    g.appendChild(txt(FL0+FPAD,FY0+56,"ต่างกันแค่ความเข้มข้นเริ่มต้น",
+      {"font-size":15,"font-weight":500,fill:"var(--ink)"}));
+    g.appendChild(txt(FR0+FPAD,FY0+32,"[A] ลดครึ่ง → แท่งสั้นลงครึ่งหนึ่ง",
+      {"font-size":17,"font-weight":700,fill:"var(--index)"}));
+    g.appendChild(txt(FR0+FPAD,FY0+56,"[B] เพิ่มขึ้น 3 เท่า → แต่แท่งจบที่เดียวกันทั้ง 3 แถว",
+      {"font-size":17,"font-weight":700,fill:"var(--cobalt)"}));
+  })();
+
+  /* ============ INTERACTIVE 1 — pick two rows, check whether the pair is usable ============ */
+  (function(){
+    var head=document.getElementById("expHead"), body=document.getElementById("expBody");
+    if(!body) return;
+    var vEl=document.getElementById("verdict"), vHd=document.getElementById("vHd"), vBd=document.getElementById("vBd");
+    var note=document.getElementById("dsNote");
+
+    var DATA={
+      book:{
+        cols:[{k:"A",head:"[A] เริ่มต้น (M)",name:"A"},{k:"B",head:"[B] เริ่มต้น (M)",name:"B"}],
+        outHead:"A₂B ที่ 10 นาที (M)", outName:"ผลิตภัณฑ์",
+        note:"ชุดข้อมูลจริงจากแบบฝึกหัด 8.3 ข้อ 2 · ทุกการทดลองใช้เวลาเท่ากัน 10 นาที ปริมาณผลิตภัณฑ์ที่ได้จึงใช้แทนอัตราในการเปรียบเทียบได้",
+        fmt:function(v){return v.toFixed(2);},
+        rows:[{no:1,A:1.00,B:0.50,out:0.40},{no:2,A:1.00,B:1.00,out:0.40},
+              {no:3,A:1.00,B:1.50,out:0.40},{no:4,A:0.50,B:0.50,out:0.20}]
+      },
+      exam:{
+        cols:[{k:"A",head:"[A] (M)",name:"A"},{k:"B",head:"[B] (M)",name:"B"}],
+        outHead:"อัตราเริ่มต้น (M/s)", outName:"อัตรา",
+        note:"ชุดข้อมูลแนวข้อสอบของปฏิกิริยา 2A + B ⟶ C · ให้อัตรามาตรง ๆ ไม่ต้องแปลงจากปริมาณผลิตภัณฑ์",
+        fmt:function(v){return v.toExponential(1).replace("e-3","×10⁻³").replace("e-2","×10⁻²");},
+        rows:[{no:1,A:0.10,B:0.10,out:2.0e-3},{no:2,A:0.20,B:0.10,out:8.0e-3},
+              {no:3,A:0.10,B:0.20,out:4.0e-3}]
+      },
+      basic:{
+        cols:[{k:"P",head:"[P] (M)",name:"P"},{k:"Q",head:"[Q] (M)",name:"Q"}],
+        outHead:"อัตราเริ่มต้น (M/s)", outName:"อัตรา",
+        note:"ชุดฝึกพื้นฐานของปฏิกิริยา P + Q ⟶ R · ทั้งสองสารเป็นอันดับหนึ่งเหมือนกัน เหมาะเป็นชุดแรกที่ลองก่อนไปชุดที่ซับซ้อนขึ้น",
+        fmt:function(v){return v.toExponential(1).replace("e-3","×10⁻³").replace("e-2","×10⁻²");},
+        rows:[{no:1,P:0.10,Q:0.10,out:5.0e-3},{no:2,P:0.20,Q:0.10,out:1.0e-2},
+              {no:3,P:0.10,Q:0.20,out:1.0e-2},{no:4,P:0.20,Q:0.20,out:2.0e-2}]
+      },
+      triple:{
+        cols:[{k:"A",head:"[A] (M)",name:"A"},{k:"B",head:"[B] (M)",name:"B"},{k:"C",head:"[C] (M)",name:"C"}],
+        outHead:"อัตราเริ่มต้น (M/s)", outName:"อัตรา",
+        note:"ชุดสามตัวแปรของปฏิกิริยา A + B + C ⟶ D · มีสารตั้งต้น 3 ตัว ต้องเลือกคู่ที่มีแค่ตัวเดียวเปลี่ยนให้ดีขึ้นไปอีกขั้น — ลองดูว่า [C] เปลี่ยนแล้วอัตราไม่ขยับเลย",
+        fmt:function(v){return v.toExponential(1).replace("e-3","×10⁻³").replace("e-2","×10⁻²");},
+        rows:[{no:1,A:0.10,B:0.10,C:0.10,out:4.0e-3},{no:2,A:0.20,B:0.10,C:0.10,out:8.0e-3},
+              {no:3,A:0.10,B:0.20,C:0.10,out:1.6e-2},{no:4,A:0.10,B:0.10,C:0.20,out:4.0e-3}]
+      }
+    };
+    var cur="book", sel=[];
+
+    function eq(a,b){return Math.abs(a-b)<1e-9;}
+    /* a change factor reads better as a word than as a decimal */
+    function factorWord(f){
+      if(eq(f,1)) return "เท่าเดิม";
+      if(eq(f,0.5)) return "ลดเหลือครึ่งหนึ่ง";
+      if(eq(f,2)) return "เพิ่มเป็น 2 เท่า";
+      if(eq(f,3)) return "เพิ่มเป็น 3 เท่า";
+      if(eq(f,1.5)) return "เพิ่มเป็น 1.5 เท่า";
+      if(eq(f,4)) return "เพิ่มเป็น 4 เท่า";
+      if(f<1) return "ลดเหลือ "+(f).toFixed(2)+" เท่า";
+      return "เพิ่มเป็น "+(f).toFixed(2)+" เท่า";
+    }
+    function factorShort(f){
+      if(eq(f,1)) return "×1";
+      if(eq(f,0.5)) return "×½";
+      if(eq(f,Math.round(f))) return "×"+Math.round(f);
+      return "×"+f.toFixed(2);
+    }
+
+    function render(){
+      var ds=DATA[cur];
+      clear(head); clear(body);
+      head.appendChild(mk("th","",{className:"pick"}));
+      head.appendChild(mk("th","การทดลองที่",{className:"n"}));
+      ds.cols.forEach(function(c){ head.appendChild(mk("th",c.head,{className:"n"})); });
+      head.appendChild(mk("th",ds.outHead,{className:"n"}));
+      ds.rows.forEach(function(r){
+        var tr=document.createElement("tr");
+        tr.setAttribute("tabindex","0");
+        tr.setAttribute("role","button");
+        tr.setAttribute("aria-pressed", sel.indexOf(r.no)>=0 ? "true":"false");
+        tr.setAttribute("data-no", r.no);
+        if(sel.indexOf(r.no)>=0) tr.className="sel";
+        var pick=mk("td","",{className:"pick"});
+        var box=document.createElement("span"); box.className="box"; pick.appendChild(box);
+        tr.appendChild(pick);
+        tr.appendChild(mk("td",String(r.no),{className:"n"}));
+        ds.cols.forEach(function(c){
+          var td=mk("td",r[c.k].toFixed(2),{className:"n"});
+          td.setAttribute("data-col",c.k);
+          tr.appendChild(td);
+        });
+        var tdOut=mk("td",ds.fmt(r.out),{className:"n"});
+        tdOut.setAttribute("data-col","out");
+        tr.appendChild(tdOut);
+        tr.addEventListener("click",function(){toggle(r.no);});
+        tr.addEventListener("keydown",function(e){
+          if(e.key===" "||e.key==="Enter"||e.key==="Spacebar"){e.preventDefault();toggle(r.no);}
+        });
+        body.appendChild(tr);
+      });
+      note.textContent=ds.note;
+      verdict();
+    }
+
+    function mk(tag,text,opt){
+      var e=document.createElement(tag);
+      e.textContent=text;
+      if(opt&&opt.className) e.className=opt.className;
+      return e;
+    }
+    function toggle(no){
+      var i=sel.indexOf(no);
+      if(i>=0) sel.splice(i,1);
+      else { sel.push(no); if(sel.length>2) sel.shift(); }
+      render();
+    }
+
+    function verdict(){
+      var ds=DATA[cur];
+      vEl.className="verdict";
+      if(sel.length===0){
+        vHd.textContent="ผลการเปรียบเทียบ";
+        vBd.innerHTML="<p>ยังไม่ได้เลือก — กดเลือกการทดลอง 2 แถวจากตารางด้านบน</p>";
+        return;
+      }
+      if(sel.length===1){
+        vHd.textContent="ผลการเปรียบเทียบ";
+        vBd.innerHTML="<p>เลือกแล้ว 1 แถว (การทดลองที่ "+sel[0]+") — เลือกอีก 1 แถวเพื่อเปรียบเทียบ</p>";
+        return;
+      }
+      var a=null,b=null;
+      ds.rows.forEach(function(r){ if(r.no===sel[0]) a=r; if(r.no===sel[1]) b=r; });
+      /* always read the pair in table order so the wording matches what the eye sees */
+      if(a.no>b.no){var t=a;a=b;b=t;}
+      var changed=[],same=[];
+      ds.cols.forEach(function(c){ (eq(a[c.k],b[c.k])?same:changed).push(c); });
+
+      if(changed.length!==1){
+        vEl.className="verdict bad";
+        vHd.textContent="คู่นี้ใช้หาอันดับไม่ได้";
+        var names=changed.map(function(c){return c.name;}).join(" และ ");
+        vBd.innerHTML=
+          "<div class='vconc'>เปลี่ยนพร้อมกัน "+changed.length+" อย่าง — แยกไม่ออกว่าอัตราที่ต่างไปเป็นผลของตัวไหน</div>"+
+          "<div style='padding-top:1em'><p>การทดลองที่ "+a.no+" เทียบกับ "+b.no+" มีทั้ง "+names+
+          " ที่เปลี่ยนไปพร้อมกัน จึงสรุปไม่ได้ว่าผลที่เห็นมาจากสารตัวใด</p>"+
+          "<p>ให้เลือกคู่ที่ความเข้มข้นของสารอื่น<b>คงที่</b> เหลือเปลี่ยนแค่สารที่เราสนใจเพียงตัวเดียว</p></div>";
+        return;
+      }
+
+      var ch=changed[0], keep=same[0];
+      var cf=b[ch.k]/a[ch.k];
+      var rf=b.out/a.out;
+      var order=Math.log(rf)/Math.log(cf);
+      var orderR=Math.round(order*2)/2;
+      var orderTxt=(Math.abs(order-orderR)<0.02)?String(orderR):order.toFixed(2);
+
+      vEl.className="verdict good";
+      vHd.textContent="คู่นี้ใช้ได้ — หาอันดับของ "+ch.name+" ได้";
+      vBd.innerHTML=
+        "<div class='vsteps'>"+
+          "<div><span class='k'>คงที่</span><span class='v'>["+keep.name+"] = "+a[keep.k].toFixed(2)+" M</span></div>"+
+          "<div><span class='k'>["+ch.name+"] เปลี่ยนไป</span><span class='v'>"+a[ch.k].toFixed(2)+" → "+b[ch.k].toFixed(2)+
+            " &nbsp;"+factorShort(cf)+"</span></div>"+
+          "<div><span class='k'>"+ds.outName+"เปลี่ยนไป</span><span class='v'>"+ds.fmt(a.out)+" → "+ds.fmt(b.out)+
+            " &nbsp;"+factorShort(rf)+"</span></div>"+
+        "</div>"+
+        "<p>ความเข้มข้นของ "+ch.name+" "+factorWord(cf)+" "+(eq(rf,1)?"แต่":"แล้ว")+ds.outName+factorWord(rf)+"</p>"+
+        "<p class='work'>ตั้งสมการ: &nbsp;("+factorShort(cf).replace("×","")+")<sup>m</sup> = "+
+          factorShort(rf).replace("×","")+" &nbsp;→&nbsp; m = "+orderTxt+"</p>"+
+        "<div class='vconc'>อันดับของ "+ch.name+" = "+orderTxt+"</div>";
+    }
+
+    var dsButtons={book:"dsBook",exam:"dsExam",basic:"dsBasic",triple:"dsTriple"};
+    Object.keys(dsButtons).forEach(function(key){
+      document.getElementById(dsButtons[key]).addEventListener("click",function(){
+        cur=key; sel=[];
+        Object.keys(dsButtons).forEach(function(k2){
+          document.getElementById(dsButtons[k2]).classList.toggle("right",k2===key);
+        });
+        render();
+      });
+    });
+    document.getElementById("dsClear").addEventListener("click",function(){ sel=[]; render(); });
+    render();
+  })();
+
+  /* ============ INTERACTIVE 2 — rate versus concentration, by order ============ */
+  (function(){
+    var curve=document.getElementById("ordCurve");
+    if(!curve) return;
+    var grid=document.getElementById("ordGrid"), axes=document.getElementById("ordAxes"),
+        mark=document.getElementById("ordMark");
+    /* right margin is left free so the ×N bracket beside the second probe point has room */
+    var X0=90,X1=560,Y0=40,Y1=340;
+    function sx(t){return X0+t*(X1-X0);}          /* t = [A] on 0..1 */
+    function sy(v){return Y1-v*(Y1-Y0);}          /* v = rate on 0..1 */
+
+    for(var i=0;i<=10;i++){
+      grid.appendChild(S("line",{x1:sx(i/10),y1:Y0,x2:sx(i/10),y2:Y1,stroke:"var(--rule-2)","stroke-width":1}));
+      grid.appendChild(S("line",{x1:X0,y1:sy(i/10),x2:X1,y2:sy(i/10),stroke:"var(--rule-2)","stroke-width":1}));
+    }
+    axes.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":3}));
+    axes.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":3}));
+    function triU(cx,cy,s,c){return S("path",{d:"M"+(cx-s)+","+cy+" L"+(cx+s)+","+cy+" L"+cx+","+(cy-s*1.7)+" Z",fill:c});}
+    function triR(cx,cy,s,c){return S("path",{d:"M"+cx+","+(cy-s)+" L"+cx+","+(cy+s)+" L"+(cx+s*1.7)+","+cy+" Z",fill:c});}
+    axes.appendChild(triU(X0,Y0,6,"var(--ink)"));
+    axes.appendChild(triR(X1,Y1,6,"var(--ink)"));
+    /* sits below the c / 2c tick labels rather than beside them */
+    axes.appendChild(txt((X0+X1)/2,Y1+70,"ความเข้มข้น [A]",{"text-anchor":"middle","font-size":19,"letter-spacing":"0.06em"}));
+    axes.appendChild(txt(0,0,"อัตราการเกิดปฏิกิริยา",{"text-anchor":"middle","font-size":19,"letter-spacing":"0.06em",
+      transform:"translate(34 "+((Y0+Y1)/2)+") rotate(-90)"}));
+
+    var ORD={
+      0:{name:"อันดับศูนย์",factor:"×1",shape:"เส้นแนวนอน — เปลี่ยนความเข้มข้นเท่าไร อัตราก็เท่าเดิม"},
+      1:{name:"อันดับหนึ่ง",factor:"×2",shape:"เส้นตรงผ่านจุดกำเนิด — อัตราแปรผันตรงกับความเข้มข้น"},
+      2:{name:"อันดับสอง",factor:"×4",shape:"เส้นโค้งชันขึ้นเรื่อย ๆ — อัตราแปรผันกับกำลังสองของความเข้มข้น"}
+    };
+    function rateAt(t,m){ return m===0 ? 0.85 : Math.pow(t,m); }
+
+    function draw(m){
+      var d="";
+      for(var t=0;t<=1.0001;t+=0.02){
+        d+=(t===0?"M":"L")+sx(t).toFixed(2)+" "+sy(rateAt(t,m)).toFixed(2);
+      }
+      curve.setAttribute("d",d);
+      curve.setAttribute("stroke", m===2?"var(--index)":"var(--cobalt)");
+
+      clear(mark);
+      /* the two probe points sit one octave apart so the doubling is readable off the picture */
+      [0.5,1.0].forEach(function(t,idx){
+        var v=rateAt(t,m);
+        mark.appendChild(S("line",{x1:sx(t),y1:sy(v),x2:sx(t),y2:Y1,
+          stroke:"var(--ink-3)","stroke-width":1.5,"stroke-dasharray":"5 4"}));
+        mark.appendChild(S("line",{x1:X0,y1:sy(v),x2:sx(t),y2:sy(v),
+          stroke:"var(--ink-3)","stroke-width":1.5,"stroke-dasharray":"5 4"}));
+        mark.appendChild(S("circle",{cx:sx(t),cy:sy(v),r:8,fill:m===2?"var(--index)":"var(--cobalt)"}));
+        mark.appendChild(txt(sx(t),Y1+30,idx===0?"c":"2c",
+          {"font-size":21,"font-weight":700,fill:"var(--ink)","text-anchor":"middle"}));
+      });
+      var v1=rateAt(0.5,m), v2=rateAt(1.0,m);
+      if(Math.abs(v2-v1)>0.02){
+        var xa=sx(1.0)+22;
+        mark.appendChild(S("line",{x1:xa,y1:sy(v1),x2:xa,y2:sy(v2),stroke:"var(--ink)","stroke-width":2}));
+        mark.appendChild(txt(xa+10,(sy(v1)+sy(v2))/2+7,ORD[m].factor,
+          {"font-size":24,"font-weight":700,fill:"var(--ink)"}));
+      } else {
+        mark.appendChild(txt(sx(1.0)+30,sy(v1)+7,"×1",
+          {"font-size":24,"font-weight":700,fill:"var(--ink-2)"}));
+      }
+
+      document.getElementById("ordNum").textContent=String(m);
+      document.getElementById("ordName").textContent=ORD[m].name;
+      document.getElementById("ordFactor").textContent=ORD[m].factor;
+      document.getElementById("ordShape").textContent=ORD[m].shape;
+      [0,1,2].forEach(function(k){
+        document.getElementById("ord"+k).classList.toggle("right",k===m);
+      });
+    }
+    [0,1,2].forEach(function(m){
+      document.getElementById("ord"+m).addEventListener("click",function(){draw(m);});
+    });
+    draw(1);
+  })();
+
+  /* ============ INTERACTIVE 3 — units of k by overall order ============ */
+  (function(){
+    var big=document.getElementById("uBig");
+    if(!big) return;
+    var deriv=document.getElementById("uDeriv"), eg=document.getElementById("uEg");
+    function frac(n,d){return "<span class='frac'><i class='n'>"+n+"</i><i class='d'>"+d+"</i></span>";}
+    var U={
+      0:{unit:frac("mol","dm³·s"),
+         deriv:"อันดับรวม 0 → กฎอัตราคือ rate = k ค่า k จึงมีหน่วยเดียวกับอัตราพอดี",
+         eg:"อัตราไม่ขึ้นกับความเข้มข้นเลย เช่น การสลายแอลกอฮอล์ในเลือด"},
+      1:{unit:frac("1","s"),
+         deriv:"k = rate ÷ [A] → "+frac("mol","dm³·s")+" ÷ "+frac("mol","dm³")+" = "+frac("1","s"),
+         eg:"พบบ่อยที่สุด เช่น การสลายตัวของสารกัมมันตรังสีและยาส่วนใหญ่ในร่างกาย"},
+      2:{unit:frac("dm³","mol·s"),
+         deriv:"k = rate ÷ [A]² → หน่วยความเข้มข้นถูกหักล้างออกไปหนึ่งชั้น จึงเหลือ dm³ อยู่ในตัวเศษ",
+         eg:"เช่น ปฏิกิริยาที่ต้องอาศัยการชนกันของอนุภาคสองตัวโดยตรง"},
+      3:{unit:frac("dm⁶","mol²·s"),
+         deriv:"k = rate ÷ [A]²[B] → หักล้างหน่วยความเข้มข้นสองชั้น จึงได้ dm⁶ และ mol² ",
+         eg:"เช่น ตัวอย่างการหา k ในหัวข้อนี้ ที่ได้ k = 2.0 หน่วยนี้"}
+    };
+    function pick(n){
+      big.innerHTML="k มีหน่วยเป็น &nbsp;"+U[n].unit;
+      deriv.innerHTML=U[n].deriv;
+      eg.textContent=U[n].eg;
+      [0,1,2,3].forEach(function(k){
+        document.getElementById("u"+k).classList.toggle("right",k===n);
+      });
+    }
+    [0,1,2,3].forEach(function(n){
+      document.getElementById("u"+n).addEventListener("click",function(){pick(n);});
+    });
+    pick(1);
+  })();
+})();
+</script>
