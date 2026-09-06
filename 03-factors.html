@@ -162,15 +162,20 @@ td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
 .cards dt{font-family:var(--tech);font-size:.7em;letter-spacing:.16em;color:var(--ink-3);margin-top:.6em}
 .cards dd{margin:0}
 
-.traps{display:grid;gap:2px;background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
-.traps div{background:var(--panel);padding:1em 1.2em;outline:1px solid var(--rule);
-  display:grid;grid-template-columns:minmax(0,1fr);gap:.3em 1.4em}
-.traps .x,.traps .o{font-family:var(--tech);font-size:.66em;letter-spacing:.16em}
-.traps .x{color:var(--index)} .traps .o{color:var(--cobalt);margin-top:.5em}
-.traps p{margin:0}
+.traps{display:grid;gap:10px;background:transparent;border:none;margin-top:1.2em}
+.traps div{outline:1px solid var(--rule);
+  display:grid;grid-template-columns:1fr;
+  grid-template-areas:"xlabel" "xtext" "olabel" "otext";gap:0}
+.traps .x,.traps .o{font-family:var(--tech);font-size:.7em;font-weight:700;letter-spacing:.16em;
+  display:flex;align-items:center;padding:.7em 1.1em;margin:0}
+.traps .x{grid-area:xlabel;color:var(--index);background:var(--index-soft)}
+.traps .o{grid-area:olabel;color:var(--cobalt);background:var(--cobalt-soft)}
+.traps p{margin:0;padding:.9em 1.1em}
+.traps p:nth-of-type(1){grid-area:xtext;background:var(--index-soft)}
+.traps p:nth-of-type(2){grid-area:otext;background:var(--cobalt-soft)}
 @media (min-width:760px){
-  .traps div{grid-template-columns:1fr 1fr}
-  .traps .o{margin:0}
+  .traps div{grid-template-columns:auto 1fr;
+    grid-template-areas:"xlabel xtext" "olabel otext"}
 }
 
 /* ---------- synthesis: click to reveal ---------- */
@@ -273,6 +278,19 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
             <dt>เพราะอะไร</dt><dd>ต้องสลายพันธะ C–H และ O=O เดิมก่อนสร้างพันธะใหม่ ใช้พลังงานมาก <b>Eₐ สูง</b> จึงต้องมีประกายไฟมาเริ่มให้</dd>
           </dl>
         </article>
+      </div>
+      <p style="margin-top:1.2em">เห็นได้ชัดกว่าเดิมถ้าวาดเป็นเนินพลังงาน — ปฏิกิริยาทั้งสองเริ่มจากจุดเดียวกัน แต่เนินที่ต้องปีนสูงไม่เท่ากันเลย เพราะพันธะที่ต้องสลายต่างชนิดกัน:</p>
+      <div class="molrow" style="grid-template-columns:1fr;max-width:520px;margin-inline:auto">
+        <figure>
+          <svg class="chart" id="chartNature" viewBox="0 0 460 260" role="img"
+               aria-label="กราฟพลังงานเทียบปฏิกิริยาพันธะไอออนิกกับพันธะโคเวเลนต์ เริ่มจากจุดเดียวกันแต่ Eₐ ต่างกันมาก">
+            <g id="axesNature"></g>
+            <path id="hillIonic" fill="none" stroke-width="3.5"/>
+            <path id="hillCovalent" fill="none" stroke-width="3.5"/>
+            <g id="markNature"></g>
+          </svg>
+          <figcaption>เริ่มจากจุดเดียวกัน แต่ Eₐ ต่างกันมาก<b>ไอออนิก Eₐ ต่ำ (น้ำเงิน) เทียบกับ โคเวเลนต์ Eₐ สูง (ชาด)</b></figcaption>
+        </figure>
       </div>
       <p style="margin-top:1.4em">ธรรมชาติของสารเป็นตัวกำหนด <b>Eₐ ตั้งต้น</b> ของปฏิกิริยา และเป็นปัจจัยเดียวในหน้านี้ที่เราเปลี่ยนไม่ได้ — เลือกสารมาแล้วก็ได้ Eₐ มาเท่านั้น <b>ส่วนอีก 4 อย่างที่เหลือ เราคุมได้ทั้งหมด</b></p>
     </div>
@@ -391,8 +409,8 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
           <div class="caliper" style="border:2px solid var(--ink);border-bottom:none;justify-content:center">
             <div class="grp" style="flex:0 0 auto;gap:.5em">
               <button id="cut0" type="button" class="right">ไม่หั่น</button>
-              <button id="cut1" type="button">หั่น 1 ครั้ง</button>
-              <button id="cut2" type="button">หั่น 2 ครั้ง</button>
+              <button id="cut1" type="button">หั่นเป็น 8 ก้อน</button>
+              <button id="cut2" type="button">หั่นเป็น 64 ก้อน</button>
             </div>
           </div>
           <svg class="chart" id="cubeSvg" viewBox="0 0 460 300" role="img" aria-label="ลูกบาศก์ที่ถูกหั่นเป็นชิ้นเล็กลง แสดงพื้นที่ผิวรวมที่เพิ่มขึ้นขณะที่ปริมาตรเท่าเดิม">
@@ -405,8 +423,8 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
         <table id="cubeTbl">
           <tr><th>สถานะ</th><th>จำนวนก้อน</th><th>ปริมาตรรวม</th><th>พื้นที่ผิวรวม</th></tr>
           <tr><td>ไม่หั่น</td><td class="n">1</td><td class="n">64</td><td class="n">96</td></tr>
-          <tr><td>หั่น 1 ครั้ง</td><td class="n">8</td><td class="n">64</td><td class="n">192</td></tr>
-          <tr><td>หั่น 2 ครั้ง</td><td class="n">64</td><td class="n">64</td><td class="n">384</td></tr>
+          <tr><td>หั่นเป็น 8 ก้อน</td><td class="n">8</td><td class="n">64</td><td class="n">192</td></tr>
+          <tr><td>หั่นเป็น 64 ก้อน</td><td class="n">64</td><td class="n">64</td><td class="n">384</td></tr>
         </table>
       </div>
       <p>ปริมาตรไม่เปลี่ยนเลย เพราะไม่ได้เอาอะไรออกไป แต่<b>ทุกครั้งที่หั่น จะเกิดผิวหน้าใหม่ขึ้นมาที่เมื่อก่อนซ่อนอยู่ข้างใน</b> — และผิวใหม่นั่นแหละคือที่ที่กรดเข้าไปชนได้เพิ่ม</p>
@@ -611,7 +629,6 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
           </div>
         </details>
       </div>
-      <p class="srcnote">ข้อมูลเชิงตัวเลขในหน้านี้อ้างอิงกิจกรรม 8.4 และ 8.5 จากคู่มือครูรายวิชาเพิ่มเติมวิทยาศาสตร์และเทคโนโลยี เคมี ชั้นมัธยมศึกษาปีที่ 5 เล่ม 3 (สสวท. ฉบับปรับปรุง พ.ศ. 2566) · กราฟการกระจายพลังงานและกราฟปริมาตร–เวลาเป็นภาพประกอบหลักการ ไม่ใช่ข้อมูลการทดลองจริง</p>
     </div>
   </section>
 
@@ -853,6 +870,63 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     });
     g.appendChild(txt((X0+X1)/2,205,unitLabel,{"font-size":13,fill:"var(--ink-3)","text-anchor":"middle"}));
   }
+  /* ============ 3.1 mini energy-hill: ionic (low Ea) vs covalent (high Ea), same start ============ */
+  (function(){
+    var X0=50,X1=410,Y0=18,Y1=225;
+    function sx(p){return X0+p*(X1-X0);}
+    function sy(e){return Y1-e*(Y1-Y0);}
+    var ax=document.getElementById("axesNature");
+    ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    function triU(cx,cy,s,c){return S("path",{d:"M"+(cx-s)+","+cy+" L"+(cx+s)+","+cy+" L"+cx+","+(cy-s*1.7)+" Z",fill:c});}
+    function triD(cx,cy,s,c){return S("path",{d:"M"+(cx-s)+","+cy+" L"+(cx+s)+","+cy+" L"+cx+","+(cy+s*1.7)+" Z",fill:c});}
+    function triR(cx,cy,s,c){return S("path",{d:"M"+cx+","+(cy-s)+" L"+cx+","+(cy+s)+" L"+(cx+s*1.7)+","+cy+" Z",fill:c});}
+    ax.appendChild(triU(X0,Y0,3.5,"var(--ink)"));
+    ax.appendChild(triR(X1,Y1,3.5,"var(--ink)"));
+    ax.appendChild(txt(X1,Y1+24,"การดำเนินไปของปฏิกิริยา",{"text-anchor":"end","font-size":13,"letter-spacing":"0.04em"}));
+    ax.appendChild(txt(0,0,"พลังงาน",{"text-anchor":"middle","font-size":13,"letter-spacing":"0.04em",
+      transform:"translate(15 "+((Y0+Y1)/2)+") rotate(-90)"}));
+
+    var reactant=0.20, product=0.13, peakIon=0.32, peakCov=0.90;
+    var xPeakIon=0.30, xPeakCov=0.48;
+    function sm(t){return t*t*(3-2*t);}
+    function hillPath(peak,xPeak){
+      var d="";
+      for(var p=0;p<=1.001;p+=0.02){
+        var e;
+        if(p<xPeak) e=reactant+(peak-reactant)*sm(p/xPeak);
+        else e=peak+(product-peak)*sm((p-xPeak)/(1-xPeak));
+        d+=(p===0?"M":"L")+sx(p).toFixed(2)+" "+sy(e).toFixed(2);
+      }
+      return d;
+    }
+    var hi=document.getElementById("hillIonic");
+    hi.setAttribute("d",hillPath(peakIon,xPeakIon));
+    hi.setAttribute("stroke","var(--cobalt)");
+    var hc=document.getElementById("hillCovalent");
+    hc.setAttribute("d",hillPath(peakCov,xPeakCov));
+    hc.setAttribute("stroke","var(--index)");
+
+    var mk=document.getElementById("markNature");
+    var yR=sy(reactant), yPi=sy(peakIon), yPc=sy(peakCov);
+    var arrowTip=3.5*1.7;
+    mk.appendChild(S("line",{x1:X0,y1:yR,x2:X1,y2:yR,stroke:"var(--ink-3)","stroke-width":1.3,"stroke-dasharray":"5 4"}));
+    mk.appendChild(S("line",{x1:X0,y1:yPi,x2:sx(xPeakIon),y2:yPi,stroke:"var(--cobalt)","stroke-width":1.2,"stroke-dasharray":"5 4"}));
+    mk.appendChild(S("line",{x1:X0,y1:yPc,x2:sx(xPeakCov),y2:yPc,stroke:"var(--index)","stroke-width":1.2,"stroke-dasharray":"5 4"}));
+    mk.appendChild(S("line",{x1:sx(xPeakIon),y1:yR-arrowTip,x2:sx(xPeakIon),y2:yPi+arrowTip,stroke:"var(--cobalt)","stroke-width":1.6}));
+    mk.appendChild(triD(sx(xPeakIon),yR-arrowTip,3.5,"var(--cobalt)"));
+    mk.appendChild(triU(sx(xPeakIon),yPi+arrowTip,3.5,"var(--cobalt)"));
+    mk.appendChild(txt(sx(xPeakIon)-11,(yR+yPi)/2+6,"Eₐ ต่ำ",{"font-size":14,"font-weight":700,fill:"var(--cobalt)","text-anchor":"end"}));
+    mk.appendChild(S("line",{x1:sx(xPeakCov),y1:yR-arrowTip,x2:sx(xPeakCov),y2:yPc+arrowTip,stroke:"var(--index)","stroke-width":1.6}));
+    mk.appendChild(triD(sx(xPeakCov),yR-arrowTip,3.5,"var(--index)"));
+    mk.appendChild(triU(sx(xPeakCov),yPc+arrowTip,3.5,"var(--index)"));
+    mk.appendChild(txt(sx(xPeakCov)+11,(yR+yPc)/2+6,"Eₐ สูง",{"font-size":14,"font-weight":700,fill:"var(--index)"}));
+    mk.appendChild(txt(sx(0.16),yPi-10,"ไอออนิก",{"font-size":13,"font-weight":700,fill:"var(--cobalt)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(0.30),yPc-10,"โคเวเลนต์",{"font-size":13,"font-weight":700,fill:"var(--index)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(0.02),yR+18,"สารตั้งต้น (จุดเริ่มต้นเดียวกัน)",{"font-size":12,"font-weight":600,fill:"var(--ink-2)"}));
+    mk.appendChild(S("circle",{cx:sx(0),cy:yR,r:5,fill:"var(--ink)"}));
+  })();
+
   buildBarChart("barConcG",[
     {label:"HCl 0.2 M",display:48,valueLabel:"48 วิ",color:"var(--ink-3)"},
     {label:"HCl 0.5 M",display:36,valueLabel:"36 วิ",color:"var(--cobalt)"}
@@ -875,8 +949,8 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     var COS=Math.cos(Math.PI/6), SIN=Math.sin(Math.PI/6);
     var levels=[
       {n:1,gap:0,  pieces:1, area:96,  label:"ก้อนเดียว ผิวรวม 96 หน่วย"},
-      {n:2,gap:9,  pieces:8, area:192, label:"หั่นครั้งเดียว ได้ 8 ก้อน ผิวรวม 192 หน่วย — เพิ่มเป็น 2 เท่า"},
-      {n:4,gap:5,  pieces:64,area:384, label:"หั่นสองครั้ง ได้ 64 ก้อน ผิวรวม 384 หน่วย — เพิ่มเป็น 4 เท่าของก้อนเดิม"}
+      {n:2,gap:9,  pieces:8, area:192, label:"หั่นเป็น 8 ก้อน ผิวรวม 192 หน่วย — เพิ่มเป็น 2 เท่า"},
+      {n:4,gap:5,  pieces:64,area:384, label:"หั่นเป็น 64 ก้อน ผิวรวม 384 หน่วย — เพิ่มเป็น 4 เท่าของก้อนเดิม"}
     ];
     /* three faces of a unit cube whose topmost vertex sits at (px,py) */
     function facePath(px,py,s,which){
