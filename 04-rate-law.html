@@ -42,7 +42,7 @@ img,svg{max-width:100%}
 .panel{border:2px solid var(--ink);display:grid;
   grid-template-columns:minmax(0,1fr) 320px;gap:2px;background:var(--rule)}
 .panel>*{background:var(--panel)}
-.panel.solo{grid-template-columns:1fr}
+.panel.solo{grid-template-columns:minmax(0,1fr)}
 .face{padding:clamp(8px,1.2vw,18px) 0 0 0}
 svg.chart{display:block;width:100%;height:auto;touch-action:none}
 .readout{padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;gap:1.1em;box-shadow:var(--engrave)}
@@ -367,6 +367,11 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       <div class="cards">
         <article>
           <h4>การทดลองที่ 1 กับ 2 — เทียบ B</h4>
+          <table style="margin:0 0 1em">
+            <tr><th>การทดลองที่</th><th>[A] (M)</th><th>[B] (M)</th><th>ผลิตภัณฑ์ (M)</th></tr>
+            <tr><td class="n">1</td><td class="n">1.00</td><td class="n">0.50</td><td class="n">0.40</td></tr>
+            <tr><td class="n">2</td><td class="n">1.00</td><td class="n">1.00</td><td class="n">0.40</td></tr>
+          </table>
           <dl>
             <dt>คงที่</dt><dd>[A] = 1.00 M ทั้งคู่</dd>
             <dt>เปลี่ยน</dt><dd>[B] จาก 0.50 → 1.00 M &nbsp;(×2)</dd>
@@ -376,6 +381,11 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
         </article>
         <article>
           <h4>การทดลองที่ 1 กับ 4 — เทียบ A</h4>
+          <table style="margin:0 0 1em">
+            <tr><th>การทดลองที่</th><th>[A] (M)</th><th>[B] (M)</th><th>ผลิตภัณฑ์ (M)</th></tr>
+            <tr><td class="n">1</td><td class="n">1.00</td><td class="n">0.50</td><td class="n">0.40</td></tr>
+            <tr><td class="n">4</td><td class="n">0.50</td><td class="n">0.50</td><td class="n">0.20</td></tr>
+          </table>
           <dl>
             <dt>คงที่</dt><dd>[B] = 0.50 M ทั้งคู่</dd>
             <dt>เปลี่ยน</dt><dd>[A] จาก 1.00 → 0.50 M &nbsp;(×0.5)</dd>
@@ -399,7 +409,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
         </div>
       </div>
       <div class="caliper">
-        <div class="grp" style="flex:0 0 auto;gap:.5em;flex-wrap:wrap">
+        <div class="grp" style="flex:0 1 auto;gap:.5em;flex-wrap:wrap">
           <button id="dsBook" type="button" class="right">ชุดข้อมูลจากหนังสือ</button>
           <button id="dsExam" type="button">ชุดข้อมูลแนวข้อสอบ</button>
           <button id="dsBasic" type="button">ชุดฝึกพื้นฐาน</button>
@@ -462,7 +472,7 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
         </div>
       </div>
       <div class="caliper">
-        <div class="grp" style="flex:0 0 auto;gap:.5em">
+        <div class="grp" style="flex:0 1 auto;gap:.5em;flex-wrap:wrap">
           <button id="ord0" type="button">อันดับ 0</button>
           <button id="ord1" type="button" class="right">อันดับ 1</button>
           <button id="ord2" type="button">อันดับ 2</button>
