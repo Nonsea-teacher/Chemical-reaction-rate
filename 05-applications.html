@@ -1,0 +1,643 @@
+<title>แผงการเชื่อมโยงและการประยุกต์</title>
+<!--
+THESIS: บทนี้ปิดท้ายด้วยการแยกสองเรื่องที่นักเรียนปนกันบ่อยที่สุด — "อัตราไว/ช้าแค่ไหน" (จลนศาสตร์)
+        กับ "ไปทางไหนในที่สุด/ได้เท่าไร" (อุณหพลศาสตร์/ปริมาณสัมพันธ์) แล้วรวมทุกมโนทัศน์เข้าด้วยกัน
+        ผ่านกรณีศึกษาจริงที่ต้องใช้ทั้งสองเรื่องพร้อมกัน
+OWN-WORLD: หน้าปัดเครื่องมือวัด (สืบทอดจากแผงที่ 01-04) โคบอลต์ = ค่าที่วัดได้/ถูก, ชาด = ค่าที่เน้น/ผิด
+STORY: ถุงลมนิรภัย — NaN₃ ต้องสลายตัวให้ได้แก๊ส 60-80 ลิตร ภายใน 40 มิลลิวินาที (เร็วกว่ากระพริบตา)
+       ถ้าเข้าใจแค่ "เกิดปฏิกิริยาได้" แต่ไม่เข้าใจว่า "อัตราเร็วแค่ไหน" ถุงลมจะพองไม่ทันการชน
+FIRST VIEWPORT: แผ่นป้ายชื่อ แล้วภาพเปรียบเทียบถุงลมพองทัน/ไม่ทัน พร้อมคำถามค้างไว้
+INTERACTIVE: 2 ตัว — เครื่องตรวจ rate/k/K ต่อปัจจัย / กราฟ V-t สลับสองแกน (ตัวกำหนดปริมาณ vs ปัจจัยอัตรา)
+NOTE: นี่คือมโนทัศน์สุดท้ายของชุด 5 มโนทัศน์ และกลับเข้ามาอยู่ในขอบเขตหลักสูตร ม.5 แล้ว
+      (ตรงกับจุดประสงค์ข้อ 8 — สืบค้นกระบวนการในชีวิตประจำวัน/อุตสาหกรรม) ต่างจากมโนทัศน์ 4 ที่เป็นเนื้อหาต่อยอด
+-->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#D9DEDA; --panel:#F7F8F6; --panel-2:#ECEFEB; --panel-3:#E1E6E2;
+  --ink:#171D1B; --ink-2:#5A6461; --ink-3:#8B948F;
+  --rule:#BAC2BD; --rule-2:#D5DBD6;
+  --index:#C0301A; --index-soft:#F2D9D3;
+  --cobalt:#17457F; --cobalt-soft:#D6E0EE;
+  --engrave: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06);
+  --sans:"Anuphan",system-ui,sans-serif;
+  --tech:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%;
+  word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1400px;margin:0 auto;padding:clamp(14px,2vw,32px)}
+img,svg{max-width:100%}
+
+.plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
+.plate>div{background:var(--panel);padding:.55em 1em;box-shadow:var(--engrave)}
+.plate .grow{flex:1 1 320px}
+.plate .lbl{font-family:var(--tech);font-weight:600;font-size:.62em;letter-spacing:.22em;
+  color:var(--ink-3);display:block;line-height:1.6}
+.plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
+.serial{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+
+.panel{border:2px solid var(--ink);display:grid;
+  grid-template-columns:minmax(0,1fr) 320px;gap:2px;background:var(--rule)}
+.panel>*{background:var(--panel)}
+.panel.solo{grid-template-columns:minmax(0,1fr)}
+.face{padding:clamp(8px,1.2vw,18px) 0 0 0}
+svg.chart{display:block;width:100%;height:auto;touch-action:none}
+.readout{padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;gap:1.1em;box-shadow:var(--engrave)}
+.win{background:var(--panel-2);border:1px solid var(--rule);padding:.7em .85em}
+.win .lbl{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-2);display:block;margin:-.7em -.85em .55em;padding:.5em .9em}
+.win.is-hi .lbl{background:var(--index)}
+.win.is-lo .lbl{background:var(--cobalt)}
+.win .num{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.05;letter-spacing:-.02em;display:block}
+.win .unit{font-family:var(--tech);font-weight:500;font-size:.62em;color:var(--ink-2)}
+
+.caliper{border:2px solid var(--ink);border-top:none;background:var(--panel);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.6em;align-items:center}
+.caliper .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+.caliper label{font-family:var(--tech);font-weight:700;font-size:.82em;color:var(--cobalt);white-space:nowrap}
+button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
+  padding:.7em 1.2em;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);
+  cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s, background .12s}
+button:hover{background:var(--index);color:#fff;border-color:var(--index)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button.right{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.hint{font-family:var(--tech);font-size:.66em;color:var(--ink-3);flex-basis:100%;margin:0;line-height:1.6}
+
+/* ---------- hook ---------- */
+.hookcmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink)}
+.hookcmp>div{background:var(--panel);padding:1.1em 1.2em;box-shadow:var(--engrave)}
+.hookcmp .k{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.18em;
+  color:var(--ink-3);display:block;margin-bottom:.5em}
+.hookcmp .f{font-family:var(--tech);font-weight:700;font-size:clamp(1.05rem,2.2vw,1.5rem);
+  margin:0 0 .5em;line-height:1.4}
+.hookcmp .n{font-size:.86em;color:var(--ink-2);display:block}
+.hookcmp em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .38em no-repeat}
+.hookq{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,2.4vw,1.55rem);color:var(--ink);
+  text-align:center;padding:.9em 1em;margin:0;border:2px solid var(--ink);border-top:0;background:var(--index-soft)}
+
+/* ---------- everyday-life examples ---------- */
+.reallife{border:2px solid var(--ink);background:var(--panel-2);margin:1.3em 0 1.6em}
+.reallife .kick{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.2em;
+  color:var(--panel);background:var(--ink);padding:.55em 1.1em;display:block}
+.reallife .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));
+  gap:2px;background:var(--rule)}
+.reallife .items>div{background:var(--panel);padding:1.05em 1.2em}
+.reallife b{font-family:var(--tech);display:block;font-size:1.05em;margin-bottom:.2em;color:var(--ink)}
+.reallife p{margin:0;font-size:.9em;color:var(--ink-2)}
+
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(2.1rem,4.4vw,4rem);line-height:1.2;
+  letter-spacing:-.02em;margin:1.2em 0 .3em;max-width:24ch}
+h1 em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .34em no-repeat}
+.dek{font-size:1.1em;color:var(--ink);max-width:56ch;margin:0 0 2.4em}
+
+.sec{border:2px solid var(--ink);background:var(--panel);margin-top:2.6em}
+.sec-hd{display:flex;align-items:baseline;gap:.7em 1em;flex-wrap:wrap;padding:clamp(14px,1.5vw,22px);
+  border-bottom:2px solid var(--ink);background:var(--panel-2)}
+.sec-no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.6rem,3vw,2.6rem);color:var(--index);line-height:1}
+h2{font-family:var(--tech);font-weight:700;font-size:clamp(1.5rem,2.6vw,2.4rem);letter-spacing:-.01em;margin:0}
+h3{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,1.7vw,1.5rem);margin:2em 0 .4em}
+h3:first-child{margin-top:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.sec-bd>p{max-width:62ch}
+.keytag{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.14em;
+  color:#fff;background:var(--cobalt);padding:.45em .9em;white-space:nowrap;margin-left:auto}
+.keytag.hot{background:var(--index)}
+.eq{font-family:var(--tech);font-weight:600;font-size:clamp(1.2rem,2.4vw,2rem);
+  text-align:center;padding:.85em .4em;background:var(--panel-2);border:1px solid var(--rule);margin:.2em 0 1.4em}
+
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.notes div{background:var(--panel);padding:1em 1.1em;outline:1px solid var(--rule)}
+.notes b.k{font-family:var(--tech);display:block;font-size:1.05em;letter-spacing:.02em;
+  color:var(--ink);margin-bottom:.3em}
+
+table{width:100%;border-collapse:collapse;font-family:var(--tech);margin:1.4em 0}
+th,td{border:1px solid var(--rule);padding:.62em .8em;text-align:left;font-weight:500}
+th{background:var(--panel-2);font-size:.66em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+th.n{text-align:center}
+td.yes{color:var(--cobalt);font-weight:700;text-align:center}
+td.no{color:var(--ink-3);text-align:center}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tblwrap table{min-width:480px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.cards article{background:var(--panel);padding:1.1em 1.2em;outline:1px solid var(--rule)}
+.cards h4{font-family:var(--tech);font-size:1em;margin:0 0 .5em;letter-spacing:-.01em}
+.cards dl{margin:0;font-size:.86em}
+.cards dt{font-family:var(--tech);font-size:.7em;letter-spacing:.16em;color:var(--ink-3);margin-top:.6em}
+.cards dd{margin:0}
+.cards .tag{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.12em;
+  color:var(--cobalt);background:var(--cobalt-soft);padding:.3em .6em;display:inline-block;margin-bottom:.5em}
+
+.traps{display:grid;gap:10px;background:transparent;border:none;margin-top:1.2em}
+.traps div{outline:1px solid var(--rule);
+  display:grid;grid-template-columns:1fr;
+  grid-template-areas:"xlabel" "xtext" "olabel" "otext";gap:0}
+.traps .x,.traps .o{font-family:var(--tech);font-size:.7em;font-weight:700;letter-spacing:.16em;
+  display:flex;align-items:center;padding:.7em 1.1em;margin:0}
+.traps .x{grid-area:xlabel;color:var(--index);background:var(--index-soft)}
+.traps .o{grid-area:olabel;color:var(--cobalt);background:var(--cobalt-soft)}
+.traps p{margin:0;padding:.9em 1.1em}
+.traps p:nth-of-type(1){grid-area:xtext;background:var(--index-soft)}
+.traps p:nth-of-type(2){grid-area:otext;background:var(--cobalt-soft)}
+@media (min-width:760px){
+  .traps div{grid-template-columns:auto 1fr;
+    grid-template-areas:"xlabel xtext" "olabel otext"}
+}
+
+.checkhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.2em;
+  color:var(--cobalt);margin:1.8em 0 .2em;display:block}
+.check{border:2px solid var(--cobalt);background:var(--cobalt-soft);padding:0 clamp(14px,1.6vw,24px)}
+.check .ex-body{padding-top:1.1em}
+.check .ex-no{color:var(--cobalt)}
+.check .ex{border-top:2px solid var(--cobalt)}
+.check .ex summary{color:var(--cobalt)}
+.check .ans{border-color:var(--cobalt-soft);background:var(--panel)}
+.ex{border-top:2px solid var(--ink)}
+.ex:first-child{border-top:0}
+.ex summary{list-style:none;cursor:pointer;font-family:var(--tech);font-weight:700;font-size:.76em;
+  letter-spacing:.12em;color:var(--cobalt);padding:.7em 0 0;display:inline-block}
+.ex summary::-webkit-details-marker{display:none}
+.ex summary::before{content:"▸ ";}
+.ex[open] summary::before{content:"▾ ";}
+.ex-body{padding:1.2em 0 1.6em}
+.ex-no{font-family:var(--tech);font-weight:700;color:var(--index);margin-right:.5em}
+.ans{background:var(--panel-2);border:1px solid var(--rule);padding:1em 1.2em;margin:.6em 0 1.4em}
+.work{font-family:var(--tech);font-variant-numeric:tabular-nums;margin:.4em 0;color:var(--ink-2)}
+.work b{color:var(--ink)}
+
+footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.6em 0 1em;text-align:center}
+
+@media (max-width:900px){
+  .panel{grid-template-columns:1fr}
+  .readout{flex-direction:row;flex-wrap:wrap}
+  .readout .win{flex:1 1 40%}
+  .plate>div{flex:1 1 100%}
+}
+</style>
+
+<div class="wrap" lang="th">
+
+  <div class="plate">
+    <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
+    <div><span class="lbl">มโนทัศน์</span><span class="val serial">05 / 05</span></div>
+    <div><span class="lbl">แผงวัด</span><span class="val serial">2NaN₃(s) → 2Na(s) + 3N₂(g)</span></div>
+  </div>
+
+  <section class="hook">
+    <div class="hookcmp">
+      <div>
+        <span class="k">สิ่งที่ต้องจริง</span>
+        <p class="f">แก๊ส N₂ ต้องออกมา <em>60-80 ลิตร</em></p>
+        <span class="n">มากพอจะพองถุงลมให้เต็มก่อนที่หัวคนขับจะกระแทกพวงมาลัย</span>
+      </div>
+      <div>
+        <span class="k">สิ่งที่ต้องจริงยิ่งกว่า</span>
+        <p class="f">ต้องเสร็จภายใน <em>40 มิลลิวินาที</em></p>
+        <span class="n">เร็วกว่าการกระพริบตาหนึ่งครั้ง — ช้ากว่านี้แม้แค่เสี้ยววินาที ถุงลมก็พองไม่ทันประโยชน์อะไรเลย</span>
+      </div>
+    </div>
+    <p class="hookq">ปฏิกิริยาที่ "เกิดได้" กับปฏิกิริยาที่ "เกิดได้ทันเวลา" ไม่ใช่เรื่องเดียวกัน — ทำไมวิศวกรถึงต้องสนใจทั้งสองเรื่องพร้อมกัน ?</p>
+  </section>
+
+  <h1>เรียนมาทั้งบท<br><em>เอาไปใช้ตรงไหนได้บ้าง</em></h1>
+  <p class="dek">มโนทัศน์นี้ไม่ใช่เรื่องใหม่ แต่เป็นการเก็บงานทั้งบทมารวมกัน เริ่มจากจุดที่นักเรียนสับสนกันมากที่สุดจุดหนึ่ง — <b>ปฏิกิริยาที่ "คายพลังงานมาก" ไม่ได้แปลว่าจะ "เกิดเร็ว" เสมอไป</b> แล้วค่อยเชื่อมไปถึงปริมาณสัมพันธ์และการประยุกต์ใช้จริง</p>
+
+  <!-- ============ 5.1 favorable ≠ fast ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.1</span><h2>คายพลังงานมาก ≠ เกิดเร็ว</h2><span class="keytag hot">จุดที่สับสนบ่อยที่สุด</span></div>
+    <div class="sec-bd">
+      <p>อีกคู่ที่ต้องแยกให้ออก: ปฏิกิริยาที่<b>คายพลังงาน</b> (ผลิตภัณฑ์เสถียรกว่าสารตั้งต้น) ฟังดูเหมือน "ควรเกิดได้เอง" แต่นั่นเป็นคำตอบของคำถาม "ไปทางไหน" เท่านั้น ไม่ใช่คำตอบของคำถาม "เร็วแค่ไหน"</p>
+
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>เพชรควรจะกลายเป็นแกรไฟต์</b><p>แกรไฟต์ (ไส้ดินสอ) เสถียรกว่าเพชรเล็กน้อยในสภาวะปกติ พูดอีกอย่างคือเพชรทุกเม็ดที่มีอยู่ "ควรจะ" สลายกลายเป็นแกรไฟต์ไปนานแล้ว</p></div>
+          <div><b>แต่ทำไมแหวนเพชรไม่กลายเป็นไส้ดินสอ</b><p>เพราะ Eₐ ของการจัดเรียงอะตอมคาร์บอนใหม่สูงมหาศาล เพชรจึงติดอยู่ในสถานะเดิม เป็นแสนล้านปีก็ยังเป็นเพชรอยู่</p></div>
+        </div>
+      </div>
+
+      <div class="panel solo">
+        <div class="face" style="padding:0">
+          <svg class="chart" id="diaSvg" viewBox="0 0 900 420" role="img"
+               aria-label="กราฟพลังงานเปรียบเทียบปฏิกิริยาทั่วไปกับการเปลี่ยนเพชรเป็นแกรไฟต์ ทั้งคู่คายพลังงานเท่ากันโดยประมาณแต่ Eₐ ต่างกันมหาศาล">
+            <g id="diaAxes"></g>
+            <path id="diaNormal" fill="none" stroke-width="4"/>
+            <path id="diaDiamond" fill="none" stroke-width="4"/>
+            <g id="diaMark"></g>
+          </svg>
+        </div>
+      </div>
+      <p style="margin-top:1em">ทั้งสองเส้นคายพลังงานพอ ๆ กัน (ผลิตภัณฑ์อยู่ต่ำกว่าสารตั้งต้นเล็กน้อยเหมือนกัน) แต่เนินของเพชร→แกรไฟต์สูงจนแทบเป็นกำแพง — ที่อุณหภูมิห้อง แทบไม่มีอนุภาคไหนมีพลังงานพอจะข้ามไปได้เลย (ทบทวนกราฟการกระจายพลังงานจากมโนทัศน์ 3 หัวข้อ 3.4) ปฏิกิริยาจึง<b>ติดอยู่กับที่ทางจลนศาสตร์ (kinetically trapped)</b> ทั้งที่เอื้อทางพลังงานเต็มที่</p>
+
+      <div class="notes">
+        <div><b class="k">ตอบคำถาม "ไปทางไหน"</b>ดูจากพลังงานของผลิตภัณฑ์เทียบสารตั้งต้น (ΔE) — เป็นเรื่องอุณหพลศาสตร์</div>
+        <div><b class="k">ตอบคำถาม "เร็วแค่ไหน"</b>ดูจาก Eₐ ของเนินที่ต้องปีนข้าม — เป็นเรื่องจลนศาสตร์ (ทั้งบทนี้)</div>
+        <div><b class="k">สองเรื่องเป็นอิสระต่อกัน</b>ปฏิกิริยาคายพลังงานมากก็ยังช้าได้ถ้า Eₐ สูง เหมือนที่เห็นในกราฟด้านบน</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.2 connecting to stoichiometry ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.2</span><h2>เชื่อมกับปริมาณสัมพันธ์</h2></div>
+    <div class="sec-bd">
+      <p>ย้อนกลับไปที่วิชาเคมีปริมาณสัมพันธ์ (ม.4) — <b>สารกำหนดปริมาณ</b> เป็นตัวตัดสินว่าในที่สุดจะได้ผลิตภัณฑ์เท่าไร ส่วนปัจจัยเรื่องอัตราทั้งหมดที่เรียนมาในบทนี้ (มโนทัศน์ 3) ไม่ได้ไปยุ่งกับตัวเลขนั้นเลย แค่ไปเปลี่ยนว่า<b>ไปถึงตัวเลขนั้นเร็วหรือช้า</b></p>
+
+      <div class="panel solo">
+        <div class="face" style="padding:0">
+          <div class="caliper" style="border-bottom:none;justify-content:center">
+            <div class="grp" style="flex:0 1 auto;gap:.5em;flex-wrap:wrap">
+              <button id="stLimit" type="button" class="right">เปลี่ยนสารกำหนดปริมาณ</button>
+              <button id="stRate" type="button">เปลี่ยนปัจจัยเรื่องอัตรา</button>
+            </div>
+          </div>
+          <svg class="chart" id="stSvg" viewBox="0 0 400 280" role="img"
+               aria-label="กราฟปริมาตรแก๊สสะสมเทียบกับเวลา เปรียบเทียบผลของการเปลี่ยนสารกำหนดปริมาณกับการเปลี่ยนปัจจัยเรื่องอัตรา">
+            <g id="stGrid"></g><g id="stAxes"></g>
+            <path id="stSlow" fill="none" stroke-width="3.5" stroke-dasharray="8 6"/>
+            <path id="stFast" fill="none" stroke-width="3.5"/>
+            <g id="stMark"></g>
+          </svg>
+          <p class="hint" id="stCap" style="padding:.9em 1.1em;border-top:1px solid var(--rule);flex-basis:auto"></p>
+        </div>
+      </div>
+
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>เติมตัวเร่งปฏิกิริยาลงไปมาก ๆ จะได้ผลิตภัณฑ์เพิ่มขึ้นด้วย</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>ตัวเร่ง (เหมือนปัจจัยอัตราทุกตัว) เปลี่ยนแค่<b>ความชันของกราฟ</b> ปริมาณผลิตภัณฑ์สุดท้ายยังถูกกำหนดโดยสารกำหนดปริมาณเหมือนเดิมทุกประการ</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.3 real-world applications ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.3</span><h2>การประยุกต์ในชีวิตจริง</h2></div>
+    <div class="sec-bd">
+      <p>กรณีศึกษาต่อไปนี้ล้วนใช้หลักการจากมโนทัศน์ 1-4 ผสมกัน ลองสังเกตว่าแต่ละกรณีดึงเรื่องไหนมาใช้บ้าง</p>
+
+      <div class="cards">
+        <article>
+          <span class="tag">มโนทัศน์ 3 · ตัวเร่งปฏิกิริยา</span>
+          <h4>ถุงลมนิรภัย</h4>
+          <dl>
+            <dt>สาร</dt><dd>2NaN₃(s) → 2Na(s) + 3N₂(g)</dd>
+            <dt>ทำไมต้องเร็ว</dt><dd>ออกแบบให้ Eₐ ต่ำมากด้วยตัวจุดชนวนไฟฟ้า ให้สลายตัวได้ในหลักมิลลิวินาที ตรงข้ามกับเพชร→แกรไฟต์ที่ Eₐ สูงจนไม่เกิดเลย</dd>
+          </dl>
+        </article>
+        <article>
+          <span class="tag">มโนทัศน์ 3 · อุณหภูมิ</span>
+          <h4>ตู้เย็นถนอมอาหาร</h4>
+          <dl>
+            <dt>สาร</dt><dd>ปฏิกิริยาการเน่าเสียจากจุลินทรีย์/เอนไซม์</dd>
+            <dt>ทำไมต้องช้า</dt><dd>ลดอุณหภูมิ = ลดสัดส่วนอนุภาคที่พลังงานถึงเกณฑ์ Eₐ อาหารจึงเก็บได้นานขึ้นโดยไม่ต้องเปลี่ยนสารเคมีอะไรเลย</dd>
+          </dl>
+        </article>
+        <article>
+          <span class="tag">มโนทัศน์ 3 · ตัวเร่งวิวิธพันธ์</span>
+          <h4>เครื่องฟอกไอเสียรถยนต์</h4>
+          <dl>
+            <dt>สาร</dt><dd>CO, NOₓ, ไฮโดรคาร์บอนที่เผาไหม้ไม่หมด</dd>
+            <dt>ทำอะไร</dt><dd>โลหะมีตระกูล (Pt, Pd, Rh) เป็นผิวสัมผัสให้แก๊สพิษมาชนแล้วสลายตัวเป็นสารพิษน้อยลง ก่อนออกจากท่อไอเสีย</dd>
+          </dl>
+        </article>
+        <article>
+          <span class="tag">มโนทัศน์ 3 · ตัวเร่งปฏิกิริยา</span>
+          <h4>กระบวนการฮาเบอร์ (ผลิต NH₃)</h4>
+          <dl>
+            <dt>สาร</dt><dd>N₂(g) + 3H₂(g) → 2NH₃(g)</dd>
+            <dt>ทำไมต้องใช้ตัวเร่ง</dt><dd>N₂ มีพันธะสามที่แข็งแรงมาก ทำให้ Eₐ ของปฏิกิริยานี้สูงมาก ถ้าไม่ใช้ตัวเร่งปฏิกิริยา (Fe) ต้องใช้อุณหภูมิสูงจัดจึงจะได้อัตราที่พอใช้งานได้ ซึ่งสิ้นเปลืองพลังงานมาก ตัวเร่งช่วยลด Eₐ ให้ได้อัตราที่ดีที่อุณหภูมิต่ำลง</dd>
+          </dl>
+        </article>
+        <article>
+          <span class="tag">มโนทัศน์ 3 · ตัวเร่งชีวภาพ</span>
+          <h4>เอนไซม์ในร่างกาย</h4>
+          <dl>
+            <dt>สาร</dt><dd>ปฏิกิริยาชีวเคมีนับพันชนิดในเซลล์</dd>
+            <dt>ทำอะไร</dt><dd>เป็นตัวเร่งที่ลด Eₐ ให้ปฏิกิริยาที่ปกติต้องใช้ความร้อนสูงมาก เกิดขึ้นได้เองที่อุณหภูมิร่างกาย 37°C</dd>
+          </dl>
+        </article>
+        <article>
+          <span class="tag">มโนทัศน์ 3 · ธรรมชาติของสาร</span>
+          <h4>สารกันหืนในอาหาร</h4>
+          <dl>
+            <dt>สาร</dt><dd>สารต้านออกซิเดชัน เช่น วิตามินอี, BHA/BHT</dd>
+            <dt>ทำอะไร</dt><dd>ไปแทรกในปฏิกิริยาออกซิเดชันของไขมันแทนที่จะปล่อยให้เกิดกับน้ำมันในอาหารโดยตรง ทำให้อัตราการหืนช้าลงมาก</dd>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ end-of-lesson exercises (แบบฝึกหัดท้ายบท จากหนังสือเรียน) ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>แบบฝึกหัดท้ายบท</h2><span class="keytag">จากหนังสือเรียน</span></div>
+    <div class="sec-bd">
+      <p>ข้อสอบชุดนี้คือ<b>แบบฝึกหัดท้ายบท</b>ทั้งหมดจากหนังสือเรียนโดยตรง (สสวท. เคมี ม.5 เล่ม 3) ครบทั้ง 7 ข้อ ตามลำดับเดิมในหนังสือ — เหมาะเก็บไว้ทบทวนก่อนสอบ เพราะรวมทุกเรื่องของบทนี้ไว้ในชุดเดียว</p>
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>ปฏิกิริยา 3A + 2B → 2C ถ้าสาร A มีความเข้มข้นเริ่มต้น 0.20 โมลาร์ เมื่อเวลาผ่านไป 90 วินาที ความเข้มข้นของสาร A ลดลงเหลือ 0.05 โมลาร์ อัตราการเปลี่ยนแปลงปริมาณของสาร C ในช่วงเวลาดังกล่าวเป็นเท่าใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p class="work">−(1/3)(Δ[A]/Δt) = (1/2)(Δ[C]/Δt)</p>
+            <p class="work">−(1/3) × (0.05 − 0.20) M ÷ (90 − 0) s = (1/2)(Δ[C]/Δt)</p>
+            <p class="work">Δ[C]/Δt = <strong>1.1 × 10⁻³ M/s</strong></p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>พิจารณากราฟความเข้มข้นของสาร A, B, C เทียบกับเวลาต่อไปนี้ จงเขียนสมการเคมีและคำนวณอัตราการเกิดปฏิกิริยาเคมี
+          <svg viewBox="0 0 680 420" style="width:100%;max-width:600px;height:auto;display:block;margin:.8em auto" role="img" aria-label="กราฟความเข้มข้นของสาร A B และ C เทียบกับเวลา จาก 0 ถึง 70 วินาที">
+            <g stroke="var(--rule-2)" stroke-width="1">
+              <line x1="90" y1="20" x2="90" y2="370"/><line x1="167" y1="20" x2="167" y2="370"/>
+              <line x1="244" y1="20" x2="244" y2="370"/><line x1="321" y1="20" x2="321" y2="370"/>
+              <line x1="399" y1="20" x2="399" y2="370"/><line x1="476" y1="20" x2="476" y2="370"/>
+              <line x1="553" y1="20" x2="553" y2="370"/><line x1="630" y1="20" x2="630" y2="370"/>
+              <line x1="90" y1="370" x2="630" y2="370"/><line x1="90" y1="292" x2="630" y2="292"/>
+              <line x1="90" y1="214" x2="630" y2="214"/><line x1="90" y1="136" x2="630" y2="136"/>
+              <line x1="90" y1="58" x2="630" y2="58"/>
+            </g>
+            <line x1="90" y1="20" x2="90" y2="370" stroke="var(--ink)" stroke-width="2.5"/>
+            <line x1="90" y1="370" x2="630" y2="370" stroke="var(--ink)" stroke-width="2.5"/>
+            <g font-family="Bai Jamjuree" font-size="15" fill="var(--ink-2)">
+              <text x="90" y="392" text-anchor="middle">0</text><text x="167" y="392" text-anchor="middle">10</text>
+              <text x="244" y="392" text-anchor="middle">20</text><text x="321" y="392" text-anchor="middle">30</text>
+              <text x="399" y="392" text-anchor="middle">40</text><text x="476" y="392" text-anchor="middle">50</text>
+              <text x="553" y="392" text-anchor="middle">60</text><text x="630" y="392" text-anchor="middle">70</text>
+              <text x="78" y="375" text-anchor="end">0.00</text><text x="78" y="297" text-anchor="end">1.00</text>
+              <text x="78" y="219" text-anchor="end">2.00</text><text x="78" y="141" text-anchor="end">3.00</text>
+              <text x="78" y="63" text-anchor="end">4.00</text>
+            </g>
+            <text x="360" y="415" text-anchor="middle" font-family="Bai Jamjuree" font-size="16" fill="var(--ink-2)" letter-spacing="0.06em">เวลา (s)</text>
+            <text x="0" y="0" text-anchor="middle" font-family="Bai Jamjuree" font-size="16" fill="var(--ink-2)" letter-spacing="0.06em" transform="translate(28 195) rotate(-90)">ความเข้มข้น (M)</text>
+            <polyline points="90.0,58.9 113.1,125.0 136.3,172.4 167.1,215.4 205.7,248.2 244.3,266.9 282.9,277.7 321.4,283.9 398.6,289.5 475.7,291.3 552.9,291.9 630.0,292.1"
+              fill="none" stroke="var(--cobalt)" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="90.0,253.3 113.1,275.4 136.3,291.2 167.1,305.5 205.7,316.4 244.3,322.7 282.9,326.3 321.4,328.3 398.6,330.2 475.7,330.8 552.9,331.0 630.0,331.1"
+              fill="none" stroke="var(--index)" stroke-width="3" stroke-linecap="round"/>
+            <polyline points="90.0,370.0 113.1,325.9 136.3,294.3 167.1,265.7 205.7,243.8 244.3,231.3 282.9,224.1 321.4,220.0 398.6,216.3 475.7,215.0 552.9,214.6 630.0,214.5"
+              fill="none" stroke="var(--ink-2)" stroke-width="3" stroke-linecap="round"/>
+            <g font-family="Bai Jamjuree" font-weight="700" font-size="17">
+              <text x="638" y="296" fill="var(--cobalt)">A</text>
+              <text x="638" y="218" fill="var(--ink-2)">C</text>
+              <text x="638" y="335" fill="var(--index)">B</text>
+            </g>
+          </svg>
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p style="margin:0 0 .4em">หาความเข้มข้นตั้งแต่เริ่มต้นจนความเข้มข้นไม่เปลี่ยนแปลง (คงที่ที่เวลา 30 วินาที)</p>
+            <div class="tblwrap"><table>
+              <tr><th>สาร</th><th class="n">เริ่มต้น (M)</th><th class="n">สิ้นสุด (M)</th><th class="n">เปลี่ยนแปลง (M)</th></tr>
+              <tr><td>A</td><td class="n">4.00</td><td class="n">1.00</td><td class="n">3.00</td></tr>
+              <tr><td>B</td><td class="n">1.50</td><td class="n">0.50</td><td class="n">1.00</td></tr>
+              <tr><td>C</td><td class="n">0.00</td><td class="n">2.00</td><td class="n">2.00</td></tr>
+            </table></div>
+            <p style="margin:1em 0 .4em">อัตราส่วนการเปลี่ยนแปลง A : B : C = 3 : 1 : 2 ดังนั้นสมการเคมีเป็น</p>
+            <div class="eq">3A + B → 2C</div>
+            <p class="work">r = −Δ[B]/Δt = −(0.50 − 1.50) M ÷ (30 − 0) s = <strong>3.3 × 10⁻² M/s</strong></p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">3</span>สาร A เกิดปฏิกิริยาเคมีเปลี่ยนเป็นสาร B และ C ตามแผนภาพการดำเนินไปของปฏิกิริยาดังแสดง ถ้าเริ่มต้นปฏิกิริยาด้วยความเข้มข้นของสาร A เท่ากัน อัตราการเกิดปฏิกิริยาของ A → B และ A → C เท่ากันหรือไม่ อย่างไร
+          <svg viewBox="0 0 900 420" style="width:100%;max-width:640px;height:auto;display:block;margin:.8em auto" role="img" aria-label="แผนภาพพลังงานแสดงสองเส้นทางจาก A ไป B และจาก A ไป C โดยเส้นทาง A ไป B มี Ea ต่ำกว่า">
+            <line x1="70" y1="20" x2="70" y2="380" stroke="var(--ink)" stroke-width="1.5"/>
+            <line x1="70" y1="380" x2="830" y2="380" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="830" y="406" text-anchor="end" font-family="Bai Jamjuree" font-size="16" fill="var(--ink-2)" letter-spacing="0.04em">การดำเนินไปของปฏิกิริยา</text>
+            <text x="0" y="0" text-anchor="middle" font-family="Bai Jamjuree" font-size="16" fill="var(--ink-2)" letter-spacing="0.04em" transform="translate(24 200) rotate(-90)">พลังงาน (kJ)</text>
+            <line x1="70" y1="251.4" x2="830" y2="251.4" stroke="var(--ink-3)" stroke-width="1" stroke-dasharray="5 4"/>
+            <path d="M70.0 251.4L85.2 250.4L100.4 247.5L115.6 242.8L130.8 236.7L146.0 229.4L161.2 221.1L176.4 211.9L191.6 202.2L206.8 192.2L222.0 182.1L237.2 172.0L252.4 162.4L267.6 153.2L282.8 144.9L298.0 137.6L313.2 131.5L328.4 126.8L343.6 123.9L358.8 122.9L374.0 123.3L389.2 124.5L404.4 126.6L419.6 129.3L434.8 132.7L450.0 136.7L465.2 141.2L480.4 146.3L495.6 151.7L510.8 157.5L526.0 163.6L541.2 170.0L556.4 176.6L571.6 183.3L586.8 190.2L602.0 197.0L617.2 203.8L632.4 210.5L647.6 217.1L662.8 223.5L678.0 229.6L693.2 235.4L708.4 240.9L723.6 245.9L738.8 250.4L754.0 254.4L769.2 257.8L784.4 260.6L799.6 262.6L814.8 263.9L830.0 264.3"
+              fill="none" stroke="var(--cobalt)" stroke-width="3"/>
+            <path d="M70.0 251.4L85.2 250.3L100.4 247.1L115.6 241.9L130.8 235.1L146.0 226.8L161.2 217.1L176.4 206.5L191.6 194.9L206.8 182.6L222.0 169.9L237.2 157.0L252.4 144.0L267.6 131.1L282.8 118.6L298.0 106.7L313.2 95.5L328.4 85.3L343.6 76.3L358.8 68.7L374.0 62.7L389.2 58.5L404.4 56.3L419.6 56.3L434.8 58.6L450.0 62.9L465.2 69.3L480.4 77.3L495.6 87.0L510.8 98.1L526.0 110.5L541.2 123.9L556.4 138.2L571.6 153.2L586.8 168.9L602.0 184.9L617.2 201.1L632.4 217.3L647.6 233.5L662.8 249.3L678.0 264.6L693.2 279.4L708.4 293.2L723.6 306.1L738.8 317.9L754.0 328.3L769.2 337.2L784.4 344.4L799.6 349.8L814.8 353.1L830.0 354.3"
+              fill="none" stroke="var(--index)" stroke-width="3" stroke-dasharray="7 5"/>
+            <g font-family="Bai Jamjuree" font-weight="700" font-size="18">
+              <text x="55" y="245" text-anchor="end" fill="var(--ink)">A</text>
+              <text x="838" y="268" fill="var(--cobalt)">B</text>
+              <text x="838" y="358" fill="var(--index)">C</text>
+            </g>
+          </svg>
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p>อัตราการเกิดปฏิกิริยาของ A → B <b>มากกว่า</b> A → C เนื่องจากพลังงานก่อกัมมันต์ (Eₐ) ของ A → B มีค่าน้อยกว่าพลังงานก่อกัมมันต์ของ A → C (สังเกตจากยอดเขาของเส้น A → B ในกราฟเตี้ยกว่าเส้น A → C — ทบทวนหัวข้อ 5.1)</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">4</span>ปฏิกิริยาการสลายตัวของโพแทสเซียมคลอเรต (KClO₃) ได้ผลิตภัณฑ์เป็นโพแทสเซียมคลอไรด์ (KCl) และแก๊สออกซิเจน (O₂) ดังสมการเคมี
+          <div class="eq">2KClO₃(s) → 2KCl(s) + 3O₂(g)</div>
+          ปฏิกิริยาดังกล่าวต้องมีการให้ความร้อนและใช้แมงกานีส(IV)ออกไซด์ (MnO₂) เป็นตัวเร่งปฏิกิริยา
+          <p style="margin:.6em 0 0"><b>4.1</b> ในการศึกษาอัตราการเกิดปฏิกิริยาเคมีควรติดตามโดยการวัดปริมาณของสารใด เพราะเหตุใด</p>
+          <p style="margin:.4em 0 0"><b>4.2</b> ถ้าต้องการให้ปฏิกิริยาเกิดได้เร็วขึ้นอีก ควรทำอย่างไร</p>
+          <p style="margin:.4em 0 0"><b>4.3</b> ถ้าทำการทดลองในภาชนะขนาด 10.0 ลิตร เมื่อทำการทดลองผ่านไป 10 นาที ที่อุณหภูมิ 55 องศาเซลเซียส วัดความดันภายในภาชนะได้เท่ากับ 11.98 บรรยากาศ จงคำนวณอัตราการเกิดปฏิกิริยาเคมีเฉลี่ยของปฏิกิริยานี้ เมื่อกำหนดให้ปริมาตรของโพแทสเซียมคลอเรตและโพแทสเซียมคลอไรด์มีค่าน้อยมากเมื่อเทียบกับปริมาตรของภาชนะ</p>
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p style="margin:0 0 .4em"><b>4.1</b> O₂ เนื่องจากเป็นแก๊สแยกออกจากสารตั้งต้นและผลิตภัณฑ์ได้ ส่วน KClO₃ และ KCl เป็นของแข็งที่ผสมกันอยู่จึงหามวลของสารแต่ละชนิดได้ยาก</p>
+            <p style="margin:1em 0 .4em"><b>4.2</b> บด KClO₃ ให้ละเอียดขึ้น (เพิ่มพื้นที่ผิว) และ/หรือ เพิ่มอุณหภูมิในการให้ความร้อน</p>
+            <p style="margin:1em 0 .4em"><b>4.3</b> หาจำนวนโมลของ O₂ จาก PV = nRT ก่อน</p>
+            <p class="work">n = PV/RT = (11.98 atm)(10.0 L) ÷ [(0.0821 L·atm/mol·K)(55+273 K)] = <strong>4.45 mol</strong></p>
+            <p class="work">[O₂] = 4.45 mol ÷ 10.0 L = <strong>0.445 M</strong></p>
+            <p class="work">r = (1/3)(Δ[O₂]/Δt) = (1/3)(0.445 M ÷ 10 min) = <strong>1.5 × 10⁻² M/min</strong></p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">5</span>ในการจุดเทียนหอม ความร้อนจากเปลวไฟจะทำให้เนื้อเทียนเป็นของเหลว เนื้อเทียนเหลวจะเคลื่อนที่ไปตามไส้เทียนและเกิดปฏิกิริยาเผาไหม้ เกิดเป็นแสงสว่างและทำให้น้ำมันหอมระเหยในเนื้อเทียนฟุ้งกระจายไป หากต้องการให้ปฏิกิริยาเกิดช้าลงซึ่งจะทำให้จุดเทียนหอมให้สว่างและส่งกลิ่นหอมได้นานขึ้น ควรทำอย่างไร</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p>• ตัดไส้เทียนให้สั้นลง เพื่อ<b>ลดพื้นที่ผิว</b>ในการเผาไหม้</p>
+            <p style="margin-top:.5em">• ครอบเทียนหอมด้วยโคมเทียน เพื่อ<b>ลดความเข้มข้นของออกซิเจน</b>ที่เข้ามาทำปฏิกิริยาการเผาไหม้</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">6</span>จากการศึกษาปฏิกิริยา A(aq) + B(aq) → P(aq) เมื่อจับเวลาที่ใช้ในการเกิดสาร P ให้ได้ความเข้มข้น 0.01 โมลาร์ ได้ผลดังตาราง
+          <div class="tblwrap"><table>
+            <tr><th>การทดลองที่</th><th class="n">[A] เริ่มต้น (M)</th><th class="n">[B] เริ่มต้น (M)</th><th class="n">สาร X (g)</th><th class="n">อุณหภูมิ (°C)</th><th class="n">เวลาที่ใช้ (s)</th></tr>
+            <tr><td class="n">1</td><td class="n">0.10</td><td class="n">0.10</td><td class="n">—</td><td class="n">25</td><td class="n">30</td></tr>
+            <tr><td class="n">2</td><td class="n">0.10</td><td class="n">0.10</td><td class="n">—</td><td class="n">45</td><td class="n">15</td></tr>
+            <tr><td class="n">3</td><td class="n">0.10</td><td class="n">0.10</td><td class="n">0.01</td><td class="n">25</td><td class="n">5</td></tr>
+            <tr><td class="n">4</td><td class="n">0.10</td><td class="n">0.20</td><td class="n">—</td><td class="n">25</td><td class="n">10</td></tr>
+            <tr><td class="n">5</td><td class="n">0.20</td><td class="n">0.10</td><td class="n">—</td><td class="n">25</td><td class="n">15</td></tr>
+          </table></div>
+          <p style="margin:.6em 0 0"><b>6.1</b> อัตราการเกิดปฏิกิริยาเคมีนี้ขึ้นอยู่กับความเข้มข้นเริ่มต้นของสารตั้งต้นใด ทราบได้อย่างไร</p>
+          <p style="margin:.4em 0 0"><b>6.2</b> สาร X ทำหน้าที่ใดในปฏิกิริยานี้</p>
+          <p style="margin:.4em 0 0"><b>6.3</b> เพราะเหตุใดการทดลองที่ 2 จึงใช้เวลาน้อยกว่าการทดลองที่ 1</p>
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p style="margin:0 0 .4em"><b>6.1</b> ขึ้นอยู่กับความเข้มข้นของทั้งสาร A และ B ทราบได้จากการทดลองที่ 1, 4 และ 5 เมื่อเพิ่มความเข้มข้นของสารตั้งต้นตัวใดตัวหนึ่ง เวลาที่ใช้ในการเกิดสาร P ลดลง</p>
+            <p style="margin:1em 0 .4em"><b>6.2</b> ตัวเร่งปฏิกิริยา (เติมแล้วเวลาลดจาก 30 วินาทีเหลือ 5 วินาที โดยไม่เปลี่ยนความเข้มข้นเริ่มต้นของ A, B)</p>
+            <p style="margin:1em 0 .4em"><b>6.3</b> การทดลองที่ 2 ใช้อุณหภูมิสูงกว่าการทดลองที่ 1 (45°C เทียบกับ 25°C)</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">7</span>การทดลองทำจรวดจากขวดน้ำพลาสติก ทำโดยเติมน้ำส้มสายชู (CH₃COOH) ลงไปประมาณหนึ่งในสี่ของขวด แล้วนำโซเดียมไฮโดรเจนคาร์บอเนต (NaHCO₃) ห่อกระดาษชำระอัดไว้ที่ปากขวด เมื่อคว่ำขวด น้ำส้มสายชูจะทำปฏิกิริยากับโซเดียมไฮโดรเจนคาร์บอเนตได้แก๊สคาร์บอนไดออกไซด์ (CO₂) ดังสมการเคมี
+          <div class="eq">CH₃COOH(aq) + NaHCO₃(s) → CH₃COONa(aq) + H₂O(l) + CO₂(g)</div>
+          การปรับปรุงข้อใดจะทำให้เกิดแรงดันจากแก๊สคาร์บอนไดออกไซด์ได้มากขึ้น
+          <p style="margin:.6em 0 0"><b>7.1</b> เพิ่มปริมาณโซเดียมไฮโดรเจนคาร์บอเนต</p>
+          <p style="margin:.4em 0 0"><b>7.2</b> เพิ่มความเข้มข้นของน้ำส้มสายชู</p>
+          <p style="margin:.4em 0 0"><b>7.3</b> เปลี่ยนขวดน้ำพลาสติกให้มีขนาดใหญ่ขึ้น</p>
+        </div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p style="margin:0 0 .4em"><b>7.1</b> อัตราการเกิดแก๊ส<b>เพิ่มขึ้น</b> เพราะเพิ่มปริมาณสารตั้งต้น (NaHCO₃ มักเป็นสารกำหนดปริมาณในการทดลองนี้ — ทบทวนหัวข้อ 5.2 การเพิ่มสารกำหนดปริมาณเปลี่ยนทั้งปริมาณสุดท้ายด้วย)</p>
+            <p style="margin:1em 0 .4em"><b>7.2</b> อัตราการเกิดแก๊ส<b>เพิ่มขึ้น</b> เพราะอัตราการเกิดปฏิกิริยาขึ้นกับความเข้มข้นของสารตั้งต้น (ปัจจัยเรื่องอัตราล้วน ๆ — ทบทวนหัวข้อ 5.2)</p>
+            <p style="margin:1em 0 .4em"><b>7.3</b> อัตราการเกิดแก๊ส<b>เท่าเดิม</b> เนื่องจากปริมาณสารตั้งต้นเท่าเดิม ขนาดขวดไม่ใช่ปัจจัยเรื่องอัตราหรือปริมาณสัมพันธ์</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer>มโนทัศน์ที่ 05 จาก 05 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  function boot(){
+  var NS="http://www.w3.org/2000/svg";
+  function S(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function txt(x,y,s,o){var a={x:x,y:y,"font-family":"Bai Jamjuree","font-size":18,"font-weight":600,
+    fill:"var(--ink-2)"};for(var k in (o||{}))a[k]=o[k];var e=S("text",a);e.textContent=s;return e;}
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild);}
+
+  /* ============ 5.1 diamond vs normal-reaction energy hill ============ */
+  (function(){
+    var ax=document.getElementById("diaAxes");
+    if(!ax) return;
+    var X0=60,X1=860,Y0=30,Y1=340;
+    function sx(p){return X0+p*(X1-X0);}
+    function sy(e){return Y1-e*(Y1-Y0);}
+    function triU(cx,cy,s,c){return S("path",{d:"M"+(cx-s)+","+cy+" L"+(cx+s)+","+cy+" L"+cx+","+(cy-s*1.7)+" Z",fill:c});}
+    function triD(cx,cy,s,c){return S("path",{d:"M"+(cx-s)+","+cy+" L"+(cx+s)+","+cy+" L"+cx+","+(cy+s*1.7)+" Z",fill:c});}
+    function triR(cx,cy,s,c){return S("path",{d:"M"+cx+","+(cy-s)+" L"+cx+","+(cy+s)+" L"+(cx+s*1.7)+","+cy+" Z",fill:c});}
+    ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(triU(X0,Y0,3.5,"var(--ink)"));
+    ax.appendChild(triR(X1,Y1,3.5,"var(--ink)"));
+    ax.appendChild(txt(X1,Y1+26,"การดำเนินไปของปฏิกิริยา",{"text-anchor":"end","font-size":16,"letter-spacing":"0.04em"}));
+    ax.appendChild(txt(0,0,"พลังงาน",{"text-anchor":"middle","font-size":16,"letter-spacing":"0.04em",
+      transform:"translate(17 "+((Y0+Y1)/2)+") rotate(-90)"}));
+
+    var reactant=0.55, product=0.42;         /* both curves cool down by about the same amount */
+    var peakNormal=0.68, peakDiamond=0.90;   /* diamond's hill is far higher, with headroom left for its label */
+    var xPeakNormal=0.35, xPeakDiamond=0.5;
+    function sm(t){return t*t*(3-2*t);}
+    function hillPath(peak,xPeak){
+      var d="";
+      for(var p=0;p<=1.001;p+=0.02){
+        var e;
+        if(p<xPeak) e=reactant+(peak-reactant)*sm(p/xPeak);
+        else e=peak+(product-peak)*sm((p-xPeak)/(1-xPeak));
+        d+=(p===0?"M":"L")+sx(p).toFixed(2)+" "+sy(e).toFixed(2);
+      }
+      return d;
+    }
+    var hn=document.getElementById("diaNormal");
+    hn.setAttribute("d",hillPath(peakNormal,xPeakNormal));
+    hn.setAttribute("stroke","var(--cobalt)");
+    var hd2=document.getElementById("diaDiamond");
+    hd2.setAttribute("d",hillPath(peakDiamond,xPeakDiamond));
+    hd2.setAttribute("stroke","var(--index)");
+
+    var mk=document.getElementById("diaMark");
+    var yR=sy(reactant), yPn=sy(peakNormal), yPd=sy(peakDiamond);
+    var arrowTip=3.5*1.7;
+    mk.appendChild(S("line",{x1:X0,y1:yR,x2:X1,y2:yR,stroke:"var(--ink-3)","stroke-width":1.3,"stroke-dasharray":"5 4"}));
+    mk.appendChild(S("line",{x1:sx(xPeakNormal),y1:yR-arrowTip,x2:sx(xPeakNormal),y2:yPn+arrowTip,stroke:"var(--cobalt)","stroke-width":1.6}));
+    mk.appendChild(triD(sx(xPeakNormal),yR-arrowTip,3.5,"var(--cobalt)"));
+    mk.appendChild(triU(sx(xPeakNormal),yPn+arrowTip,3.5,"var(--cobalt)"));
+    mk.appendChild(txt(sx(xPeakNormal)-11,(yR+yPn)/2+6,"Eₐ ปกติ",{"font-size":17,"font-weight":700,fill:"var(--cobalt)","text-anchor":"end"}));
+    mk.appendChild(S("line",{x1:sx(xPeakDiamond),y1:yR-arrowTip,x2:sx(xPeakDiamond),y2:yPd+arrowTip,stroke:"var(--index)","stroke-width":1.6}));
+    mk.appendChild(triD(sx(xPeakDiamond),yR-arrowTip,3.5,"var(--index)"));
+    mk.appendChild(triU(sx(xPeakDiamond),yPd+arrowTip,3.5,"var(--index)"));
+    mk.appendChild(txt(sx(xPeakDiamond)+11,(yR+yPd)/2+6,"Eₐ สูงมหาศาล",{"font-size":17,"font-weight":700,fill:"var(--index)"}));
+    mk.appendChild(txt(sx(xPeakNormal),yPn-16,"ปฏิกิริยาทั่วไป",{"font-size":16,"font-weight":700,fill:"var(--cobalt)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(xPeakDiamond),yPd-16,"เพชร → แกรไฟต์",{"font-size":16,"font-weight":700,fill:"var(--index)","text-anchor":"middle"}));
+    mk.appendChild(txt(sx(0.18),yR+22,"จุดเริ่มต้นพลังงานใกล้กัน",{"font-size":14,"font-weight":600,fill:"var(--ink-2)","text-anchor":"middle"}));
+    mk.appendChild(S("circle",{cx:sx(0),cy:yR,r:5,fill:"var(--ink)"}));
+  })();
+
+  /* ============ INTERACTIVE 2 — limiting reagent vs rate-factor toggle ============ */
+  (function(){
+    var g=document.getElementById("stGrid");
+    if(!g) return;
+    var X0=50,X1=375,Y0=46,Y1=225;
+    function sx(p){return X0+p*(X1-X0);}
+    function sy(v){return Y1-v*(Y1-Y0);}
+    var ax=document.getElementById("stAxes");
+    for(var i=0;i<=4;i++){var y=sy(i/4); g.appendChild(S("line",{x1:X0,y1:y,x2:X1,y2:y,stroke:"var(--rule-2)","stroke-width":1}));}
+    ax.appendChild(S("line",{x1:X0,y1:Y0,x2:X0,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(S("line",{x1:X0,y1:Y1,x2:X1,y2:Y1,stroke:"var(--ink)","stroke-width":1.5}));
+    ax.appendChild(txt(X1,Y1+24,"เวลา",{"text-anchor":"end","font-size":13}));
+    ax.appendChild(txt(0,0,"ปริมาตรแก๊สสะสม",{"text-anchor":"middle","font-size":13,
+      transform:"translate(14 "+((Y0+Y1)/2)+") rotate(-90)"}));
+
+    function sm(t){return t*t*(3-2*t);}
+    function riseCurve(thresh,finalV){
+      var d="";
+      for(var p=0;p<=1.001;p+=0.02){
+        var t=Math.min(p/thresh,1);
+        d+=(p===0?"M":"L")+sx(p).toFixed(2)+" "+sy(finalV*sm(t)).toFixed(2);
+      }
+      return d;
+    }
+    var fastEl=document.getElementById("stFast"), slowEl=document.getElementById("stSlow");
+    fastEl.setAttribute("stroke","var(--cobalt)");
+    slowEl.setAttribute("stroke","var(--ink-3)");
+    var mk=document.getElementById("stMark"), capEl=document.getElementById("stCap");
+
+    var modes={
+      limit:{threshA:0.42,threshB:0.42,finalA:1.0,finalB:0.55,
+        labelA:"Mg 1.0 g",labelB:"Mg 0.5 g",
+        cap:"เปลี่ยน<b>สารกำหนดปริมาณ</b> — ความชันช่วงแรกใกล้เคียงกัน (อัตราไม่ได้เปลี่ยน) แต่<b>ปริมาตรสุดท้ายต่างกัน</b> เพราะมีสารตั้งต้นให้ทำปฏิกิริยาไม่เท่ากัน"},
+      rate:{threshA:0.28,threshB:0.62,finalA:1.0,finalB:1.0,
+        labelA:["อุณหภูมิสูง","หรือมีตัวเร่ง"],labelB:["อุณหภูมิห้อง"],
+        cap:"เปลี่ยน<b>ปัจจัยเรื่องอัตรา</b> (เช่นอุณหภูมิ) — เส้นชันต่างกันชัดเจน แต่<b>ปริมาตรสุดท้ายเท่ากันเป๊ะ</b> เพราะสารตั้งต้นปริมาณเท่าเดิม (ทบทวนมโนทัศน์ 3)"}
+    };
+    function label(x,yAnchor,lines,color){
+      lines=Array.isArray(lines)?lines:[lines];
+      var lineH=16;
+      var startY=yAnchor-(lines.length-1)*lineH;
+      lines.forEach(function(line,i){
+        mk.appendChild(txt(x,startY+i*lineH,line,{"font-size":13,"font-weight":700,fill:color}));
+      });
+    }
+    function render(mode){
+      var m=modes[mode];
+      fastEl.setAttribute("d",riseCurve(m.threshA,m.finalA));
+      slowEl.setAttribute("d",riseCurve(m.threshB,m.finalB));
+      clear(mk);
+      label(sx(m.threshA)+6,sy(m.finalA)-10,m.labelA,"var(--cobalt)");
+      label(sx(Math.min(m.threshB+0.05,0.78)),sy(m.finalB*0.55),m.labelB,"var(--ink-3)");
+      if(mode==="limit"){
+        mk.appendChild(S("line",{x1:X0,y1:sy(m.finalA),x2:X1,y2:sy(m.finalA),stroke:"var(--cobalt)","stroke-width":1.2,"stroke-dasharray":"4 4"}));
+        mk.appendChild(S("line",{x1:X0,y1:sy(m.finalB),x2:X1,y2:sy(m.finalB),stroke:"var(--ink-3)","stroke-width":1.2,"stroke-dasharray":"4 4"}));
+      }
+      capEl.innerHTML=m.cap;
+      document.getElementById("stLimit").classList.toggle("right",mode==="limit");
+      document.getElementById("stRate").classList.toggle("right",mode==="rate");
+    }
+    render("limit");
+    document.getElementById("stLimit").addEventListener("click",function(){render("limit");});
+    document.getElementById("stRate").addEventListener("click",function(){render("rate");});
+  })();
+  }
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(boot); } else { boot(); }
+})();
+</script>

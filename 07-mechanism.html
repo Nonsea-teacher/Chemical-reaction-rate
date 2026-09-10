@@ -1,0 +1,799 @@
+<title>แผงกลไกของปฏิกิริยา</title>
+<!--
+PARKED: ตัดออกจากชุดหลัก (1-5) แล้วตั้งแต่ 9 กันยายน 2569 เพราะเกินหลักสูตร ม.5 พอสมควร
+        เก็บไว้เผื่ออยากเพิ่มเข้าไปในอนาคต ไม่ได้ลิงก์จาก index.html และไม่นับใน "X / 5 พร้อมใช้"
+        ถ้าจะเอากลับมาใช้ ให้เปลี่ยนชื่อไฟล์เป็น 05-mechanism.html แล้วขยับ "การเชื่อมโยงและการประยุกต์"
+        ไปเป็น 06 อีกที (กลับด้านของการเปลี่ยนที่ทำไปตอนตัดออก)
+THESIS: สมการรวมบอกแค่ต้นทาง-ปลายทาง ไม่ได้บอกว่าเดินทางยังไง — ปฏิกิริยาเกิดเป็นขั้น ๆ
+        และกฎอัตราที่วัดได้สะท้อน "ขั้นที่ช้าที่สุด" เพียงขั้นเดียว
+        หน้านี้คือคำตอบของคำถามที่มโนทัศน์ 4 ค้างไว้ว่า ทำไมอันดับถึงไม่เท่ากับสัมประสิทธิ์
+OWN-WORLD: หน้าปัดเครื่องมือวัด (สืบทอดจากแผงที่ 01-04) โคบอลต์ = ค่าที่วัดได้/ถูก, ชาด = ค่าที่เน้น/ผิด
+STORY: NO₂ + CO ⟶ NO + CO₂ วัดได้ rate = k[NO₂]² — CO อยู่ในสมการแต่หายไปจากกฎอัตรา
+       เฉลยอยู่ที่กลไกสองขั้น: CO ไปอยู่ในขั้นเร็ว เลยไม่มีสิทธิ์กำหนดอัตรา
+FIRST VIEWPORT: แผ่นป้ายชื่อ แล้วกล่องเทียบ "สมการที่ดุลแล้ว" กับ "กฎอัตราที่วัดได้" พร้อมคำถามค้างไว้
+INTERACTIVE: 3 ตัว — เครื่องบวกกลไก / คอขวดปรับความเร็วได้ (ชิ้นเอก) / เครื่องตรวจกลไก
+NOTE: 2.4 ในมโนทัศน์ 2 เกริ่นกราฟหลายยอด/คอขวด/สารมัธยันตร์ไว้แล้ว หน้านี้จึงทบทวนสั้น ๆ
+      แล้วทุ่มน้ำหนักไปที่ "กฎอัตรา ↔ กลไก" ซึ่งเป็นของใหม่และต้องใช้มโนทัศน์ 4 เป็นฐาน
+-->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#D9DEDA; --panel:#F7F8F6; --panel-2:#ECEFEB; --panel-3:#E1E6E2;
+  --ink:#171D1B; --ink-2:#5A6461; --ink-3:#8B948F;
+  --rule:#BAC2BD; --rule-2:#D5DBD6;
+  --index:#C0301A; --index-soft:#F2D9D3;
+  --cobalt:#17457F; --cobalt-soft:#D6E0EE;
+  --engrave: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.06);
+  --sans:"Anuphan",system-ui,sans-serif;
+  --tech:"Bai Jamjuree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:clamp(17px,1.15vw,22px);line-height:1.75;-webkit-text-size-adjust:100%;
+  word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1400px;margin:0 auto;padding:clamp(14px,2vw,32px)}
+img,svg{max-width:100%}
+
+.plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
+  background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
+.plate>div{background:var(--panel);padding:.55em 1em;box-shadow:var(--engrave)}
+.plate .grow{flex:1 1 320px}
+.plate .lbl{font-family:var(--tech);font-weight:600;font-size:.62em;letter-spacing:.22em;
+  color:var(--ink-3);display:block;line-height:1.6}
+.plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
+.serial{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+
+.panel{border:2px solid var(--ink);display:grid;
+  grid-template-columns:minmax(0,1fr) 320px;gap:2px;background:var(--rule)}
+.panel>*{background:var(--panel)}
+.panel.solo{grid-template-columns:minmax(0,1fr)}
+.face{padding:clamp(8px,1.2vw,18px) 0 0 0}
+svg.chart{display:block;width:100%;height:auto;touch-action:none}
+.readout{padding:clamp(14px,1.4vw,22px);display:flex;flex-direction:column;gap:1.1em;box-shadow:var(--engrave)}
+.win{background:var(--panel-2);border:1px solid var(--rule);padding:.7em .85em}
+.win .lbl{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-2);display:block;margin:-.7em -.85em .55em;padding:.5em .9em}
+.win.is-hi .lbl{background:var(--index)}
+.win.is-lo .lbl{background:var(--cobalt)}
+.win .num{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.7rem,3vw,2.7rem);line-height:1.05;letter-spacing:-.02em;display:block}
+.win .unit{font-family:var(--tech);font-weight:500;font-size:.62em;color:var(--ink-2)}
+
+.caliper{border:2px solid var(--ink);border-top:none;background:var(--panel);
+  padding:clamp(12px,1.4vw,20px);display:flex;flex-wrap:wrap;gap:1em 1.6em;align-items:center}
+.caliper .grp{display:flex;align-items:center;gap:.7em;flex:1 1 250px}
+.caliper label{font-family:var(--tech);font-weight:700;font-size:.82em;color:var(--cobalt);white-space:nowrap}
+input[type=range]{flex:1;accent-color:var(--cobalt);height:1.6em;min-width:90px}
+button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
+  padding:.7em 1.2em;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);
+  cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s, background .12s}
+button:hover{background:var(--index);color:#fff;border-color:var(--index)}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button.right{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.hint{font-family:var(--tech);font-size:.66em;color:var(--ink-3);flex-basis:100%;margin:0;line-height:1.6}
+
+/* ---------- hook ---------- */
+.hookcmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink)}
+.hookcmp>div{background:var(--panel);padding:1.1em 1.2em;box-shadow:var(--engrave)}
+.hookcmp .k{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.18em;
+  color:var(--ink-3);display:block;margin-bottom:.5em}
+.hookcmp .f{font-family:var(--tech);font-weight:700;font-size:clamp(1.2rem,2.6vw,1.8rem);
+  margin:0 0 .5em;line-height:1.4}
+.hookcmp .n{font-size:.86em;color:var(--ink-2);display:block}
+.hookcmp em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .38em no-repeat}
+.hookq{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,2.4vw,1.55rem);color:var(--ink);
+  text-align:center;padding:.9em 1em;margin:0;border:2px solid var(--ink);border-top:0;background:var(--index-soft)}
+
+/* ---------- everyday-life examples ---------- */
+.reallife{border:2px solid var(--ink);background:var(--panel-2);margin:1.3em 0 1.6em}
+.reallife .kick{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.2em;
+  color:var(--panel);background:var(--ink);padding:.55em 1.1em;display:block}
+.reallife .items{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));
+  gap:2px;background:var(--rule)}
+.reallife .items>div{background:var(--panel);padding:1.05em 1.2em}
+.reallife b{font-family:var(--tech);display:block;font-size:1.05em;margin-bottom:.2em;color:var(--ink)}
+.reallife p{margin:0;font-size:.9em;color:var(--ink-2)}
+
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(2.1rem,4.4vw,4rem);line-height:1.2;
+  letter-spacing:-.02em;margin:1.2em 0 .3em;max-width:24ch}
+h1 em{font-style:normal;color:var(--index);
+  background:linear-gradient(var(--index-soft),var(--index-soft)) bottom/100% .34em no-repeat}
+.dek{font-size:1.1em;color:var(--ink);max-width:56ch;margin:0 0 2.4em}
+
+.sec{border:2px solid var(--ink);background:var(--panel);margin-top:2.6em}
+.sec-hd{display:flex;align-items:baseline;gap:.7em 1em;flex-wrap:wrap;padding:clamp(14px,1.5vw,22px);
+  border-bottom:2px solid var(--ink);background:var(--panel-2)}
+.sec-no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(1.6rem,3vw,2.6rem);color:var(--index);line-height:1}
+h2{font-family:var(--tech);font-weight:700;font-size:clamp(1.5rem,2.6vw,2.4rem);letter-spacing:-.01em;margin:0}
+h3{font-family:var(--tech);font-weight:700;font-size:clamp(1.15rem,1.7vw,1.5rem);margin:2em 0 .4em}
+h3:first-child{margin-top:0}
+.sec-bd{padding:clamp(16px,2vw,34px)}
+.sec-bd>p{max-width:62ch}
+.keytag{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.14em;
+  color:#fff;background:var(--cobalt);padding:.45em .9em;white-space:nowrap;margin-left:auto}
+.keytag.hot{background:var(--index)}
+.keytag.rev{background:var(--ink-3)}
+.eq{font-family:var(--tech);font-weight:600;font-size:clamp(1.2rem,2.4vw,2rem);
+  text-align:center;padding:.85em .4em;background:var(--panel-2);border:1px solid var(--rule);margin:.2em 0 1.4em}
+.eq.long{font-size:clamp(1rem,2vw,1.5rem)}
+
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.notes div{background:var(--panel);padding:1em 1.1em;outline:1px solid var(--rule)}
+.notes b.k{font-family:var(--tech);display:block;font-size:1.05em;letter-spacing:.02em;
+  color:var(--ink);margin-bottom:.3em}
+
+ol.steps{list-style:none;counter-reset:s;margin:1.2em 0 0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule)}
+ol.steps li{counter-increment:s;background:var(--panel);padding:1.1em 1.2em;position:relative;outline:1px solid var(--rule)}
+ol.steps li::before{content:counter(s);font-family:var(--tech);font-weight:700;font-size:1.6em;
+  color:var(--index);display:block;line-height:1;margin-bottom:.25em}
+ol.steps b{font-family:var(--tech);display:block;margin-bottom:.2em}
+
+table{width:100%;border-collapse:collapse;font-family:var(--tech);margin:1.4em 0}
+th,td{border:1px solid var(--rule);padding:.62em .8em;text-align:left;font-weight:500}
+th{background:var(--panel-2);font-size:.66em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
+th.n{text-align:center}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tblwrap table{min-width:520px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2px;
+  background:var(--panel);border:1px solid var(--rule);margin-top:1.2em}
+.cards article{background:var(--panel);padding:1.1em 1.2em;outline:1px solid var(--rule)}
+.cards h4{font-family:var(--tech);font-size:1em;margin:0 0 .5em;letter-spacing:-.01em}
+.cards dl{margin:0;font-size:.86em}
+.cards dt{font-family:var(--tech);font-size:.7em;letter-spacing:.16em;color:var(--ink-3);margin-top:.6em}
+.cards dd{margin:0}
+.cards dt.warn{color:var(--index);font-size:.85em;font-weight:700}
+.cards dd.warn{color:var(--index);font-weight:700;background:var(--index-soft);
+  display:inline-block;padding:.35em .6em;margin-top:.3em}
+
+.traps{display:grid;gap:10px;background:transparent;border:none;margin-top:1.2em}
+.traps div{outline:1px solid var(--rule);
+  display:grid;grid-template-columns:1fr;
+  grid-template-areas:"xlabel" "xtext" "olabel" "otext";gap:0}
+.traps .x,.traps .o{font-family:var(--tech);font-size:.7em;font-weight:700;letter-spacing:.16em;
+  display:flex;align-items:center;padding:.7em 1.1em;margin:0}
+.traps .x{grid-area:xlabel;color:var(--index);background:var(--index-soft)}
+.traps .o{grid-area:olabel;color:var(--cobalt);background:var(--cobalt-soft)}
+.traps p{margin:0;padding:.9em 1.1em}
+.traps p:nth-of-type(1){grid-area:xtext;background:var(--index-soft)}
+.traps p:nth-of-type(2){grid-area:otext;background:var(--cobalt-soft)}
+@media (min-width:760px){
+  .traps div{grid-template-columns:auto 1fr;
+    grid-template-areas:"xlabel xtext" "olabel otext"}
+}
+
+/* ---------- mechanism step blocks (shared by 5.1, 5.4, 5.6) ---------- */
+.mech{border:2px solid var(--ink);background:var(--panel);margin:1.2em 0}
+.mech .mhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink);padding:.6em 1.1em;display:block}
+.mech .mrow{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5em 1em;
+  padding:.85em 1.1em;border-top:1px solid var(--rule)}
+.mech .mrow:first-of-type{border-top:none}
+.mech .tag{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.14em;
+  padding:.35em .7em;white-space:nowrap;flex:0 0 auto}
+.mech .tag.slow{background:var(--index);color:#fff}
+.mech .tag.fast{background:var(--cobalt-soft);color:var(--cobalt)}
+.mech .tag.sum{background:var(--ink);color:#fff}
+.mech .fx{font-family:var(--tech);font-weight:600;font-size:clamp(1rem,2.1vw,1.35rem);
+  flex:1 1 auto;min-width:0}
+.mech .mrow.total{background:var(--panel-2);border-top:2px solid var(--ink)}
+.sp{transition:opacity .25s, color .25s}
+.sp.cut{position:relative;color:var(--ink-3);opacity:.55}
+.sp.cut::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;
+  background:var(--index);transform:rotate(-8deg)}
+.sp.keep{color:var(--cobalt);font-weight:700}
+.mech .why{font-family:var(--tech);font-size:.7em;color:var(--ink-3);
+  padding:.2em 1.1em 1em;margin:0;line-height:1.7}
+
+/* ---------- INTERACTIVE 3: mechanism checker verdict ---------- */
+.verdict{border:2px solid var(--ink);border-top:none;background:var(--panel)}
+.verdict .vhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.18em;
+  color:var(--panel);background:var(--ink-3);padding:.6em 1.1em;display:block}
+.verdict.good .vhd{background:var(--cobalt)}
+.verdict.bad .vhd{background:var(--index)}
+.verdict .vbd{padding:clamp(14px,1.6vw,24px)}
+.verdict p{margin:0 0 .6em}
+.verdict p:last-child{margin-bottom:0}
+.crit{display:grid;gap:2px;background:var(--rule);border:1px solid var(--rule);margin:0 0 1em}
+.crit div{background:var(--panel-2);padding:.85em 1em;display:grid;
+  grid-template-columns:auto 1fr;gap:.2em .8em;align-items:start}
+.crit .mark{font-family:var(--tech);font-weight:700;font-size:1.15em;grid-row:span 2}
+.crit .pass .mark{color:var(--cobalt)}
+.crit .fail .mark{color:var(--index)}
+.crit .k{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.14em;color:var(--ink-3)}
+.crit .v{font-family:var(--tech);font-size:.92em;font-weight:600}
+.crit .fail .v{color:var(--index)}
+.vconc{font-family:var(--tech);font-weight:700;font-size:clamp(1.05rem,2vw,1.4rem);
+  padding:.7em 1em;background:var(--cobalt);color:#fff;text-align:center}
+.verdict.bad .vconc{background:var(--index)}
+
+.checkhd{font-family:var(--tech);font-weight:700;font-size:.66em;letter-spacing:.2em;
+  color:var(--cobalt);margin:1.8em 0 .2em;display:block}
+.check{border:2px solid var(--cobalt);background:var(--cobalt-soft);padding:0 clamp(14px,1.6vw,24px)}
+.check .ex-body{padding-top:1.1em}
+.check .ex-no{color:var(--cobalt)}
+.check .ex{border-top:2px solid var(--cobalt)}
+.check .ex summary{color:var(--cobalt)}
+.check .ans{border-color:var(--cobalt-soft);background:var(--panel)}
+.ex{border-top:2px solid var(--ink)}
+.ex:first-child{border-top:0}
+.ex summary{list-style:none;cursor:pointer;font-family:var(--tech);font-weight:700;font-size:.76em;
+  letter-spacing:.12em;color:var(--cobalt);padding:.7em 0 0;display:inline-block}
+.ex summary::-webkit-details-marker{display:none}
+.ex summary::before{content:"▸ ";}
+.ex[open] summary::before{content:"▾ ";}
+.ex-body{padding:1.2em 0 1.6em}
+.ex-no{font-family:var(--tech);font-weight:700;color:var(--index);margin-right:.5em}
+.ans{background:var(--panel-2);border:1px solid var(--rule);padding:1em 1.2em;margin:.6em 0 1.4em}
+.work{font-family:var(--tech);font-variant-numeric:tabular-nums;margin:.4em 0;color:var(--ink-2)}
+.work b{color:var(--ink)}
+
+footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.6em 0 1em;text-align:center}
+
+@media (max-width:900px){
+  .panel{grid-template-columns:1fr}
+  .readout{flex-direction:row;flex-wrap:wrap}
+  .readout .win{flex:1 1 40%}
+  /* below this width the header badge always wraps to its own line anyway —
+     force every plate box to full width so none is left stretched beside empty background */
+  .plate>div{flex:1 1 100%}
+}
+</style>
+
+<div class="wrap" lang="th">
+
+  <div class="plate">
+    <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
+    <div><span class="lbl">มโนทัศน์</span><span class="val serial">07 (พักไว้ — นอกชุดหลัก)</span></div>
+    <div><span class="lbl">แผงวัด</span><span class="val serial">กลไก → ขั้นช้า → กฎอัตรา</span></div>
+  </div>
+
+  <section class="hook">
+    <div class="hookcmp">
+      <div>
+        <span class="k">สมการที่ดุลแล้ว</span>
+        <p class="f">NO₂ + <em>CO</em> ⟶ NO + CO₂</p>
+        <span class="n">CO เป็นสารตั้งต้นเต็มตัว ไม่ใส่ลงไปปฏิกิริยาก็ไม่เกิด</span>
+      </div>
+      <div>
+        <span class="k">กฎอัตราที่วัดได้จริง</span>
+        <p class="f">rate = k[NO₂]²</p>
+        <span class="n"><em>ไม่มี CO อยู่ในนี้เลย</em> — เติม CO มากขึ้นสิบเท่า อัตราก็เท่าเดิม</span>
+      </div>
+    </div>
+    <p class="hookq">สารที่ขาดไม่ได้ แต่ใส่เท่าไรก็ไม่ทำให้เร็วขึ้น — เป็นไปได้อย่างไร ?</p>
+  </section>
+
+  <h1>สมการบอกปลายทาง<br><em>กลไกบอกเส้นทาง</em></h1>
+  <p class="dek">มโนทัศน์ที่ 4 บอกว่าอันดับของปฏิกิริยาไม่เท่ากับเลขสัมประสิทธิ์ ต้องวัดจากการทดลองเท่านั้น แต่ยังไม่ได้บอกว่า<b>ทำไม</b> — หน้านี้คือคำตอบ และคำตอบนั้นเปลี่ยนวิธีที่เรามองสมการเคมีไปเลย</p>
+
+  <!-- ============ 5.1 the overall equation is a summary, not an event ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.1</span><h2>สมการรวมไม่ใช่สิ่งที่เกิดขึ้นจริง</h2></div>
+    <div class="sec-bd">
+      <p>ย้อนกลับไปที่ทฤษฎีการชนในมโนทัศน์ที่ 2 — การที่อนุภาค<b>สองตัว</b>จะชนกันให้ถูกทั้งพลังงานและทิศทางก็ยากพออยู่แล้ว ทีนี้ลองนึกถึงสมการอย่าง 2NO₂ + F₂ ⟶ 2NO₂F ถ้ามันเกิดในก้าวเดียวจริง แปลว่าอนุภาคสามตัวต้องมาชนกันพร้อมกัน ณ จุดเดียว เวลาเดียว หันถูกด้านทั้งสามตัว</p>
+      <p><b>โอกาสแบบนั้นน้อยจนแทบไม่เกิดขึ้นเลย</b> ธรรมชาติจึงเลี่ยงไปใช้วิธีที่ง่ายกว่า คือแตกงานออกเป็นขั้นย่อย ๆ ที่ชนกันทีละสองตัว แล้วต่อกันเป็นทอด ๆ</p>
+
+      <div class="notes">
+        <div><b class="k">ขั้นย่อย (elementary step)</b>เหตุการณ์การชนจริงหนึ่งครั้ง เกิดขึ้นในก้าวเดียว ไม่มีอะไรซ่อนอยู่ข้างใน</div>
+        <div><b class="k">กลไก (mechanism)</b>ลำดับของขั้นย่อยทั้งหมดที่ต่อกันจากสารตั้งต้นไปจนถึงผลิตภัณฑ์</div>
+        <div><b class="k">สมการรวม</b>ผลสรุปของทั้งกลไก บอกแค่ว่าเริ่มจากอะไรและได้อะไร ไม่ได้บอกว่าผ่านอะไรมาบ้าง</div>
+      </div>
+
+      <h3>กฎเหล็กข้อแรก: บวกทุกขั้นแล้วต้องได้สมการรวม</h3>
+      <p>กลไกที่เสนอมาจะถูกต้องได้ ต้องบวกขั้นย่อยทุกขั้นแล้วตัดสารที่โผล่ทั้งสองข้างออก จนเหลือสมการรวมพอดี — ลองกดดูกับกลไกของปฏิกิริยาในหน้าเปิด</p>
+
+      <div class="mech" id="mechAdd">
+        <span class="mhd">กลไกของ NO₂ + CO ⟶ NO + CO₂</span>
+        <div class="mrow">
+          <span class="tag slow">ขั้นที่ 1 · ช้า</span>
+          <span class="fx">NO₂ + <span class="sp" data-pair="a">NO₂</span> ⟶ <span class="sp" data-pair="b">NO₃</span> + NO</span>
+        </div>
+        <div class="mrow">
+          <span class="tag fast">ขั้นที่ 2 · เร็ว</span>
+          <span class="fx"><span class="sp" data-pair="b">NO₃</span> + CO ⟶ <span class="sp" data-pair="a">NO₂</span> + CO₂</span>
+        </div>
+        <div class="mrow total">
+          <span class="tag sum">รวม</span>
+          <span class="fx" id="mechSum">NO₂ + NO₂ + NO₃ + CO ⟶ NO₃ + NO + NO₂ + CO₂</span>
+        </div>
+        <p class="why" id="mechWhy">ตอนนี้ยังเป็นการเอาทุกอย่างมาต่อกันดื้อ ๆ — กดปุ่มเพื่อตัดสารที่โผล่ทั้งสองข้างออก</p>
+      </div>
+      <div class="caliper" style="border-top:2px solid var(--ink)">
+        <div class="grp" style="flex:0 1 auto;gap:.5em;flex-wrap:wrap">
+          <button id="mechCut" type="button">ตัดสารที่โผล่ทั้งสองข้าง</button>
+          <button id="mechReset" type="button">เริ่มใหม่</button>
+        </div>
+        <p class="hint">สังเกตว่า NO₃ ตัดหมดทั้งคู่ ส่วน NO₂ ตัดออกได้แค่ตัวเดียว เพราะขั้นที่ 1 ใช้ NO₂ ไปสองตัวแต่ขั้นที่ 2 คืนกลับมาแค่ตัวเดียว</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.2 the bottleneck ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.2</span><h2>ขั้นกำหนดอัตรา — คอขวด</h2><span class="keytag rev">ทบทวนจากมโนทัศน์ 2</span></div>
+    <div class="sec-bd">
+      <p>เรื่องนี้เคยเจอมาแล้วในมโนทัศน์ที่ 2 หัวข้อ 2.4 ตอนดูกราฟพลังงานหลายยอด — <b>ยอดที่สูงที่สุดคือขั้นที่ช้าที่สุด และเป็นตัวกำหนดอัตราของทั้งปฏิกิริยา</b> ที่นี่เราจะไปต่ออีกก้าวหนึ่ง ด้วยคำถามที่ข้อสอบชอบถาม: ถ้าอยากให้ปฏิกิริยาเร็วขึ้น ควรไปเร่งขั้นไหน</p>
+
+      <div class="reallife">
+        <span class="kick">ในชีวิตจริง</span>
+        <div class="items">
+          <div><b>ล้างจานสามคน</b><p>คนแรกเก็บจานเร็วมาก คนที่สองล้างช้า คนที่สามเช็ดเร็วมาก — ต่อให้คนเก็บจานเร็วขึ้นอีกเท่าตัว จานก็ไปกองรออยู่ที่คนล้างเหมือนเดิม งานทั้งกองเสร็จช้าเท่าเดิม</p></div>
+          <div><b>ด่านเก็บเงินบนทางด่วน</b><p>ถนนสิบเลนวิ่งฉิวแค่ไหน ถ้าด่านเปิดช่องเดียว เวลาเดินทางทั้งเส้นก็ถูกกำหนดโดยด่านนั้นอยู่ดี</p></div>
+        </div>
+      </div>
+
+      <p>กล่องด้านล่างเป็นปฏิกิริยาสมมติสามขั้น <b>ลองเลื่อนความเร็วของแต่ละขั้นดู</b> แล้วสังเกตตัวเลขใต้แต่ละแท่งที่บอกว่า "ถ้าเร่งขั้นนี้ให้เร็วขึ้นเท่าตัว เวลารวมจะลดลงกี่เปอร์เซ็นต์"</p>
+
+      <div class="panel solo">
+        <div class="face" style="padding:0">
+          <svg class="chart" id="bnSvg" viewBox="0 0 900 330" role="img"
+               aria-label="แผนภูมิแท่งเวลาที่ใช้ของปฏิกิริยาสามขั้น แสดงว่าขั้นที่ช้าที่สุดกินเวลาเกือบทั้งหมด">
+            <g id="bnG"></g>
+          </svg>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp"><label>ขั้นที่ 1</label><input type="range" id="bn1" min="1" max="12" value="2" step="1"></div>
+        <div class="grp"><label>ขั้นที่ 2</label><input type="range" id="bn2" min="1" max="12" value="9" step="1"></div>
+        <div class="grp"><label>ขั้นที่ 3</label><input type="range" id="bn3" min="1" max="12" value="10" step="1"></div>
+        <p class="hint" id="bnHint"></p>
+      </div>
+
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>อยากให้ปฏิกิริยาเร็วขึ้น ก็เร่งขั้นไหนก็ได้ ยังไงก็ช่วยได้บ้าง</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>เร่งขั้นที่เร็วอยู่แล้ว<b>แทบไม่ช่วยอะไรเลย</b> ต้องไปเร่งขั้นที่ช้าที่สุดเท่านั้นถึงจะเห็นผล — นี่คือเหตุผลที่ตัวเร่งปฏิกิริยาต้องออกแบบมาให้ลด Eₐ ของ<b>ขั้นกำหนดอัตรา</b> ไม่ใช่ขั้นไหนก็ได้</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.3 the one place coefficients DO work ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.3</span><h2>ที่เดียวที่สัมประสิทธิ์ใช้ได้</h2><span class="keytag hot">หัวใจของหน้านี้</span></div>
+    <div class="sec-bd">
+      <p>มโนทัศน์ที่ 4 ย้ำไว้หนักมากว่า <b>ห้ามเอาสัมประสิทธิ์จากสมการรวมมาเป็นเลขชี้กำลังในกฎอัตรา</b> — ข้อนั้นยังจริงอยู่ทุกตัวอักษร แต่มีข้อยกเว้นอยู่หนึ่งที่ และเป็นข้อยกเว้นที่ทำให้ทั้งเรื่องนี้ทำงานได้</p>
+
+      <div class="cite">
+        <span class="cite-hd">ข้อยกเว้นเดียว</span>
+        <p style="font-size:1.1em;font-weight:700">สำหรับ<b>ขั้นย่อย</b> (ไม่ใช่สมการรวม) เขียนกฎอัตราจากสัมประสิทธิ์ได้เลย</p>
+        <p>เพราะขั้นย่อยคือเหตุการณ์การชนจริง ๆ ที่เกิดขึ้น — สัมประสิทธิ์ในขั้นย่อยจึงบอกตรง ๆ ว่ามีอนุภาคกี่ตัวต้องมาชนกัน ซึ่งนั่นคือสิ่งเดียวกับที่กำหนดว่าอัตราไวต่อความเข้มข้นแค่ไหน</p>
+      </div>
+
+      <p style="margin-top:1.4em">จำนวนอนุภาคที่ต้องมาชนกันในขั้นย่อยหนึ่งขั้น เรียกว่า <b>โมเลกุลาริตี (molecularity)</b></p>
+
+      <div class="tblwrap">
+        <table>
+          <tr><th>ขั้นย่อย</th><th>โมเลกุลาริตี</th><th>กฎอัตราของขั้นนั้น</th></tr>
+          <tr><td>A ⟶ ผลิตภัณฑ์</td><td>ยูนิโมเลกุลาร์ (1 ตัว)</td><td class="n">rate = k[A]</td></tr>
+          <tr><td>A + B ⟶ ผลิตภัณฑ์</td><td>ไบโมเลกุลาร์ (2 ตัว)</td><td class="n">rate = k[A][B]</td></tr>
+          <tr><td>A + A ⟶ ผลิตภัณฑ์</td><td>ไบโมเลกุลาร์ (2 ตัว)</td><td class="n">rate = k[A]²</td></tr>
+          <tr><td>A + B + C ⟶ ผลิตภัณฑ์</td><td>เทอร์โมเลกุลาร์ (3 ตัว)</td><td class="n">พบได้ยากมาก</td></tr>
+        </table>
+      </div>
+
+      <h3>ทีนี้มีตัวเลขสามชุดที่ต้องแยกให้ออก</h3>
+      <p>มโนทัศน์ที่ 4 แยก "สัมประสิทธิ์" ออกจาก "อันดับ" ไปแล้ว หน้านี้เพิ่มตัวที่สามเข้ามา และตัวที่สามนี่แหละคือสะพานเชื่อมสองตัวแรกเข้าหากัน</p>
+
+      <div class="cards">
+        <article>
+          <h4>สัมประสิทธิ์ของสมการรวม</h4>
+          <dl>
+            <dt>มาจากไหน</dt><dd>ดุลสมการบนกระดาษ</dd>
+            <dt>ตัวอย่าง</dt><dd>NO₂ + CO ⟶ NO + CO₂ · สัมประสิทธิ์ CO = 1</dd>
+            <dt class="warn">✗ ใช้ทำอะไรไม่ได้</dt><dd class="warn">เขียนกฎอัตราไม่ได้!</dd>
+          </dl>
+        </article>
+        <article>
+          <h4>โมเลกุลาริตีของขั้นย่อย</h4>
+          <dl>
+            <dt>มาจากไหน</dt><dd>กลไกที่นักเคมีเสนอ (ทฤษฎี)</dd>
+            <dt>ตัวอย่าง</dt><dd>ขั้นช้า NO₂ + NO₂ ⟶ … เป็นไบโมเลกุลาร์</dd>
+            <dt>ใช้ทำอะไร</dt><dd><b>เขียนกฎอัตราของขั้นนั้นได้</b> — และถ้าเป็นขั้นช้า ก็คือกฎอัตราของทั้งปฏิกิริยา</dd>
+          </dl>
+        </article>
+        <article>
+          <h4>อันดับของปฏิกิริยา</h4>
+          <dl>
+            <dt>มาจากไหน</dt><dd>วัดจากการทดลองเท่านั้น</dd>
+            <dt>ตัวอย่าง</dt><dd>วัดได้ rate = k[NO₂]² → อันดับ 2</dd>
+            <dt>ใช้ทำอะไร</dt><dd>เป็น<b>หลักฐาน</b>ไว้ตรวจว่ากลไกที่เสนอมาสมเหตุสมผลหรือไม่</dd>
+          </dl>
+        </article>
+      </div>
+
+      <p style="margin-top:1.4em">ลูกศรของเรื่องนี้ชี้ทางเดียว: <b>กลไก → กฎอัตราที่ทำนายได้ → เอาไปเทียบกับผลการทดลอง</b> ไม่ใช่ทางกลับกัน กฎอัตราที่วัดได้ไม่ได้พิสูจน์ว่ากลไกถูก มันแค่บอกว่ากลไกไหน<b>ยังไม่ถูกตัดออก</b></p>
+    </div>
+  </section>
+
+  <!-- ============ 5.4 solving the hook ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.4</span><h2>ไขปริศนา: CO หายไปไหน</h2></div>
+    <div class="sec-bd">
+      <p>ตอนนี้เครื่องมือครบแล้ว กลับไปที่คำถามหน้าเปิด กลไกที่นักเคมีเสนอสำหรับ NO₂ + CO คือสองขั้นที่เราบวกกันไปแล้วในหัวข้อ 5.1</p>
+
+      <div class="mech">
+        <span class="mhd">อ่านกลไกทีละขั้น</span>
+        <div class="mrow">
+          <span class="tag slow">ขั้นที่ 1 · ช้า</span>
+          <span class="fx">NO₂ + NO₂ ⟶ NO₃ + NO</span>
+        </div>
+        <p class="why">ไบโมเลกุลาร์ใน NO₂ → กฎอัตราของขั้นนี้คือ rate = k[NO₂]² · และเพราะเป็นขั้นที่ช้าที่สุด นี่จึงเป็นกฎอัตราของทั้งปฏิกิริยา</p>
+        <div class="mrow">
+          <span class="tag fast">ขั้นที่ 2 · เร็ว</span>
+          <span class="fx">NO₃ + CO ⟶ NO₂ + CO₂</span>
+        </div>
+        <p class="why">CO เข้ามาทำงานตรงนี้ — แต่เป็นขั้นที่เร็วอยู่แล้ว จึงไม่ใช่คอขวด เติม CO เพิ่มก็แค่ทำให้ขั้นที่เร็วอยู่แล้วเร็วขึ้นอีก ซึ่งไม่ช่วยอะไรเลย</p>
+      </div>
+
+      <div class="eq">ทำนายจากกลไก: rate = k[NO₂]² &nbsp;&nbsp;=&nbsp;&nbsp; วัดจริงได้: rate = k[NO₂]² ✓</div>
+
+      <p><b>คำตอบของปริศนา:</b> CO ขาดไม่ได้จริง เพราะถ้าไม่มี CO ขั้นที่ 2 ก็เดินต่อไม่ได้ ปฏิกิริยาก็ไม่จบ — แต่ CO ไม่ได้อยู่ใน<b>ขั้นที่ช้าที่สุด</b> มันจึงไม่มีสิทธิ์กำหนดอัตรา สารที่ไม่อยู่ในขั้นกำหนดอัตราจะหายไปจากกฎอัตราเสมอ</p>
+
+      <div class="notes">
+        <div><b class="k">เชื่อมกลับมโนทัศน์ที่ 4</b>กรณีที่สาร B มีอันดับเป็นศูนย์แล้วหายไปจากกฎอัตราทั้งที่ต้องใส่ลงไป — ตอนนั้นเรารู้แค่ว่า "มันเป็นแบบนั้น" ตอนนี้เรารู้แล้วว่าเพราะ B ไปอยู่ในขั้นที่ไม่ใช่คอขวด</div>
+        <div><b class="k">เชื่อมกลับมโนทัศน์ที่ 2</b>สาร NO₃ ที่โผล่มาเป็นสารมัธยันตร์ตรงนี้ คือสารตัวเดียวกับในหัวข้อ 2.1 ที่ใช้สอนเรื่องทิศทางการชน (NO + NO₃ ⟶ 2NO₂) — เจอกันอีกครั้งในบทบาทใหม่</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.5 intermediate vs catalyst ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.5</span><h2>สารมัธยันตร์ กับ ตัวเร่งปฏิกิริยา</h2></div>
+    <div class="sec-bd">
+      <p>ทั้งสองตัวนี้เหมือนกันตรงที่ <b>ไม่ปรากฏในสมการรวม</b> แต่ปรากฏอยู่ในกลไก นักเรียนจึงสับสนกันบ่อยมาก วิธีแยกง่ายที่สุดคือดูว่ามัน<b>โผล่ครั้งแรกฝั่งไหน</b></p>
+
+      <div class="cards">
+        <article>
+          <h4>สารมัธยันตร์ — เกิดก่อน ใช้ทีหลัง</h4>
+          <dl>
+            <dt>ลำดับ</dt><dd>โผล่เป็น<b>ผลิตภัณฑ์</b>ของขั้นก่อน แล้วถูกใช้เป็น<b>สารตั้งต้น</b>ของขั้นหลัง</dd>
+            <dt>ตอนเริ่มปฏิกิริยา</dt><dd>ยังไม่มีอยู่เลย ต้องสร้างขึ้นมาระหว่างทาง</dd>
+            <dt>ตัวอย่าง</dt><dd>NO₃ ในกลไกของ NO₂ + CO</dd>
+          </dl>
+        </article>
+        <article>
+          <h4>ตัวเร่งปฏิกิริยา — ใช้ก่อน ได้คืนทีหลัง</h4>
+          <dl>
+            <dt>ลำดับ</dt><dd>โผล่เป็น<b>สารตั้งต้น</b>ของขั้นก่อน แล้วได้คืนเป็น<b>ผลิตภัณฑ์</b>ของขั้นหลัง</dd>
+            <dt>ตอนเริ่มปฏิกิริยา</dt><dd>ต้องใส่ลงไปเอง และเมื่อจบยังอยู่ครบเท่าเดิม</dd>
+            <dt>ตัวอย่าง</dt><dd>I⁻ จาก KI ที่เร่งการสลายตัวของ H₂O₂ (มโนทัศน์ที่ 3)</dd>
+          </dl>
+        </article>
+      </div>
+
+      <p style="margin-top:1.4em">พูดสั้น ๆ คือ <b>สารมัธยันตร์ขึ้นก่อนแล้วค่อยลง ส่วนตัวเร่งลงก่อนแล้วค่อยขึ้น</b> ทั้งคู่จบลงด้วยการหักล้างกันหมดในสมการรวม แต่ด้วยเหตุผลที่ตรงข้ามกันคนละทาง</p>
+
+      <div class="traps">
+        <div>
+          <span class="x">✗ เข้าใจผิด</span>
+          <p>สารมัธยันตร์คือตัวเร่งปฏิกิริยาชนิดหนึ่ง เพราะไม่โผล่ในสมการรวมเหมือนกัน</p>
+          <span class="o">✓ ที่ถูกต้อง</span>
+          <p>คนละอย่างกันคนละทาง สารมัธยันตร์<b>ถูกใช้จนหมด</b>ระหว่างทาง ส่วนตัวเร่ง<b>ได้คืนมาครบ</b> — ดูว่าตัวไหนโผล่ฝั่งขวาของขั้นแรก (สารมัธยันตร์) หรือฝั่งซ้ายของขั้นแรก (ตัวเร่ง) ก็แยกออกทันที</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.6 checking a proposed mechanism + INTERACTIVE 3 ============ -->
+  <section class="sec">
+    <div class="sec-hd"><span class="sec-no">5.6</span><h2>ตรวจกลไกที่เสนอมา</h2></div>
+    <div class="sec-bd">
+      <p>นี่คือทักษะปลายทางของทั้งหน้า และเป็นรูปแบบข้อสอบที่เจอบ่อยที่สุด — โจทย์จะให้<b>สมการรวม</b> กับ<b>กฎอัตราที่วัดได้</b> มาแล้วเสนอกลไกมาให้หลายแบบ ให้เราตัดสินว่าแบบไหนใช้ได้ ตรวจแค่สองเกณฑ์</p>
+
+      <ol class="steps">
+        <li><b>บวกทุกขั้นแล้วได้สมการรวมไหม</b>ถ้าบวกแล้วไม่ตรง ตัดทิ้งทันที ไม่ต้องดูอย่างอื่นต่อ</li>
+        <li><b>กฎอัตราของขั้นช้าตรงกับที่วัดได้ไหม</b>เขียนกฎอัตราจากขั้นที่ช้าที่สุด (ใช้สัมประสิทธิ์ของขั้นนั้นได้เลย) แล้วเทียบกับผลการทดลอง</li>
+      </ol>
+
+      <h3>ลองตรวจด้วยตัวเอง</h3>
+      <p>ปฏิกิริยา 2NO₂ + F₂ ⟶ 2NO₂F มีผลการทดลองว่า <b>rate = k[NO₂][F₂]</b> ด้านล่างเป็นกลไกที่มีคนเสนอมาสามแบบ กดเลือกทีละแบบแล้วดูว่าผ่านเกณฑ์ทั้งสองข้อหรือไม่</p>
+
+      <div class="panel solo">
+        <div class="face" style="padding:0">
+          <div class="mech" id="mechShow" style="border:none;margin:0"></div>
+        </div>
+      </div>
+      <div class="caliper">
+        <div class="grp" style="flex:0 1 auto;gap:.5em;flex-wrap:wrap">
+          <button id="mkA" type="button" class="right">กลไก ก</button>
+          <button id="mkB" type="button">กลไก ข</button>
+          <button id="mkC" type="button">กลไก ค</button>
+        </div>
+        <p class="hint">ทั้งสามแบบดูสมเหตุสมผลเมื่อมองผ่าน ๆ — แต่มีแบบเดียวที่ผ่านทั้งสองเกณฑ์</p>
+      </div>
+      <div class="verdict" id="mkVerdict">
+        <span class="vhd" id="mkHd">ผลการตรวจ</span>
+        <div class="vbd" id="mkBd"></div>
+      </div>
+
+      <span class="checkhd">ตรวจสอบความเข้าใจ</span>
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>ถ้ากลไกหนึ่งมีขั้นช้าเป็น A + A ⟶ C แล้วขั้นเร็วเป็น C + B ⟶ D กฎอัตราของปฏิกิริยานี้คืออะไร และสาร B ควรปรากฏในกฎอัตราหรือไม่</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p class="work">ขั้นช้าคือ A + A ⟶ C เป็นไบโมเลกุลาร์ใน A → <b>rate = k[A]²</b></p>
+            <p><b>B ไม่ปรากฏในกฎอัตรา</b> เพราะอยู่ในขั้นที่เร็ว ไม่ใช่ขั้นกำหนดอัตรา — แม้ B จะขาดไม่ได้ก็ตาม (ไม่มี B ปฏิกิริยาก็ไปไม่ถึง D)</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>จากกลไกในข้อ 1 สาร C เป็นสารมัธยันตร์หรือตัวเร่งปฏิกิริยา ใช้อะไรตัดสิน</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p>C เป็น<b>สารมัธยันตร์</b> เพราะโผล่ครั้งแรกเป็น<b>ผลิตภัณฑ์</b>ของขั้นที่ 1 แล้วจึงถูกใช้เป็นสารตั้งต้นของขั้นที่ 2 (เกิดก่อน ใช้ทีหลัง)</p>
+            <p style="margin-top:.6em">ถ้าเป็นตัวเร่งจะกลับกัน คือต้องโผล่เป็นสารตั้งต้นของขั้นแรก แล้วได้คืนมาในขั้นหลัง</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ end-of-lesson exercises ============ -->
+  <section class="sec">
+    <div class="sec-hd"><h2>แบบฝึกหัดท้ายบท</h2></div>
+    <div class="sec-bd">
+      <div class="check">
+        <div class="ex-body"><span class="ex-no">1</span>ปฏิกิริยา 2N₂O₅ ⟶ 4NO₂ + O₂ มีกลไกที่เสนอไว้ดังนี้<br>
+          &nbsp;&nbsp;ขั้นที่ 1 (ช้า) &nbsp; N₂O₅ ⟶ NO₂ + NO₃<br>
+          &nbsp;&nbsp;ขั้นที่ 2 (เร็ว) &nbsp; NO₂ + NO₃ ⟶ NO + O₂ + NO₂<br>
+          &nbsp;&nbsp;ขั้นที่ 3 (เร็ว) &nbsp; NO + N₂O₅ ⟶ 3NO₂<br>
+          จงระบุ (ก) สารมัธยันตร์ทั้งหมด (ข) กฎอัตราที่ทำนายได้จากกลไกนี้</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p class="work"><b>(ก) สารมัธยันตร์</b> คือ NO₃ และ NO — ทั้งคู่เกิดขึ้นระหว่างทางแล้วถูกใช้หมดในขั้นถัดไป ไม่ปรากฏในสมการรวม</p>
+            <p class="work"><b>(ข)</b> ขั้นช้าคือ N₂O₅ ⟶ NO₂ + NO₃ เป็นยูนิโมเลกุลาร์ → <b>rate = k[N₂O₅]</b></p>
+            <p style="margin-top:.6em">สังเกตว่าสัมประสิทธิ์ของ N₂O₅ ในสมการรวมคือ 2 แต่อันดับที่ทำนายได้เป็น 1 — เป็นอีกตัวอย่างที่อันดับไม่เท่ากับสัมประสิทธิ์</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">2</span>ปฏิกิริยาหนึ่งวัดได้ว่า rate = k[X] ทั้งที่สมการรวมคือ X + 2Y ⟶ Z นักเรียนคนหนึ่งสรุปว่า "แสดงว่า Y ไม่จำเป็นต้องใส่ก็ได้ เพราะไม่มีผลต่ออัตรา" ข้อสรุปนี้ถูกหรือไม่ เพราะเหตุใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p><b>ไม่ถูก</b> — การที่ Y ไม่อยู่ในกฎอัตรา แปลว่า Y ไม่ได้อยู่ใน<b>ขั้นกำหนดอัตรา</b> เท่านั้น ไม่ได้แปลว่าไม่ต้องใช้ Y</p>
+            <p style="margin-top:.6em">Y ยังจำเป็นอยู่ เพราะสมการรวมต้องใช้ Y ถึง 2 โมลต่อ X 1 โมล ถ้าไม่ใส่ Y ปฏิกิริยาจะเดินไปได้แค่ขั้นแรกแล้วหยุด ไม่ได้ผลิตภัณฑ์ Z ออกมา</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">3</span>เพราะเหตุใดขั้นย่อยที่ต้องใช้อนุภาคสามตัวมาชนกันพร้อมกัน (เทอร์โมเลกุลาร์) จึงพบได้ยากมากในธรรมชาติ ให้อธิบายด้วยทฤษฎีการชน</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p>เพราะการชนที่ทำให้เกิดปฏิกิริยาต้องครบทั้งพลังงานถึง Eₐ และทิศทางที่ถูกต้อง ซึ่งอนุภาคแค่<b>สองตัว</b>ก็ยากอยู่แล้ว</p>
+            <p style="margin-top:.6em">การที่อนุภาค<b>สามตัว</b>จะมาถึงจุดเดียวกันในเวลาเดียวกัน โดยหันด้านถูกต้องพร้อมกันทั้งสามตัว มีโอกาสเกิดน้อยกว่ามาก ธรรมชาติจึงเลือกทางที่ง่ายกว่าคือแตกเป็นขั้นย่อยที่ชนกันทีละสองตัวแทน</p>
+          </div>
+        </details>
+
+        <div class="ex-body"><span class="ex-no">4</span>ปฏิกิริยา A + B ⟶ C วัดได้ rate = k[A]²  มีผู้เสนอกลไกสองแบบ<br>
+          &nbsp;&nbsp;<b>แบบที่ 1</b> ขั้นช้า A + B ⟶ M &nbsp;· ขั้นเร็ว M + A ⟶ C<br>
+          &nbsp;&nbsp;<b>แบบที่ 2</b> ขั้นช้า A + A ⟶ M &nbsp;· ขั้นเร็ว M + B ⟶ C + A<br>
+          แบบใดสอดคล้องกับผลการทดลอง และอีกแบบตกเกณฑ์ข้อใด</div>
+        <details class="ex"><summary>ดูเฉลย</summary>
+          <div class="ans">
+            <p class="work"><b>แบบที่ 2 สอดคล้อง</b></p>
+            <p class="work">แบบที่ 1: บวกได้ 2A + B ⟶ C ซึ่ง<b>ไม่ตรงกับสมการรวม</b> (ตกเกณฑ์ข้อ 1) และกฎอัตราจากขั้นช้าเป็น k[A][B] ก็ไม่ตรงกับที่วัดได้ (ตกเกณฑ์ข้อ 2 ด้วย)</p>
+            <p class="work">แบบที่ 2: บวกแล้วได้ A + B ⟶ C ✓ ตรงกับสมการรวม และขั้นช้า A + A ⟶ M ให้ rate = k[A]² ✓ ตรงกับผลการทดลอง</p>
+            <p style="margin-top:.6em">สังเกตว่าในแบบที่ 2 สาร A ถูกใช้ไป 2 ตัวในขั้นช้า แล้วได้คืนมา 1 ตัวในขั้นเร็ว จึงเหลือใช้สุทธิ 1 ตัวตามสมการรวม</p>
+          </div>
+        </details>
+      </div>
+
+      <p class="hint" style="margin-top:1.6em;flex-basis:auto">หมายเหตุ — หัวข้อกลไกของปฏิกิริยาเป็นเนื้อหาต่อยอดจากหนังสือเรียน ใช้เตรียมสอบเข้ามหาวิทยาลัย ตัวอย่างและโจทย์ในหน้านี้เป็นปฏิกิริยามาตรฐานที่ใช้กันทั่วไปในตำราจลนศาสตร์เคมี</p>
+    </div>
+  </section>
+
+  <footer>มโนทัศน์ที่ 07 (พักไว้ นอกชุดหลัก) · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg";
+  function S(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function txt(x,y,s,o){var a={x:x,y:y,"font-family":"Bai Jamjuree","font-size":18,"font-weight":600,
+    fill:"var(--ink-2)"};for(var k in (o||{}))a[k]=o[k];var e=S("text",a);e.textContent=s;return e;}
+  function clear(g){while(g.firstChild)g.removeChild(g.firstChild);}
+
+  /* ============ INTERACTIVE 1 — add the steps, cancel what appears on both sides ============ */
+  (function(){
+    var box=document.getElementById("mechAdd");
+    if(!box) return;
+    var sum=document.getElementById("mechSum"), why=document.getElementById("mechWhy");
+    var cutBtn=document.getElementById("mechCut"), resetBtn=document.getElementById("mechReset");
+    var raw="NO₂ + NO₂ + NO₃ + CO ⟶ NO₃ + NO + NO₂ + CO₂";
+    var rawWhy="ตอนนี้ยังเป็นการเอาทุกอย่างมาต่อกันดื้อ ๆ — กดปุ่มเพื่อตัดสารที่โผล่ทั้งสองข้างออก";
+    function setCut(on){
+      Array.prototype.forEach.call(box.querySelectorAll(".sp"),function(s){
+        s.classList.toggle("cut",on);
+      });
+      if(on){
+        sum.innerHTML='NO₂ + CO ⟶ NO + CO₂ &nbsp;<span style="color:var(--cobalt)">✓ ตรงกับสมการรวม</span>';
+        why.innerHTML="NO₃ ถูกสร้างในขั้นที่ 1 แล้วใช้หมดในขั้นที่ 2 จึงตัดออกทั้งคู่ — นี่คือ<b>สารมัธยันตร์</b> · ส่วน NO₂ ขั้นที่ 1 ใช้ไป 2 ตัว ขั้นที่ 2 คืนมา 1 ตัว จึงตัดกันได้ 1 คู่ เหลือ NO₂ ใช้สุทธิ 1 ตัวตามสมการรวม";
+      }else{
+        sum.textContent=raw;
+        why.textContent=rawWhy;
+      }
+      cutBtn.classList.toggle("right",on);
+    }
+    cutBtn.addEventListener("click",function(){ setCut(true); });
+    resetBtn.addEventListener("click",function(){ setCut(false); });
+    setCut(false);
+  })();
+
+  /* ============ INTERACTIVE 2 — the bottleneck ============ */
+  (function(){
+    var g=document.getElementById("bnG");
+    if(!g) return;
+    var sl=[document.getElementById("bn1"),document.getElementById("bn2"),document.getElementById("bn3")];
+    var hint=document.getElementById("bnHint");
+    var X0=150, X1=790, Y0=42, RH=68;
+    var UNIT=120;                       /* time units: a step at speed 1 takes 120 s */
+    function timeOf(sp){ return UNIT/sp; }
+
+    function render(){
+      clear(g);
+      var speeds=sl.map(function(s){return parseInt(s.value,10);});
+      var times=speeds.map(timeOf);
+      var total=times[0]+times[1]+times[2];
+      var slowest=times.indexOf(Math.max.apply(null,times));
+      var fastest=times.indexOf(Math.min.apply(null,times));
+      /* with every step at the same speed there is no bottleneck to point at — saying
+         "step 1 is the bottleneck" (and naming it twice in the summary) would be wrong,
+         and this tie is worth calling out: it is the only case where "speed up any step"
+         actually holds */
+      var tied=Math.max.apply(null,times)/Math.min.apply(null,times) < 1.15;
+      /* the bar scale is pinned to the worst case so bars don't rescale while dragging */
+      var maxT=UNIT;
+
+      g.appendChild(txt(X0,26,"เวลาที่แต่ละขั้นใช้",{"font-size":16,fill:"var(--ink-3)"}));
+      g.appendChild(txt(X1,26,"เร่งขั้นนี้ 2 เท่า → เวลารวมลดลง",{"font-size":16,fill:"var(--ink-3)","text-anchor":"end"}));
+
+      /* The longest bar plus its "120 วิ" label plus the "← คอขวด" marker used to run
+         straight into the right-hand column and overlap it. Bars now get a fixed zone
+         (BARMAX) that leaves room for both labels, and the right column carries only the
+         short "−42%" — its meaning already sits in the column heading above. */
+      var BARMAX=300;
+      times.forEach(function(t,i){
+        var y=Y0+i*RH;
+        var w=Math.max((t/maxT)*BARMAX,3);
+        var isSlow=(i===slowest)&&!tied;
+        var col=isSlow?"var(--index)":"var(--cobalt)";
+        g.appendChild(txt(X0-14,y+26,"ขั้นที่ "+(i+1),
+          {"font-size":18,"font-weight":700,fill:"var(--ink)","text-anchor":"end"}));
+        g.appendChild(S("rect",{x:X0,y:y+6,width:w,height:34,fill:col}));
+        g.appendChild(txt(X0+w+12,y+30,t.toFixed(0)+" วิ",
+          {"font-size":19,"font-weight":700,fill:col}));
+        if(isSlow) g.appendChild(txt(X0+w+12+64,y+30,"← คอขวด",
+          {"font-size":16,"font-weight":700,fill:"var(--index)"}));
+        /* what halving this step's time would buy */
+        var saved=t/2, pct=saved/total*100;
+        g.appendChild(txt(X1,y+30,"−"+pct.toFixed(0)+"%",
+          {"font-size":20,"font-weight":700,
+           fill:pct>=15?"var(--index)":"var(--ink-3)","text-anchor":"end"}));
+      });
+
+      var yT=Y0+3*RH+16;
+      g.appendChild(S("line",{x1:X0-90,y1:yT,x2:X1,y2:yT,stroke:"var(--ink)","stroke-width":2}));
+      g.appendChild(txt(X0-14,yT+40,"เวลารวม",{"font-size":18,"font-weight":700,fill:"var(--ink)","text-anchor":"end"}));
+      g.appendChild(txt(X0,yT+42,total.toFixed(0)+" วินาที",
+        {"font-size":30,"font-weight":700,fill:"var(--ink)"}));
+      var share=Math.max.apply(null,times)/total*100;
+      g.appendChild(txt(X1,yT+42,
+        tied?"ทุกขั้นเร็วเท่ากัน — ไม่มีขั้นไหนเป็นคอขวด"
+            :("ขั้นที่ "+(slowest+1)+" กินเวลา "+share.toFixed(0)+"% ของทั้งหมด"),
+        {"font-size":18,"font-weight":700,fill:tied?"var(--ink-3)":"var(--index)","text-anchor":"end"}));
+
+      if(tied){
+        hint.innerHTML="ตอนนี้ทุกขั้นเร็วเท่ากันหมด จึงไม่มีขั้นไหนเป็นคอขวด — เร่งขั้นไหนก็ลดเวลารวมได้เท่ากันคือ "+
+          (times[0]/2/total*100).toFixed(0)+"% <b>นี่เป็นกรณีเดียวที่คำว่า \"เร่งขั้นไหนก็ได้\" เป็นจริง</b> "+
+          "ลองลากขั้นใดขั้นหนึ่งให้ช้าลงมาก ๆ แล้วดูว่าตัวเลขทางขวาแยกออกจากกันทันที";
+      }else{
+        hint.innerHTML="ตอนนี้เร่ง<b>ขั้นที่ "+(slowest+1)+"</b> (ขั้นช้าที่สุด) ให้เร็วขึ้นเท่าตัว จะลดเวลารวมได้ "+
+          (times[slowest]/2/total*100).toFixed(0)+"% แต่เร่ง<b>ขั้นที่ "+(fastest+1)+"</b> (ที่เร็วอยู่แล้ว) ลดได้แค่ "+
+          (times[fastest]/2/total*100).toFixed(0)+"% — ลองลากให้ทุกขั้นเร็วเท่ากันดู แล้วสังเกตว่าเกิดอะไรขึ้น";
+      }
+    }
+    sl.forEach(function(s){ s.addEventListener("input",render); });
+    render();
+  })();
+
+  /* ============ INTERACTIVE 3 — check a proposed mechanism ============ */
+  (function(){
+    var show=document.getElementById("mechShow");
+    if(!show) return;
+    var vEl=document.getElementById("mkVerdict"), vHd=document.getElementById("mkHd"), vBd=document.getElementById("mkBd");
+
+    var MECHS={
+      a:{
+        name:"กลไก ก",
+        steps:[{tag:"ขั้นเดียว · ช้า",cls:"slow",eq:"2NO₂ + F₂ ⟶ 2NO₂F"}],
+        sum:"2NO₂ + F₂ ⟶ 2NO₂F",
+        sumOk:true,
+        rate:"k[NO₂]²[F₂]",
+        rateOk:false,
+        note:"ถ้าปฏิกิริยาเกิดในก้าวเดียวจริง ต้องมีอนุภาคสามตัวมาชนพร้อมกัน (เทอร์โมเลกุลาร์) ซึ่งพบได้ยากมากอยู่แล้ว และกฎอัตราที่ทำนายได้ก็ไม่ตรงกับการทดลอง"
+      },
+      b:{
+        name:"กลไก ข",
+        steps:[{tag:"ขั้นที่ 1 · ช้า",cls:"slow",eq:"NO₂ + F₂ ⟶ NO₂F + F"},
+               {tag:"ขั้นที่ 2 · เร็ว",cls:"fast",eq:"NO₂ + F ⟶ NO₂F"}],
+        sum:"2NO₂ + F₂ ⟶ 2NO₂F",
+        sumOk:true,
+        rate:"k[NO₂][F₂]",
+        rateOk:true,
+        note:"บวกสองขั้นแล้ว F ตัดกันหมด (เป็นสารมัธยันตร์) เหลือสมการรวมพอดี และขั้นช้าเป็นไบโมเลกุลาร์ระหว่าง NO₂ กับ F₂ ให้กฎอัตราตรงกับที่วัดได้"
+      },
+      c:{
+        name:"กลไก ค",
+        steps:[{tag:"ขั้นที่ 1 · ช้า",cls:"slow",eq:"NO₂ + F₂ ⟶ NO₂F + F"},
+               {tag:"ขั้นที่ 2 · เร็ว",cls:"fast",eq:"F + F ⟶ F₂"}],
+        sum:"NO₂ + F ⟶ NO₂F",
+        sumOk:false,
+        rate:"k[NO₂][F₂]",
+        rateOk:true,
+        note:"กับดักของข้อนี้ — ขั้นช้าเหมือนกลไก ข ทุกอย่าง กฎอัตราจึงตรงกับการทดลอง แต่พอบวกทั้งสองขั้นแล้วกลับไม่ได้สมการรวม จึงใช้ไม่ได้ ต้องตรวจเกณฑ์ข้อ 1 เสมอ ไม่ใช่ดูแค่กฎอัตรา"
+      }
+    };
+    var MEASURED="k[NO₂][F₂]";
+    var BUTTONS={a:"mkA",b:"mkB",c:"mkC"};
+    var cur="a";
+
+    function render(){
+      var m=MECHS[cur];
+      clear(show);
+      var hd=document.createElement("span");
+      hd.className="mhd"; hd.textContent=m.name+" — ปฏิกิริยา 2NO₂ + F₂ ⟶ 2NO₂F";
+      show.appendChild(hd);
+      m.steps.forEach(function(st){
+        var row=document.createElement("div"); row.className="mrow";
+        var tag=document.createElement("span"); tag.className="tag "+st.cls; tag.textContent=st.tag;
+        var fx=document.createElement("span"); fx.className="fx"; fx.textContent=st.eq;
+        row.appendChild(tag); row.appendChild(fx); show.appendChild(row);
+      });
+      var tot=document.createElement("div"); tot.className="mrow total";
+      var ttag=document.createElement("span"); ttag.className="tag sum"; ttag.textContent="บวกทุกขั้น";
+      var tfx=document.createElement("span"); tfx.className="fx"; tfx.textContent=m.sum;
+      tot.appendChild(ttag); tot.appendChild(tfx); show.appendChild(tot);
+
+      var pass=m.sumOk&&m.rateOk;
+      vEl.className="verdict "+(pass?"good":"bad");
+      vHd.textContent=pass?(m.name+" — ใช้ได้ ผ่านทั้งสองเกณฑ์"):(m.name+" — ใช้ไม่ได้");
+      vBd.innerHTML=
+        '<div class="crit">'+
+          '<div class="'+(m.sumOk?"pass":"fail")+'">'+
+            '<span class="mark">'+(m.sumOk?"✓":"✗")+'</span>'+
+            '<span class="k">เกณฑ์ 1 · บวกทุกขั้นแล้วได้สมการรวมไหม</span>'+
+            '<span class="v">'+m.sum+(m.sumOk?" — ตรงกับสมการรวม":" — ไม่ตรงกับ 2NO₂ + F₂ ⟶ 2NO₂F")+'</span>'+
+          '</div>'+
+          '<div class="'+(m.rateOk?"pass":"fail")+'">'+
+            '<span class="mark">'+(m.rateOk?"✓":"✗")+'</span>'+
+            '<span class="k">เกณฑ์ 2 · กฎอัตราของขั้นช้าตรงกับที่วัดได้ไหม</span>'+
+            '<span class="v">ทำนายได้ rate = '+m.rate+(m.rateOk?" — ตรงกับที่วัดได้":" — ที่วัดได้คือ rate = "+MEASURED)+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<p>'+m.note+'</p>'+
+        '<div class="vconc">'+(pass?"กลไกนี้สอดคล้องกับผลการทดลอง":"ตัดกลไกนี้ทิ้ง")+'</div>';
+
+      Object.keys(BUTTONS).forEach(function(k){
+        document.getElementById(BUTTONS[k]).classList.toggle("right",k===cur);
+      });
+    }
+    Object.keys(BUTTONS).forEach(function(k){
+      document.getElementById(BUTTONS[k]).addEventListener("click",function(){ cur=k; render(); });
+    });
+    render();
+  })();
+})();
+</script>
