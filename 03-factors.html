@@ -216,6 +216,30 @@ td.n{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
 .srcnote{font-family:var(--tech);font-size:.66em;color:var(--ink-3);border:1px dashed var(--rule);
   padding:.7em 1em;margin:1.4em 0 0;line-height:1.7}
 
+/* ---------- แถบนำทางระหว่างมโนทัศน์ ---------- */
+.nav{display:flex;flex-wrap:wrap;gap:2px;background:var(--rule);
+  border:2px solid var(--ink);border-top:none;margin-bottom:2px}
+.nav>a,.nav>span{flex:1 1 auto;background:var(--panel);padding:.6em .4em;
+  text-align:center;text-decoration:none;color:var(--ink);
+  font-family:var(--tech);font-weight:700;font-size:.95em;font-variant-numeric:tabular-nums;
+  box-shadow:var(--engrave);transition:background .12s,color .12s}
+.nav>a:hover{background:var(--index);color:#fff}
+.nav .home{flex:0 0 auto;padding-left:1.1em;padding-right:1.1em;font-size:.72em;letter-spacing:.14em}
+.nav .cur{background:var(--cobalt);color:#fff;box-shadow:none}
+
+.pager{display:flex;flex-wrap:wrap;gap:2px;background:var(--rule);
+  border:2px solid var(--ink);margin-top:2.6em}
+.pager>a,.pager>span{flex:1 1 200px;background:var(--panel);padding:.9em 1.1em;
+  text-decoration:none;color:var(--ink);box-shadow:var(--engrave);transition:background .12s}
+.pager>a:hover{background:var(--panel-2)}
+.pager .k{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--ink-3);display:block}
+.pager .t{font-family:var(--tech);font-weight:700;font-size:.92em;display:block;line-height:1.4}
+.pager .mid{flex:0 0 auto;text-align:center}
+.pager .nx{text-align:right}
+.pager .nx .t{color:var(--cobalt)}
+.pager .off .t{color:var(--ink-3);font-weight:600}
+
 footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
   padding:2.6em 0 1em;text-align:center}
 
@@ -234,9 +258,18 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
 
   <div class="plate">
     <div class="grow"><span class="lbl">หน่วยการเรียนรู้</span><span class="val">อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</span></div>
-    <div><span class="lbl">มโนทัศน์</span><span class="val serial">03 / 06</span></div>
+    <div><span class="lbl">มโนทัศน์</span><span class="val serial">03 / 05</span></div>
     <div><span class="lbl">แผงวัด</span><span class="val serial">CaCO₃(s) + 2HCl(aq) → CaCl₂(aq) + H₂O(l) + CO₂(g)</span></div>
   </div>
+
+  <nav class="nav" aria-label="ข้ามไปมโนทัศน์อื่น">
+    <a class="home" href="index.html">หน้าแรก</a>
+    <a href="01-rate-definition.html">01</a>
+    <a href="02-collision-theory.html">02</a>
+    <span class="cur">03</span>
+    <a href="04-rate-law.html">04</a>
+    <a href="05-applications.html">05</a>
+  </nav>
 
   <section class="hook">
     <figure class="flaskfig">
@@ -636,6 +669,13 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
       </div>
     </div>
   </section>
+
+
+  <nav class="pager" aria-label="ไปหน้าก่อนหน้าหรือถัดไป">
+    <a href="02-collision-theory.html"><span class="k">◂ ก่อนหน้า</span><span class="t">02 ทฤษฎีการชน</span></a>
+    <a class="mid" href="index.html"><span class="k">กลับไป</span><span class="t">หน้าแรก</span></a>
+    <a class="nx" href="04-rate-law.html"><span class="k">ถัดไป ▸</span><span class="t">04 กฎอัตราและอันดับปฏิกิริยา</span></a>
+  </nav>
 
   <footer>มโนทัศน์ที่ 03 จาก 05 · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
 </div>
