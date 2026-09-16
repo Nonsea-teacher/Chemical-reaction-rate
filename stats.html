@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>สถิติการเข้าชม — อัตราการเกิดปฏิกิริยาเคมี</title>
+<title>สถิติการเรียน — อัตราการเกิดปฏิกิริยาเคมี</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,8 +21,8 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
-  font-size:clamp(17px,1.15vw,20px);line-height:1.75;-webkit-text-size-adjust:100%}
-.wrap{max-width:760px;margin:0 auto;padding:clamp(20px,4vw,48px)}
+  font-size:clamp(16px,1.1vw,19px);line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:820px;margin:0 auto;padding:clamp(18px,4vw,44px)}
 
 .plate{display:flex;flex-wrap:wrap;align-items:stretch;gap:2px;
   background:var(--rule);border:2px solid var(--ink);margin-bottom:2px}
@@ -32,45 +32,79 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
   color:var(--ink-3);display:block;line-height:1.6}
 .plate .val{font-family:var(--tech);font-weight:600;font-size:1.05em;line-height:1.35;display:block}
 
-h1{font-family:var(--tech);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.6rem);
-  line-height:1.2;letter-spacing:-.02em;margin:1.1em 0 .3em}
-.dek{font-size:.95em;color:var(--ink-2);margin:0 0 1.8em}
+h1{font-family:var(--tech);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.5rem);
+  line-height:1.2;letter-spacing:-.02em;margin:1.1em 0 .25em}
+.dek{font-size:.92em;color:var(--ink-2);margin:0 0 1.6em}
 
-.rows{display:grid;gap:2px;background:var(--rule);border:2px solid var(--ink)}
-.rows a,.rows div.row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1em;
-  background:var(--panel);padding:1em 1.2em;text-decoration:none;color:var(--ink);
-  transition:background .12s}
-.rows a:hover{background:var(--panel-2)}
-.rows .no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
-  font-size:1.3em;color:var(--index);line-height:1;width:2.6em}
-.rows .tt{font-family:var(--tech);font-weight:700;font-size:.98em;display:block;line-height:1.35}
-.rows img{height:20px;width:auto;display:block}
+.sec{border:2px solid var(--ink);background:var(--panel);margin-top:2em}
+.sec-hd{display:flex;align-items:baseline;gap:.8em;flex-wrap:wrap;
+  padding:.85em 1.2em;border-bottom:2px solid var(--ink);background:var(--panel-2)}
+.sec-hd h2{font-family:var(--tech);font-weight:700;font-size:1.1em;margin:0}
+.sec-hd .q{font-size:.78em;color:var(--ink-2);margin-left:auto}
+.sec-bd{padding:1.2em}
+
+/* ---------- ยอดรวม ---------- */
+.total{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:2px;
+  background:var(--rule);border:2px solid var(--ink)}
+.total>div{background:var(--panel);padding:1.1em 1.2em;text-align:center;box-shadow:var(--engrave)}
+.total .k{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.18em;
+  color:var(--ink-3);display:block}
+.total .n{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:clamp(2rem,5.5vw,2.9rem);line-height:1.1;color:var(--cobalt);display:block;margin:.05em 0}
+.total .u{font-family:var(--tech);font-size:.72em;color:var(--ink-2);letter-spacing:.06em}
+.total .delta{font-family:var(--tech);font-size:.7em;color:var(--index);display:block;margin-top:.2em}
+
+/* ---------- แถบเทียบรายหน้า ---------- */
+.bar{display:grid;grid-template-columns:2.4em 1fr auto;align-items:center;gap:.8em;
+  padding:.55em 0;border-top:1px solid var(--rule-2)}
+.bar:first-child{border-top:0}
+.bar .no{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--index);font-size:1.05em}
+.bar .track{background:var(--panel-2);outline:1px solid var(--rule-2);height:2.1em;position:relative}
+/* ต้อง display:block — span เป็น inline ทำให้ width/height ไม่มีผล แถบจะหายไปเฉย ๆ */
+.bar .fill{display:block;background:var(--cobalt);height:100%;min-width:2px;transition:width .5s ease}
+.bar .name{position:absolute;left:.6em;top:50%;transform:translateY(-50%);
+  font-size:.78em;color:var(--ink);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:calc(100% - 1.2em);pointer-events:none}
+.bar .name.on{color:#fff}
+.bar .n{font-family:var(--tech);font-weight:700;font-variant-numeric:tabular-nums;
+  text-align:right;white-space:nowrap;line-height:1.2}
+.bar .n i{font-style:normal;font-weight:500;font-size:.68em;color:var(--ink-3);display:block}
+
+/* ---------- ตาราง ---------- */
+table{width:100%;border-collapse:collapse;font-family:var(--tech)}
+th,td{border:1px solid var(--rule);padding:.5em .7em;text-align:left;font-weight:500;font-size:.88em}
+th{background:var(--panel-2);font-size:.62em;letter-spacing:.14em;color:var(--ink-3);font-weight:700}
+td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+td.hi{color:var(--cobalt);font-weight:700}
+.tblwrap{overflow-x:auto}
+.tblwrap table{min-width:430px}
+
+.note{font-size:.82em;color:var(--ink-2);margin:.9em 0 0;line-height:1.6}
+.note b{color:var(--ink)}
 
 .dash{display:block;border:2px solid var(--ink);background:var(--cobalt);color:#fff;
-  text-decoration:none;padding:1.1em 1.3em;box-shadow:4px 4px 0 var(--ink);margin-bottom:2.4em;
+  text-decoration:none;padding:1em 1.2em;box-shadow:4px 4px 0 var(--ink);margin-top:2em;
   transition:transform .08s,box-shadow .08s}
 .dash:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-.dash .k{font-family:var(--tech);font-weight:700;font-size:.62em;letter-spacing:.2em;
+.dash .k{font-family:var(--tech);font-weight:700;font-size:.6em;letter-spacing:.2em;
   color:var(--cobalt-soft);display:block}
-.dash .t{font-family:var(--tech);font-weight:700;font-size:1.15em;display:block;line-height:1.35;margin:.15em 0 .35em}
-.dash .d{font-size:.82em;color:var(--cobalt-soft);display:block;line-height:1.6}
+.dash .t{font-family:var(--tech);font-weight:700;font-size:1.1em;display:block;margin:.1em 0 .3em}
+.dash .d{font-size:.78em;color:var(--cobalt-soft);display:block;line-height:1.55}
 
-h2.sub{font-family:var(--tech);font-weight:700;font-size:1.15em;margin:0 0 .2em}
-
-.warn{border:2px solid var(--index);background:var(--index-soft);padding:1em 1.2em;margin-top:1.8em}
-.warn b{font-family:var(--tech)}
-.warn p{margin:.4em 0 0;font-size:.9em}
-.warn p:first-of-type{margin-top:0}
-
-.back{display:inline-block;margin-top:1.8em;font-family:var(--tech);font-weight:700;
-  font-size:.8em;letter-spacing:.12em;color:var(--cobalt);text-decoration:none;
-  border:2px solid var(--ink);background:var(--panel);padding:.7em 1.2em;
-  box-shadow:3px 3px 0 var(--ink)}
+.back{display:inline-block;margin-top:1.6em;font-family:var(--tech);font-weight:700;
+  font-size:.78em;letter-spacing:.12em;color:var(--cobalt);text-decoration:none;
+  border:2px solid var(--ink);background:var(--panel);padding:.65em 1.1em;box-shadow:3px 3px 0 var(--ink)}
 .back:hover{background:var(--index);color:#fff;border-color:var(--index)}
 
-footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing:.14em;
-  padding:2.4em 0 1em;text-align:center}
+.hint{font-family:var(--tech);font-size:.7em;color:var(--ink-3);letter-spacing:.05em;
+  margin:1em 0 0;text-align:right}
+.hint.bad{color:var(--index)}
+
+footer{font-family:var(--tech);font-size:.66em;color:var(--ink-3);letter-spacing:.14em;
+  padding:2.2em 0 1em;text-align:center}
 @media (max-width:900px){ .plate>div{flex:1 1 100%} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 </head>
 <body>
@@ -81,61 +115,205 @@ footer{font-family:var(--tech);font-size:.68em;color:var(--ink-3);letter-spacing
     <div><span class="lbl">หน้านี้</span><span class="val">สำหรับครู</span></div>
   </div>
 
-  <h1>สถิติการเข้าชม</h1>
-  <p class="dek">หน้านี้ไม่ได้ลิงก์จากสารบัญ นักเรียนจะไม่เจอเอง</p>
+  <h1>สถิติการเรียน</h1>
+  <p class="dek">ดึงสดจาก GoatCounter ทุกครั้งที่เปิดหน้านี้ · เปิดดูได้ไม่จำกัด ไม่ทำให้ยอดเพิ่ม เพราะหน้านี้แค่อ่านตัวเลข ไม่ได้ถูกนับเอง</p>
+
+  <div class="total">
+    <div>
+      <span class="k">เปิดทั้งหมด</span>
+      <span class="n" id="tViews">···</span>
+      <span class="u">ครั้ง</span>
+      <span class="delta" id="dViews"></span>
+    </div>
+    <div>
+      <span class="k">ผู้เข้าชม</span>
+      <span class="n" id="tUniq">···</span>
+      <span class="u">คน (ไม่ซ้ำ)</span>
+      <span class="delta" id="dUniq"></span>
+    </div>
+    <div>
+      <span class="k">เปิดเฉลี่ยต่อคน</span>
+      <span class="n" id="tAvg">···</span>
+      <span class="u">ครั้ง/คน</span>
+    </div>
+  </div>
+
+  <!-- ===== หน้าไหนถูกเปิดมากสุด ===== -->
+  <section class="sec">
+    <div class="sec-hd"><h2>หน้าไหนถูกเปิดมากที่สุด</h2><span class="q">ใช้ดูว่าเนื้อหาไหนถูกใช้จริง</span></div>
+    <div class="sec-bd">
+      <div id="bars"></div>
+      <p class="note" id="barsNote"></p>
+    </div>
+  </section>
+
+  <!-- ===== นักเรียนเรียนไปถึงไหน ===== -->
+  <section class="sec">
+    <div class="sec-hd"><h2>นักเรียนไปถึงมโนทัศน์ไหน</h2><span class="q">ใช้ดูว่าหลุดตรงไหน</span></div>
+    <div class="sec-bd">
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr><th>มโนทัศน์</th><th class="n">คน</th><th class="n">เทียบกับ 01</th><th>อ่านว่า</th></tr>
+          </thead>
+          <tbody id="funnel"></tbody>
+        </table>
+      </div>
+      <p class="note">ตัวเลขนี้<b>ไม่ใช่ funnel แท้ ๆ</b> เพราะนักเรียนที่สแกน QR ของมโนทัศน์ใดมโนทัศน์หนึ่งจะเข้าหน้านั้นตรง ๆ ได้เลย ไม่ได้ไล่จาก 01 — ให้ใช้ดูคร่าว ๆ ว่ามโนทัศน์ท้าย ๆ มีคนแตะน้อยกว่ามากไหม ถ้าน้อยผิดปกติอาจแปลว่าเนื้อหายาวไป หรือยังไม่ได้สั่งให้ไปอ่าน</p>
+    </div>
+  </section>
+
+  <!-- ===== หน้าไหนถูกกลับมาอ่านซ้ำ ===== -->
+  <section class="sec">
+    <div class="sec-hd"><h2>หน้าไหนถูกกลับมาอ่านซ้ำ</h2><span class="q">ใช้ดูว่าอันไหนยาก/ใช้ทบทวน</span></div>
+    <div class="sec-bd">
+      <div class="tblwrap">
+        <table>
+          <thead>
+            <tr><th>มโนทัศน์</th><th class="n">ครั้ง</th><th class="n">คน</th><th class="n">ครั้ง/คน</th></tr>
+          </thead>
+          <tbody id="repeat"></tbody>
+        </table>
+      </div>
+      <p class="note">ยิ่งค่า <b>ครั้ง/คน</b> สูง แปลว่าคนเดิมกลับมาเปิดซ้ำบ่อย — มักหมายถึงหน้านั้นถูกใช้ทบทวนก่อนสอบ หรือเนื้อหาเข้าใจยากจนต้องกลับมาดูใหม่ ถ้าหน้าไหนสูงผิดปกติ ลองดูว่าส่วนไหนของหน้านั้นที่ควรอธิบายเพิ่ม</p>
+    </div>
+  </section>
 
   <a class="dash" href="https://teacherthanawat.goatcounter.com" target="_blank" rel="noopener">
-    <span class="k">ดูข้อมูลเต็ม + ย้อนหลัง</span>
+    <span class="k">สิ่งที่หน้านี้ทำไม่ได้</span>
     <span class="t">เปิด GoatCounter dashboard ▸</span>
-    <span class="d">รายวัน / รายสัปดาห์ / รายเดือน · มือถือหรือคอม · มาจากลิงก์ไหน · หน้าไหนคนเข้ามากสุด · ดาวน์โหลด CSV ได้</span>
+    <span class="d">กราฟรายวัน/รายสัปดาห์ · แยกมือถือ-คอม · มาจากลิงก์ไหน · ช่วงเวลาที่คนเข้ามากสุด · ดาวน์โหลด CSV (ต้อง login)</span>
   </a>
-
-  <h2 class="sub">ยอดสะสมรวมแบบดูเร็ว</h2>
-  <p class="dek" style="margin-bottom:1em">ตัวเลขด้านล่างคือยอดสะสมทั้งหมดตั้งแต่ติดตัวนับ ดูได้โดยไม่ต้อง login</p>
-
-  <div class="rows">
-    <a href="index.html">
-      <span class="no">—</span>
-      <span class="tt">หน้าแรก (สารบัญ)</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-home&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมหน้าแรก" loading="eager" onerror="this.remove()">
-    </a>
-    <a href="01-rate-definition.html">
-      <span class="no">01</span>
-      <span class="tt">อัตราการเกิดปฏิกิริยาคืออะไร</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-01&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมมโนทัศน์ 1" loading="eager" onerror="this.remove()">
-    </a>
-    <a href="02-collision-theory.html">
-      <span class="no">02</span>
-      <span class="tt">ทฤษฎีการชน</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-02&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมมโนทัศน์ 2" loading="eager" onerror="this.remove()">
-    </a>
-    <a href="03-factors.html">
-      <span class="no">03</span>
-      <span class="tt">ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยา</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-03&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมมโนทัศน์ 3" loading="eager" onerror="this.remove()">
-    </a>
-    <a href="04-rate-law.html">
-      <span class="no">04</span>
-      <span class="tt">กฎอัตราและอันดับของปฏิกิริยา</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-04&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมมโนทัศน์ 4" loading="eager" onerror="this.remove()">
-    </a>
-    <a href="05-applications.html">
-      <span class="no">05</span>
-      <span class="tt">การเชื่อมโยงและการประยุกต์</span>
-      <img src="https://visitor-badge.laobi.icu/badge?page_id=nonsea-teacher-chemrate-05&amp;left_text=views&amp;left_color=5A6461&amp;right_color=17457F" alt="ยอดเข้าชมมโนทัศน์ 5" loading="eager" onerror="this.remove()">
-    </a>
-  </div>
-
-  <div class="warn">
-    <p><b>อ่านก่อนใช้ตัวเลขนี้</b></p>
-    <p>· การเปิดหน้านี้ 1 ครั้ง จะ <b>+1 ให้ทุกหน้าในตาราง</b> เพราะต้องโหลดป้ายทั้ง 6 อัน ถ้าครูเปิดเช็กบ่อย ให้หักยอดของตัวเองออกด้วย</p>
-    <p>· เป็นยอด<b>สะสมรวม</b> ไม่ใช่จำนวนคน คนเดิมเปิดซ้ำ 3 รอบก็นับ 3</p>
-    <p>· ตัวเลขในตารางนี้ดูย้อนหลังไม่ได้ ถ้าอยากดูแนวโน้มรายวัน/รายสัปดาห์ ให้กดปุ่มสีน้ำเงินด้านบน</p>
-  </div>
 
   <a class="back" href="index.html">◂ กลับไปหน้าแรก</a>
 
-  <footer>หน้าสถิติสำหรับครู · อัตราการเกิดปฏิกิริยาเคมี · เคมี ม.5</footer>
+  <p class="hint" id="hint">กำลังดึงข้อมูล …</p>
+
+  <footer>หน้าสถิติสำหรับครู · ไม่ได้ลิงก์จากสารบัญ · เคมี ม.5</footer>
 </div>
+
+<script>
+(function(){
+  "use strict";
+  var GC = "https://teacherthanawat.goatcounter.com/counter/";
+  var BASE = "/Chemical-reaction-rate/";
+  var SNAP = "chemrate-stats-snapshot";
+
+  // หน้าแรกถูกบันทึกได้ 2 path แล้วแต่นักเรียนพิมพ์ index.html มาด้วยหรือไม่ จึงต้องรวมกัน
+  var PAGES = [
+    {no:"—",  tt:"หน้าแรก (สารบัญ)",          lesson:false, paths:[BASE, BASE+"index.html"]},
+    {no:"01", tt:"อัตราการเกิดปฏิกิริยาคืออะไร", lesson:true,  paths:[BASE+"01-rate-definition.html"]},
+    {no:"02", tt:"ทฤษฎีการชน",                lesson:true,  paths:[BASE+"02-collision-theory.html"]},
+    {no:"03", tt:"ปัจจัยที่มีผลต่ออัตรา",        lesson:true,  paths:[BASE+"03-factors.html"]},
+    {no:"04", tt:"กฎอัตราและอันดับปฏิกิริยา",   lesson:true,  paths:[BASE+"04-rate-law.html"]},
+    {no:"05", tt:"การเชื่อมโยงและการประยุกต์",  lesson:true,  paths:[BASE+"05-applications.html"]}
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var fmt = function(n){ return n.toLocaleString("th-TH"); };
+  function num(v){ return parseInt(String(v).replace(/[^0-9]/g,""),10) || 0; }
+
+  // GoatCounter แคชคำตอบไว้ ถ้าไม่ใส่ cache-buster จะได้ตัวเลขเก่าค้าง
+  function get(path){
+    return fetch(GC + path + ".json?cb=" + Date.now() + Math.random(), {mode:"cors"})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(j){ return {views:num(j.count), uniq:num(j.count_unique)}; })
+      .catch(function(){ return null; });   // 404 = ยังไม่มีใครเข้าหน้านั้น
+  }
+
+  function snapshot(read, data){
+    try {
+      if (read) return JSON.parse(localStorage.getItem(SNAP) || "null");
+      localStorage.setItem(SNAP, JSON.stringify(data));
+    } catch (e) { /* โหมดส่วนตัว หรือเบราว์เซอร์บล็อก — ข้ามไป */ }
+    return null;
+  }
+
+  function delta(el, now, before){
+    if (before === null || before === undefined) return;
+    var d = now - before;
+    el.textContent = d > 0 ? "▲ +" + fmt(d) + " จากครั้งก่อน"
+                   : d < 0 ? "" : "เท่าเดิมกับครั้งก่อน";
+  }
+
+  Promise.all(PAGES.map(function(p){
+    return Promise.all(p.paths.map(get)).then(function(res){
+      var live = res.filter(Boolean);
+      p.views = live.reduce(function(s,x){return s+x.views;}, 0);
+      p.uniq  = live.reduce(function(s,x){return s+x.uniq;}, 0);
+      p.ok    = live.length > 0;
+      return p;
+    });
+  })).then(function(pages){
+    var any = pages.some(function(p){ return p.ok; });
+    if (!any) {
+      $("hint").className = "hint bad";
+      $("hint").textContent = "ดึงข้อมูลไม่ได้ — ตรวจว่าใน GoatCounter ยังติ๊ก “Allow adding visitor counts on your website” อยู่";
+      return;
+    }
+
+    var tv = pages.reduce(function(s,p){return s+p.views;}, 0);
+    var tu = pages.reduce(function(s,p){return s+p.uniq;}, 0);
+    $("tViews").textContent = fmt(tv);
+    $("tUniq").textContent  = fmt(tu);
+    $("tAvg").textContent   = tu ? (tv/tu).toFixed(1) : "—";
+
+    var was = snapshot(true);
+    if (was) { delta($("dViews"), tv, was.views); delta($("dUniq"), tu, was.uniq); }
+    snapshot(false, {views:tv, uniq:tu, at:Date.now()});
+
+    // ---- แถบเทียบ ----
+    var max = Math.max.apply(null, pages.map(function(p){return p.views;})) || 1;
+    $("bars").innerHTML = pages.map(function(p){
+      var pct = Math.round(p.views / max * 100);
+      return '<div class="bar"><span class="no">' + p.no + '</span>' +
+        '<span class="track"><span class="fill" style="width:' + pct + '%"></span>' +
+        '<span class="name' + (pct > 42 ? ' on' : '') + '">' + p.tt + '</span></span>' +
+        '<span class="n">' + fmt(p.views) + '<i>' + fmt(p.uniq) + ' คน</i></span></div>';
+    }).join("");
+
+    var top = pages.slice().sort(function(a,b){return b.views-a.views;})[0];
+    var low = pages.filter(function(p){return p.lesson;})
+                   .sort(function(a,b){return a.views-b.views;})[0];
+    $("barsNote").innerHTML = tv < 20
+      ? "ยอดยังน้อยมาก (" + fmt(tv) + " ครั้ง) ตัวเลขยังบอกอะไรไม่ได้ ลองกลับมาดูหลังให้นักเรียนใช้สักพัก"
+      : "เปิดมากสุดคือ <b>" + top.tt + "</b> · น้อยสุดในกลุ่มบทเรียนคือ <b>" + low.tt + "</b>";
+
+    // ---- ไปถึงไหน ----
+    var lessons = pages.filter(function(p){ return p.lesson; });
+    var base = lessons[0].uniq;
+    $("funnel").innerHTML = lessons.map(function(p, i){
+      var pct = base ? Math.round(p.uniq / base * 100) : 0;
+      var read = i === 0 ? "จุดเริ่มต้น"
+               : !base ? "—"
+               : pct >= 80 ? "ตามมาเกือบครบ"
+               : pct >= 50 ? "หายไปบ้าง"
+               : pct >= 25 ? "หายไปเยอะ"
+               : "แทบไม่มีคนไปถึง";
+      return "<tr><td>" + p.no + " " + p.tt + "</td>" +
+             '<td class="n">' + fmt(p.uniq) + "</td>" +
+             '<td class="n ' + (i === 0 ? "" : "hi") + '">' + (base ? pct + "%" : "—") + "</td>" +
+             "<td>" + read + "</td></tr>";
+    }).join("");
+
+    // ---- อ่านซ้ำ ----
+    var withRatio = lessons.map(function(p){
+      return {p:p, r: p.uniq ? p.views / p.uniq : 0};
+    });
+    var maxR = Math.max.apply(null, withRatio.map(function(x){return x.r;}));
+    $("repeat").innerHTML = withRatio.map(function(x){
+      var isTop = maxR > 0 && x.r === maxR;
+      return "<tr><td>" + x.p.no + " " + x.p.tt + "</td>" +
+             '<td class="n">' + fmt(x.p.views) + "</td>" +
+             '<td class="n">' + fmt(x.p.uniq) + "</td>" +
+             '<td class="n ' + (isTop ? "hi" : "") + '">' + (x.r ? x.r.toFixed(1) : "—") + "</td></tr>";
+    }).join("");
+
+    $("hint").textContent = "อัปเดตเมื่อ " +
+      new Date().toLocaleString("th-TH", {dateStyle:"medium", timeStyle:"short"}) +
+      " · รีเฟรชเพื่อดึงใหม่";
+  });
+})();
+</script>
 </body>
 </html>
