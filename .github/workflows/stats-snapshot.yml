@@ -18,11 +18,12 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # v5 ขึ้นไปใช้ Node 24 แล้ว — v4 ยังรันได้แต่ GitHub ขึ้น warning ว่า Node 20 เลิกใช้แล้ว
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: ดึงยอดจาก GoatCounter
         run: node .github/scripts/snapshot.mjs
