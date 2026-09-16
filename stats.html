@@ -71,6 +71,18 @@ h1{font-family:var(--tech);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.5rem);
   text-align:right;white-space:nowrap;line-height:1.2}
 .bar .n i{font-style:normal;font-weight:500;font-size:.68em;color:var(--ink-3);display:block}
 
+/* ---------- ปุ่มสลับช่วงเวลา + กราฟ ---------- */
+.grp{display:flex;flex-wrap:wrap;gap:.5em;margin:0 0 1.1em}
+.grp button{font-family:var(--tech);font-weight:600;font-size:.74em;letter-spacing:.1em;
+  padding:.6em 1.1em;background:var(--panel-2);color:var(--ink);border:2px solid var(--ink);
+  cursor:pointer;box-shadow:3px 3px 0 var(--ink);
+  transition:transform .08s,box-shadow .08s,background .12s}
+.grp button:hover{background:var(--index);color:#fff;border-color:var(--index)}
+.grp button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.grp button.on{background:var(--cobalt);color:#fff;border-color:var(--cobalt)}
+.grp button:focus-visible{outline:3px solid var(--index);outline-offset:2px}
+svg.chart{display:block;width:100%;height:auto}
+
 /* ---------- ตาราง ---------- */
 table{width:100%;border-collapse:collapse;font-family:var(--tech)}
 th,td{border:1px solid var(--rule);padding:.5em .7em;text-align:left;font-weight:500;font-size:.88em}
@@ -137,6 +149,23 @@ footer{font-family:var(--tech);font-size:.66em;color:var(--ink-3);letter-spacing
       <span class="u">ครั้ง/คน</span>
     </div>
   </div>
+
+  <!-- ===== ยอดตามช่วงเวลา ===== -->
+  <section class="sec">
+    <div class="sec-hd">
+      <h2>ยอดวิวตามช่วงเวลา</h2>
+      <span class="q" id="trendQ">ใช้ดูว่าช่วงไหนนักเรียนใช้จริง</span>
+    </div>
+    <div class="sec-bd">
+      <div class="grp" id="grp">
+        <button type="button" data-mode="day" class="on">รายวัน</button>
+        <button type="button" data-mode="month">รายเดือน</button>
+        <button type="button" data-mode="year">รายปี</button>
+      </div>
+      <div id="chartBox"><p class="note" id="chartMsg">กำลังโหลดประวัติ …</p></div>
+      <p class="note">ยอดรายวันคำนวณจาก<b>ผลต่างของยอดสะสมสองวันติดกัน</b> · GitHub Action บันทึกให้อัตโนมัติทุกคืนราว 23:55 น. · ข้อมูลเริ่มสะสมตั้งแต่วันที่ติดตั้ง ย้อนหลังกว่านั้นไม่มี</p>
+    </div>
+  </section>
 
   <!-- ===== หน้าไหนถูกเปิดมากสุด ===== -->
   <section class="sec">
@@ -235,6 +264,127 @@ footer{font-family:var(--tech);font-size:.66em;color:var(--ink-3);letter-spacing
     el.textContent = d > 0 ? "▲ +" + fmt(d) + " จากครั้งก่อน"
                    : d < 0 ? "" : "เท่าเดิมกับครั้งก่อน";
   }
+
+  /* ============ กราฟยอดตามช่วงเวลา (จาก stats-history.json) ============ */
+  (function(){
+    var box = $("chartBox"), msg = $("chartMsg"), grp = $("grp");
+    var daily = null;
+
+    function say(t){ box.innerHTML = '<p class="note">' + t + "</p>"; }
+
+    // ผลต่างของยอดสะสมสองวันติดกัน = ยอดของวันนั้น
+    function toDaily(snaps){
+      var out = [];
+      for (var i = 1; i < snaps.length; i++) {
+        var a = snaps[i-1].pages.TOTAL, b = snaps[i].pages.TOTAL;
+        out.push({date: snaps[i].date,
+                  v: Math.max(0, b.v - a.v),
+                  u: Math.max(0, b.u - a.u)});
+      }
+      return out;
+    }
+
+    function bucket(rows, mode){
+      if (mode === "day") return rows.slice(-30);
+      var keyOf = mode === "month" ? function(d){ return d.slice(0,7); }
+                                   : function(d){ return d.slice(0,4); };
+      var map = new Map();
+      rows.forEach(function(r){
+        var k = keyOf(r.date);
+        var cur = map.get(k) || {date:k, v:0, u:0};
+        cur.v += r.v; cur.u += r.u;
+        map.set(k, cur);
+      });
+      return Array.from(map.values());
+    }
+
+    var THAI_M = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.",
+                  "ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+    function label(key, mode){
+      if (mode === "year")  return String(+key + 543);
+      if (mode === "month") return THAI_M[+key.slice(5,7) - 1] + " " + (+key.slice(0,4) + 543 - 2500);
+      return +key.slice(8,10) + "/" + +key.slice(5,7);
+    }
+
+    function draw(mode){
+      var rows = bucket(daily, mode);
+      if (!rows.length) { say("ยังไม่มีข้อมูลพอ"); return; }
+
+      var W = 760, H = 250, L = 46, R = 10, T = 16, B = 46;
+      var max = Math.max.apply(null, rows.map(function(r){ return r.v; })) || 1;
+      var iw = (W - L - R) / rows.length;
+      var bw = Math.max(3, Math.min(iw * 0.66, 46));
+      var y = function(v){ return T + (H - T - B) * (1 - v / max); };
+
+      var svg = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
+                'aria-label="กราฟยอดวิวแบ่งตามช่วงเวลา">';
+      // เส้นกริดแนวนอน 3 เส้น + ตัวเลขแกน
+      [0, 0.5, 1].forEach(function(f){
+        var v = Math.round(max * f), yy = y(v);
+        svg += '<line x1="' + L + '" y1="' + yy + '" x2="' + (W-R) + '" y2="' + yy +
+               '" stroke="var(--rule-2)" stroke-width="1"/>' +
+               '<text x="' + (L-8) + '" y="' + (yy+4) + '" text-anchor="end" font-family="Bai Jamjuree" ' +
+               'font-size="12" fill="var(--ink-3)">' + v + "</text>";
+      });
+      svg += '<line x1="' + L + '" y1="' + y(0) + '" x2="' + (W-R) + '" y2="' + y(0) +
+             '" stroke="var(--ink)" stroke-width="1.5"/>';
+
+      rows.forEach(function(r, i){
+        var cx = L + iw * i + iw / 2;
+        var h  = y(0) - y(r.v);
+        svg += '<rect x="' + (cx - bw/2) + '" y="' + y(r.v) + '" width="' + bw +
+               '" height="' + Math.max(h, r.v ? 2 : 0) + '" fill="var(--cobalt)"><title>' +
+               label(r.date, mode) + " · " + r.v + " ครั้ง · " + r.u + " คน</title></rect>";
+        if (r.v && h > 16) {
+          svg += '<text x="' + cx + '" y="' + (y(r.v) - 5) + '" text-anchor="middle" ' +
+                 'font-family="Bai Jamjuree" font-weight="700" font-size="12" fill="var(--cobalt)">' +
+                 r.v + "</text>";
+        }
+        // ถ้าแท่งเยอะ ให้เว้นป้ายแกนนอนไม่ให้ทับกัน
+        var every = Math.ceil(rows.length / 12);
+        if (i % every === 0 || i === rows.length - 1) {
+          svg += '<text x="' + cx + '" y="' + (H - B + 22) + '" text-anchor="middle" ' +
+                 'font-family="Bai Jamjuree" font-size="12" fill="var(--ink-2)">' +
+                 label(r.date, mode) + "</text>";
+        }
+      });
+      svg += "</svg>";
+
+      var sum = rows.reduce(function(s,r){ return s + r.v; }, 0);
+      box.innerHTML = svg +
+        '<p class="note" style="margin-top:.7em">รวม <b>' + fmt(sum) + "</b> ครั้งใน " +
+        rows.length + (mode === "day" ? " วันล่าสุด" : mode === "month" ? " เดือน" : " ปี") +
+        " · แตะที่แท่งเพื่อดูตัวเลข</p>";
+    }
+
+    fetch("stats-history.json?cb=" + Date.now())
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(h){
+        var snaps = (h.snapshots || []).filter(function(s){ return s.pages && s.pages.TOTAL; });
+        if (snaps.length < 2) {
+          var d0 = snaps[0]
+            ? new Date(snaps[0].date + "T00:00:00").toLocaleDateString("th-TH", {dateStyle:"long"})
+            : "วันนี้";
+          say("เพิ่งเริ่มเก็บข้อมูลเมื่อ <b>" + d0 +
+              "</b> · ต้องมีอย่างน้อย 2 วันจึงจะคำนวณยอดรายวันได้ กลับมาดูใหม่พรุ่งนี้ได้เลย");
+          $("trendQ").textContent = "กำลังสะสมข้อมูล";
+          return;
+        }
+        daily = toDaily(snaps);
+        draw("day");
+        Array.prototype.forEach.call(grp.querySelectorAll("button"), function(b){
+          b.addEventListener("click", function(){
+            Array.prototype.forEach.call(grp.querySelectorAll("button"), function(x){
+              x.classList.toggle("on", x === b);
+            });
+            draw(b.getAttribute("data-mode"));
+          });
+        });
+      })
+      .catch(function(){
+        say("ยังไม่มีไฟล์ <b>stats-history.json</b> — GitHub Action จะสร้างให้เองคืนแรกหลัง push");
+      });
+  })();
 
   Promise.all(PAGES.map(function(p){
     return Promise.all(p.paths.map(get)).then(function(res){

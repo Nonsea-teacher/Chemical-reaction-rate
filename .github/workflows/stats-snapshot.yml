@@ -1,0 +1,40 @@
+name: บันทึกสถิติรายวัน
+
+on:
+  schedule:
+    # 16:55 UTC = 23:55 น. เวลาไทย — เก็บตอนใกล้จบวัน ยอดที่ได้จึงเป็นของวันนั้นเกือบเต็มวัน
+    # (GitHub อาจรันช้ากว่าเวลาที่ตั้งไว้ได้หลายนาที ถือว่ารับได้)
+    - cron: "55 16 * * *"
+  workflow_dispatch:        # กดรันเองได้จากแท็บ Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stats-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: ดึงยอดจาก GoatCounter
+        run: node .github/scripts/snapshot.mjs
+
+      - name: commit ถ้ามีการเปลี่ยนแปลง
+        run: |
+          if git diff --quiet stats-history.json; then
+            echo "ยอดไม่เปลี่ยน ไม่ต้อง commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stats-history.json
+          git commit -m "บันทึกสถิติวันที่ $(TZ=Asia/Bangkok date +%F)"
+          git push
